@@ -1,0 +1,10 @@
+import manim as mn
+
+BKG_COLOR = mn.BLACK
+DM_WIDTH = 2
+DM_HEIGHT = 4
+DM_COLOR: mn.ManimColor = mn.RED # Color of the data matrix
+G_SIZE = DM_WIDTH
+G_COLOR : mn.ManimColor = mn.BLUE # Color of the
+
+TXT_COLOR: str = "#343434"
