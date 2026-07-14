@@ -1,11 +1,11 @@
 ---
 # try also 'default' to start simple
-theme: seriph
+theme: ext//slidev-theme-behackl-kfu
 # random image from a curated Unsplash collection by Anthony
 # like them? see https://unsplash.com/collections/94734566/slidev
 background: https://cover.sli.dev
 # some information about your slides (markdown enabled)
-title: Welcome to Slidev
+title: Slides
 info: |
   ## Parallel PIDC
   Presentation for Parallel PIDC Algorithm.
@@ -20,86 +20,247 @@ transition: slide-left
 comark: true
 # duration of the presentation
 duration: 35min
+presenterName: Sriram, A, and B
+affiliation: Georgia Institute of Technology
+mdc: true
 ---
 
-# Welcome to Slidev
+# A _**Somewhat Long Title**_ for a Math Talk or Lecture
 
-Presentation slides for developers
+### Some Subtitle, Maybe Software | _**Conference**_ @ Place, Country
 
-<div @click="$slidev.nav.next" class="mt-12 py-1" hover:bg="white op-10">
-  Press Space for next page <carbon:arrow-right />
-</div>
+<template #extra>
 
-<div class="abs-br m-6 text-xl">
-  <button @click="$slidev.nav.openInEditor()" title="Open in Editor" class="slidev-icon-btn">
-    <carbon:edit />
-  </button>
-  <a href="https://github.com/slidevjs/slidev" target="_blank" class="slidev-icon-btn">
-    <carbon:logo-github />
-  </a>
-</div>
+Extra content: Joint work with [Some Colleague](#) and [Other Colleague](#)
 
-<!--
-The last comment block of each slide will be treated as slide notes. It will be visible and editable in Presenter Mode along with the slide. [Read more in the docs](https://sli.dev/guide/syntax.html#notes)
--->
+</template>
 
 ---
 transition: fade-out
-clicks: 3
+clicks: 4
 ---
 
-# Example 
+# Example Animation
 
 <SlidesAllPairsEvaluation />
-<!--
-<ManimClip
-  :clips="[
-    '/videos/slides_AllPairsEvaluation/AllPairsEvaluation_0000_autocreated.mp4',
-    '/videos/slides_AllPairsEvaluation/AllPairsEvaluation_0001_unnamed.mp4',
-    '/videos/slides_AllPairsEvaluation/AllPairsEvaluation_0002_unnamed.mp4',
-    '/videos/slides_AllPairsEvaluation/AllPairsEvaluation_0003_unnamed.mp4',
-  ]"
-  :auto-start="true"
-/>
--->
-
 ---
 transition: fade-out
+clicks: 4
+---
+# Transpose Xform
+
+<SlidesTransposeTransform />
+
+
 ---
 
-# What is Slidev?
+# Powered by _**Slidev**_
 
-Slidev is a slides maker and presenter designed for developers, consist of the following features
+Slidev is a slide maker and <span v-mark.yellow>presentation tool</span> designed for developers.
 
-- 📝 **Text-based** - focus on the content with Markdown, and then style them later
-- 🎨 **Themable** - themes can be shared and re-used as npm packages
-- 🧑‍💻 **Developer Friendly** - code highlighting, live coding with autocompletion
-- 🤹 **Interactive** - embed Vue components to enhance your expressions
-- 🎥 **Recording** - built-in recording and camera view
-- 📤 **Portable** - export to PDF, PPTX, PNGs, or even a hostable SPA
-- 🛠 **Hackable** - virtually anything that's possible on a webpage is possible in Slidev
-<br>
-<br>
+This theme, leaning on the CD of the University of Graz, has been created by [Benjamin Hackl](https://benjamin-hackl.at).
 
-Read more about [Why Slidev?](https://sli.dev/guide/why)
+<div v-click>
 
-<!--
-You can have `style` tag in markdown to override the style for the current page.
-Learn more: https://sli.dev/features/slide-scope-style
--->
+To start a new presentation, simply start a new file `slides.md`
+with a bit of content like
 
-<style>
-h1 {
-  background-color: #2B90B6;
-  background-image: linear-gradient(45deg, #4EC5D4 10%, #146b8c 20%);
-  background-size: 100%;
-  -webkit-background-clip: text;
-  -moz-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -moz-text-fill-color: transparent;
-}
-</style>
+</div>
+<div v-click="3">
 
-<!--
-Here is another comment.
--->
+```md {none|1-5|all}{lines: true, at: '+1'}
+---
+theme: path/to/slidev-theme-behackl-kfu
+presenterName: Benjamin Hackl
+affiliation: Department of Mathematics and Scientific Computing / University of Graz
+---
+
+# Fancy Main Title
+
+### With Some Subtitle
+
+```
+</div>
+<div v-click>
+
+Then startup the preview server using
+
+```bash
+$ npx slidev
+```
+
+</div>
+
+---
+
+# Navigation
+
+Hover on the bottom-left corner to see the navigation's controls panel
+
+## Keyboard Shortcuts
+
+|     |     |
+| --- | --- |
+| <kbd>space</kbd> / <kbd>tab</kbd> / <kbd>right</kbd> | next animation or slide |
+| <kbd>left</kbd>  / <kbd>shift</kbd><kbd>space</kbd> | previous animation or slide |
+| <kbd>up</kbd> | previous slide |
+| <kbd>down</kbd> | next slide |
+
+
+---
+
+# Admonitions!
+
+::admonition{kind="warning" title="Warning" icon="mdi:warning"}
+here is something important!
+::
+
+::admonition{kind="danger" title="Very dangerous!" icon="mdi:skull"}
+here is something dangerous!
+::
+
+::admonition{kind="info" title="Interesting ..." icon="mdi:info"}
+here is something interesting!
+::
+
+::admonition{title="Uni Graz branding!" kind="kfu"}
+Here is something KFU related!
+::
+
+::admonition{title="Defaults?"}
+Let us also try and get some default values up and running?
+::
+
+---
+
+# An Inequality ...
+
+- Bóna--DeJonge-question $\iff a_n / C_n > a_{n+1} / C_{n+1}$ for $n\geq 3$
+- After some further manipulations, this is equivalent to...
+
+<v-click>
+<block title="Proposition">
+
+$a_n / C_n$ is decreasing for $n \geq 3$ if and only if
+$$ F(n) := \sum_{k=1}^n k \sigma(k) (k^2 - 3n + 2) (2k^2 - n) \binom{2n}{n-k} < 0 $$
+for $n \geq 5$.
+
+</block>
+</v-click>
+
+---
+
+# ... followed by __Asymptotics!__
+
+<div style="font-size: 18px;">
+
+- Split *binomial sums* into "central" and "tails" regions, <br>show
+  contribution of tails is negligible
+- Approximate $\binom{2n}{n-k}$ in "central" region, complete tails
+- Mellin for integral representation; shift line of integration + collect residues
+
+</div>
+
+<decor class="top-15 right-40">
+<mdi-compass />
+</decor>
+
+<block v-click title="Theorem (H.&ndash;Wagner, 2024)">
+
+For $n \to \infty$, we have
+$$ F(n) = \binom{2n}{n} \Big( -\frac{n^2}{8} + \frac{n}{24} + o(n) \Big) $$
+
+</block>
+<div v-click>
+
+- **Not good enough!** No information about error -- can only
+  say sequence is _eventually decreasing_...
+
+</div>
+
+---
+
+# *__Act II__* -- `dependent_bterms` in SageMath
+
+<v-clicks depth="2">
+
+- **$B$-terms:** $O$-terms with explicit constant + validity point,
+  e.g., $B_{n\geq 100}(42 n^3)$
+
+- Package extends SageMath; assume $n\to\infty$:
+
+  - Support for additional monomially bounded variable $n^\alpha \leq k \leq n^\beta$
+
+  - Taylor expansions with (and at) $B$-terms
+
+
+</v-clicks>
+
+<div class="grid grid-cols-[2fr_1fr] gap-4">
+<div>
+<v-clicks at="5">
+
+- Installation:
+  ```sh
+  $ sage -pip install dependent_bterms
+  ```
+
+- Try it! Interactive demo at [behackl.dev/asy/dbt](https://behackl.dev/asy/dbt), or
+  view [static version](https://github.com/behackl/dependent_bterms/blob/main/toolbox_demo.ipynb)
+  on GitHub
+
+</v-clicks>
+</div>
+<div>
+<decor v-click="5" class="bottom-30 right-30"><mdi-laptop/></decor>
+</div>
+</div>
+
+
+---
+layout: image-right
+image: https://picsum.photos/900/600
+---
+
+# Code
+
+Use code snippets and get the highlighting directly!
+
+```py
+def fibonacci(n):
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    return fibonacci(n-1) + fibonacci(n-2)
+```
+
+---
+layout: two-cols-header
+---
+
+This spans both columns, might only be evident if used
+with a sufficiently long text?
+
+::left::
+
+This is a list in the left column.
+
+- First item
+- Second item
+- Third item
+- And final item
+
+::right::
+
+And this is right column. We could put a little
+decoration element here?
+
+<decor class="bottom-10 right-50"><mdi-flower/></decor>
+
+---
+layout: end
+class: "text-center"
+---
+
+# Thank you!

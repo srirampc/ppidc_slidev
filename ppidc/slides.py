@@ -4,7 +4,7 @@ import numpy as np
 import ppidc.cfg as cfg
 from ppidc.data import MatParams, MatrixRect
 
-mn.config.background_color = mn.GRAY_A
+mn.config.background_color = cfg.BKG_COLOR
 
 class BasicExample(mn.Scene):
     def construct(self):
