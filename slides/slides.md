@@ -1,14 +1,17 @@
 ---
 # try also 'default' to start simple
 theme: ext//slidev-theme-behackl-kfu
+# addons, can be a list of package names or local paths
+# Learn more: https://sli.dev/guide/theme-addon.html#use-addon
+addons: []
 # random image from a curated Unsplash collection by Anthony
 # like them? see https://unsplash.com/collections/94734566/slidev
 background: https://cover.sli.dev
 # some information about your slides (markdown enabled)
-title: Slides
-info: |
-  ## Parallel PIDC
-  Presentation for Parallel PIDC Algorithm.
+title: Parallel PIDC
+info: false
+# author field for exported PDF or PPTX
+author: Sriram P C
 # apply UnoCSS classes to the current slide
 class: text-center
 # https://sli.dev/features/drawing
@@ -45,7 +48,7 @@ clicks: 4
 <SlidesAllPairsEvaluation />
 ---
 transition: fade-out
-clicks: 4
+clicks: 3
 ---
 # Transpose Xform
 
@@ -123,8 +126,8 @@ here is something dangerous!
 here is something interesting!
 ::
 
-::admonition{title="Uni Graz branding!" kind="kfu"}
-Here is something KFU related!
+::admonition{title="GT branding!" kind="gt"}
+Here is something GT related!
 ::
 
 ::admonition{title="Defaults?"}
@@ -184,7 +187,7 @@ $$ F(n) = \binom{2n}{n} \Big( -\frac{n^2}{8} + \frac{n}{24} + o(n) \Big) $$
 
 <v-clicks depth="2">
 
-- **$B$-terms:** $O$-terms with explicit constant + validity point,
+- **$B$-terms:** $O$-terms with *__explicit__* constant + validity point,
   e.g., $B_{n\geq 100}(42 n^3)$
 
 - Package extends SageMath; assume $n\to\infty$:

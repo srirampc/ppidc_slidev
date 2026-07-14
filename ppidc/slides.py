@@ -6,17 +6,16 @@ from ppidc.data import MatParams, MatrixRect
 
 mn.config.background_color = cfg.BKG_COLOR
 
-class BasicExample(mn.Scene):
-    def construct(self):
-        circle = mn.Circle(radius=3, color=mn.BLUE)
-        dot = mn.Dot()
-
-        self.play(mn.GrowFromCenter(circle))
-        self.next_section()
-        self.play(mn.MoveAlongPath(dot, circle), run_time=2, rate_func=mn.linear)
-        self.next_section()  # This will start a new non-looping slide
-
-        self.play(dot.animate.move_to(mn.ORIGIN))
+# class BasicExample(mn.Scene):
+#     def construct(self):
+#         circle = mn.Circle(radius=3, color=mn.BLUE)
+#         dot = mn.Dot()
+#
+#         self.play(mn.GrowFromCenter(circle))
+#         self.next_section()
+#         self.play(mn.MoveAlongPath(dot, circle), run_time=2, rate_func=mn.linear)
+#         self.next_section()  # This will start a new non-looping slide
+#         self.play(dot.animate.move_to(mn.ORIGIN))
 
 class TransposeTransform(mn.Scene):
     def data_rect(self):
