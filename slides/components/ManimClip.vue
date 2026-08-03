@@ -1,78 +1,94 @@
 <!-- components/ManimClip.vue -->
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { onSlideEnter, onSlideLeave } from '@slidev/client'
+import { useNav, onSlideEnter, onSlideLeave } from '@slidev/client'
 
 const props = withDefaults(
-  defineProps<{
-    clips: string[]
-    autoStart?: boolean   // true: plays immediately on slide enter
-                           // false (default): first click starts playback
-  }>(),
+  defineProps<{ clips: string[]; autoStart?: boolean }>(),
   { autoStart: false }
 )
 
-const videoEl = ref<HTMLVideoElement>()
-const started = ref(false)
+const { clicks } = useNav()
 
-// In autoStart mode, click n -> clip n (clip 0 plays as soon as the slide is entered).
-// In manual mode, click 0 = nothing yet, click 1 -> clip 0, click 2 -> clip 1, etc.
-// (i.e. manual mode "spends" one click just starting the sequence.)
+const videoA = ref<HTMLVideoElement>()
+const videoB = ref<HTMLVideoElement>()
+const activeIsA = ref(true)
+let currentIndex = -1
+
+function activeEl() { return activeIsA.value ? videoA.value : videoB.value }
+function inactiveEl() { return activeIsA.value ? videoB.value : videoA.value }
+
 function clipIndexForClick(n: number): number {
   const raw = props.autoStart ? n : n - 1
   return Math.max(0, Math.min(raw, props.clips.length - 1))
 }
 
-function playClip(n: number) {
-  if (!props.autoStart && n <= 0) {
-    started.value = false
-    return
-  }
-  started.value = true
-  const clip = props.clips[clipIndexForClick(n)]
-  if (!videoEl.value) return
-  if (!videoEl.value.currentSrc.endsWith(clip)) {
-    videoEl.value.src = clip
-  }
-  videoEl.value.currentTime = 0
-  videoEl.value.play()
+async function showClip(index: number) {
+  if (index === currentIndex) return
+  currentIndex = index
+
+  const clip = props.clips[index]
+  const nextEl = inactiveEl()
+  const curEl = activeEl()
+  if (!nextEl || !curEl) return
+
+  nextEl.src = clip
+
+  // Wait for a real decoded frame before revealing it — this is the part
+  // that actually kills the flicker, not just having two elements.
+  await new Promise<void>((resolve) => {
+    const onReady = () => {
+      nextEl.removeEventListener('loaded_data', onReady)
+      resolve()
+    }
+    nextEl.addEventListener('loaded_data', onReady)
+    nextEl.load()
+  })
+
+  await nextEl.play().catch(() => {})
+  activeIsA.value = !activeIsA.value
+  curEl.pause()
 }
 
-onSlideEnter(() => {
-  playClip($clicksContext.current)
-})
-
-onSlideLeave(() => {
-  videoEl.value?.pause()
-})
-
-watch(() => $clicksContext.current, (n) => playClip(n))
-</script>
-
-<template>
-  <video ref="videoEl" v-show="started" muted playsinline />
-</template>
-<!--
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useNav } from '@slidev/client'
-
-const props = defineProps<{ clips: string[] }>()
-const videoEl = ref<HTMLVideoElement>()
-
-watch(
-  () => $clicksContext.current,
-  (n) => {
-    const clip = props.clips[Math.min(n, props.clips.length - 1)]
-    if (!videoEl.value) return
-    if (videoEl.value.currentSrc.endsWith(clip)) return
-    videoEl.value.src = clip
-    videoEl.value.play()
+function playForClick(n: number) {
+  if (!props.autoStart && n <= 0) {
+    currentIndex = -1
+    return
   }
-)
+  showClip(clipIndexForClick(n))
+}
+
+onSlideEnter(() => playForClick(clicks.value))
+onSlideLeave(() => { videoA.value?.pause(); videoB.value?.pause() })
+
+watch(clicks, (n) => playForClick(n))
 </script>
 
 <template>
-  <video ref="videoEl" :src="clips[0]" autoplay />
+  <div class="manim-clip-wrapper">
+    <video ref="videoA" muted playsinline preload="auto" :class="{ back: !activeIsA }" />
+    <video ref="videoB" muted playsinline preload="auto" :class="{ back: activeIsA }" />
+  </div>
 </template>
--->
+
+<style scoped>
+.manim-clip-wrapper {
+  position: relative;
+  width: 100%;
+}
+.manim-clip-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: block;
+}
+.manim-clip-wrapper video.back {
+  opacity: 0;
+  z-index: 0;
+}
+.manim-clip-wrapper video:not(.back) {
+  opacity: 1;
+  z-index: 1;
+}
+</style>
