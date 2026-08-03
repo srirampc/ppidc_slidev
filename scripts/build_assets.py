@@ -131,7 +131,7 @@ def render_scene(scene: SceneRef, quality_flag: str) -> Path:
         str(scene.file),
         scene.class_name,
     ]
-    result = subprocess.run(cmd, cwd=ROOT)
+    result = subprocess.run(cmd, cwd=ROOT)  # noqa: PLW1510
     if result.returncode != 0:
         raise RuntimeError(f"manim render failed for {scene.slug} (exit {result.returncode})")
 
@@ -274,7 +274,7 @@ Wait for a click — set `clicks: {manual_clicks}` in this slide's frontmatter, 
 """
 
 
-def write_snippets(scene_results: list[tuple["SceneRef", list[str]]]) -> None:
+def write_snippets(scene_results: list[tuple[SceneRef, list[str]]]) -> None:
     """Writes one generated wrapper component + a minimal reference snippet
     per scene. Components go in slides/components/generated/ (auto-imported
     by Slidev like any other component). Snippets go in slides/snippets/ —

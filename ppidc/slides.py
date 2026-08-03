@@ -1,31 +1,18 @@
 import manim as mn
 import numpy as np
 
-import ppidc.cfg as cfg
+from ppidc import cfg
 from ppidc.data import MatParams, MatrixRect
 
 mn.config.background_color = cfg.BKG_COLOR
 
-# class BasicExample(mn.Scene):
-#     def construct(self):
-#         circle = mn.Circle(radius=3, color=mn.BLUE)
-#         dot = mn.Dot()
-#
-#         self.play(mn.GrowFromCenter(circle))
-#         self.next_section()
-#         self.play(mn.MoveAlongPath(dot, circle), run_time=2, rate_func=mn.linear)
-#         self.next_section()  # This will start a new non-looping slide
-#         self.play(dot.animate.move_to(mn.ORIGIN))
 
 class TransposeTransform(mn.Scene):
-    def data_rect(self):
-        return mn.Rectangle(width=cfg.DM_WIDTH, height=cfg.DM_HEIGHT)
-
     def construct(self) -> None:
-        rect_d = self.data_rect().set_color(cfg.DM_COLOR).shift(3 * mn.LEFT)
+        rect_d = cfg.matrix_rect().set_color(cfg.DM_COLOR).shift(3 * mn.LEFT)
         rect_dc = rect_d.copy()
         rect_d_t = (
-            self.data_rect()
+            cfg.matrix_rect()
             .set_color(cfg.G_COLOR)
             .shift(3 * mn.RIGHT)
             .rotate(-mn.PI / 2)
@@ -53,11 +40,90 @@ class TransposeTransform(mn.Scene):
         self.add(rect_d, mat_d.text, *mat_d.arrows)
         self.wait()
         self.next_section()
-        self.play(mn.Transform(rect_dc, rect_d_t), run_time=3)
+        self.play(
+            mn.Transform(rect_dc, rect_d_t),
+            mn.Transform(mat_d.row_arrow.copy(), mat_d_t.col_arrow),
+            mn.Transform(mat_d.col_arrow.copy(), mat_d_t.row_arrow),
+            mn.Transform(mat_d.row_txt.copy(), mat_d_t.col_txt),
+            mn.Transform(mat_d.col_txt.copy(), mat_d_t.row_txt),
+            # mn.FadeIn(mat_d_t.text),
+            run_time=3,
+        )
         self.wait()
         self.next_section()
-        self.play(mn.FadeIn(mat_d_t.text, *mat_d_t.arrows), run_time=3)
+        self.play(mn.FadeIn(mat_d_t.text), run_time=3)
+        # self.wait()
+
+
+class AllPairsMI(mn.Scene):
+    def create_line_x(
+        self, src_rect: mn.Rectangle, l_shift: float = 0.4
+    ) -> tuple[mn.VGroup, mn.Line]:
+        line_x = (
+            mn.Line(src_rect.get_bottom(), src_rect.get_top())
+            .set_color(mn.GRAY_C)
+            .shift(l_shift * mn.LEFT)
+        )
+        txt_x = mn.MathTex("x", fill_color=cfg.TXT_COLOR).move_to(
+            line_x.get_start() + 0.2 * mn.DOWN, mn.UP
+        )
+        group_x = mn.VGroup(line_x, txt_x)
+        return group_x, line_x
+
+    def create_line_y(
+        self, src_rect: mn.Rectangle, r_shift: float = 0.4
+    ) -> tuple[mn.VGroup, mn.Line]:
+        line_y = (
+            mn.Line(src_rect.get_bottom(), src_rect.get_top())
+            .set_color(mn.GRAY_C)
+            .shift(r_shift * mn.RIGHT)
+        )
+        txt_y = mn.MathTex("y", fill_color=cfg.TXT_COLOR).move_to(
+            line_y.get_start() + 0.2 * mn.DOWN, mn.UP
+        )
+        group_y = mn.VGroup(line_y, txt_y)
+        return group_y, line_y
+
+    def construct(self) -> None:
+        rect_d = cfg.matrix_rect().set_color(cfg.DM_COLOR).shift(3 * mn.LEFT)
+        matrix_d = MatrixRect(
+            rect_d,
+            rect_d.get_vertices(),
+            MatParams(rect_d.color, r"D", r"m", r"n", 0.2, 0.2, text_pos=mn.ORIGIN),
+        )
+        group_x, _line_x = self.create_line_x(rect_d)
+        group_y, _line_y = self.create_line_y(rect_d)
+        shift_grp_x, shift_line_x = self.create_line_x(rect_d, -3.6)
+        shift_grp_y, shift_line_y = self.create_line_y(rect_d, 4.4)
+        fn_text = mn.VGroup(
+            mn.MathTex("MI(", fill_color=cfg.TXT_COLOR).move_to(
+                shift_line_x.get_midpoint() + 0.2 * mn.LEFT, mn.RIGHT
+            ),
+            mn.MathTex(",", fill_color=cfg.TXT_COLOR).move_to(
+                0.5 * shift_line_x.get_midpoint() + 0.5 * shift_line_y.get_midpoint(),
+                mn.UP,
+            ),
+            mn.MathTex(")", fill_color=cfg.TXT_COLOR).move_to(
+                shift_line_y.get_midpoint() + 0.2 * mn.RIGHT, mn.LEFT
+
+            ),
+        )
+
+        self.play(mn.Create(rect_d), mn.Create(matrix_d.text))
+        self.next_section()
+        self.play(*[mn.Create(arx) for arx in matrix_d.arrows])
+        self.next_section()
+        self.play(mn.Create(group_x))
+        self.play(mn.Create(group_y))
+        self.next_section()
+        self.play(
+            mn.Transform(group_x.copy(), shift_grp_x),
+            mn.Transform(group_y.copy(), shift_grp_y),
+        )
+        self.next_section()
+        self.play(mn.FadeIn(fn_text))
         self.wait()
+
 
 # Command to run:
 class AllPairsEvaluation(mn.Scene):
@@ -154,7 +220,6 @@ class AllPairsEvaluation(mn.Scene):
             .shift(0.2 * mn.RIGHT)
         )
 
-
         self.play(mn.Create(rect_d), mn.Create(mat_d.text))
         self.next_section()
         self.play(*[mn.Create(arx) for arx in mat_d.arrows])
@@ -180,4 +245,3 @@ class AllPairsEvaluation(mn.Scene):
         )
         self.add(square_n, mat_n.text, *mat_n.arrows)
         self.wait()
-        #

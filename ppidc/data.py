@@ -1,15 +1,18 @@
-from typing import NamedTuple
+from dataclasses import dataclass, field
 
 import manim as mn
 import manim.typing as mnt
 
-class MatParams(NamedTuple):
+
+@dataclass
+class MatParams:
     color: mn.ManimColor
     name: str
     col_name: str
     row_name: str
     col_off: float
     row_off: float
+    text_pos: mnt.Vector3D = field(default_factory=mnt.Vector3D)  # pyright: ignore[reportCallIssue, reportArgumentType]
 
 
 class MatrixRect:
@@ -17,7 +20,12 @@ class MatrixRect:
         self.rect = rect
         self.vertices = vertices
         self.rp = rp
-        self.text = mn.MathTex(rp.name, fill_color=rp.color).move_to(rect.get_center())
+        if (rp.text_pos == mn.DOWN).all():
+            self.text = mn.MathTex(
+                rp.name, fill_color=rp.color
+            ).move_to(rect.get_bottom() + 0.2 * mn.DOWN, mn.UP)
+        else:
+            self.text = mn.MathTex(rp.name, fill_color=rp.color).move_to(rect.get_center())
         col_arrow = (
             mn.DoubleArrow(vertices[2], vertices[1], stroke_width=2.5, tip_length=0.2)
             .set_color(rp.color)
@@ -39,4 +47,8 @@ class MatrixRect:
             .move_to(row_arrow.get_midpoint())
             .shift(rp.row_off * mn.UP)
         )
-        self.arrows = [row_arrow, col_arrow, row_txt, col_txt]
+        self.row_arrow = row_arrow
+        self.col_arrow = col_arrow
+        self.row_txt = row_txt
+        self.col_txt = col_txt
+        self.arrows = [self.row_arrow, self.col_arrow, self.row_txt, self.col_txt]
