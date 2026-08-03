@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Config — adjust to taste
+# Config
 # ---------------------------------------------------------------------------
 
 ROOT = Path(__file__).resolve().parent.parent  # project root, assuming scripts/build_assets.py
@@ -316,7 +316,7 @@ def main() -> None:
     # (Python 3.7+; no-op if already UTF-8, e.g. on macOS/Linux.)
     for stream in (sys.stdout, sys.stderr):
         try:
-            stream.reconfigure(encoding="utf-8", errors="replace")
+            stream.reconfigure(encoding="utf-8", errors="replace")  # pyright: ignore[reportAttributeAccessIssue]
         except (AttributeError, ValueError):
             pass
 
