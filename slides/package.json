@@ -5,7 +5,8 @@
   "scripts": {
     "build": "slidev build",
     "dev": "slidev --open",
-    "export": "slidev export"
+    "export": "slidev export",
+    "postinstall": "cd ext/slidev-theme-spc-gt && pnpm install"
   },
   "dependencies": {
     "@slidev/cli": "^52.19.0",
