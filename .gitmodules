@@ -1,0 +1,3 @@
+[submodule "slides/ext/slidev-theme-spc-gt"]
+	path = slides/ext/slidev-theme-spc-gt
+	url = https://github.com/srirampc/slidev-theme-spc-gt.git

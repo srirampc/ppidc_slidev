@@ -1,6 +1,6 @@
 ---
 # try also 'default' to start simple
-theme: ext//slidev-theme-behackl-kfu
+theme: ext/slidev-theme-spc-gt
 # addons, can be a list of package names or local paths
 # Learn more: https://sli.dev/guide/theme-addon.html#use-addon
 addons: []
@@ -34,7 +34,7 @@ mdc: true
 
 <template #extra>
 
-Extra content: Joint work with [Some Colleague](#) and [Other Colleague](#)
+Extra content: Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 
 </template>
 
@@ -45,14 +45,15 @@ clicks: 4
 
 # Example Animation
 
-<SlidesAllPairsEvaluation />
+<SlidesAllPairsEvaluation auto-start/>
+
 ---
 transition: fade-out
 clicks: 3
 ---
 # Transpose Xform
 
-<SlidesTransposeTransform />
+<SlidesTransposeTransform auto-start/>
 
 
 ---
