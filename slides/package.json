@@ -3,8 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build",
-    "dev": "slidev --open",
+    "build": "pnpm --dir ext/slidev-theme-spc-gt install && slidev build",
+    "dev": "pnpm --dir ext/slidev-theme-spc-gt install && slidev --open",
     "export": "slidev export",
     "postinstall": "cd ext/slidev-theme-spc-gt && pnpm install"
   },
