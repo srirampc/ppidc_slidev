@@ -84,8 +84,83 @@ class AllPairsMI(mn.Scene):
         group_y = mn.VGroup(line_y, txt_y)
         return group_y, line_y
 
+    def net_lines(
+        self,
+        square_n: mn.Square,
+    ) -> mn.VGroup:
+
+
+        net_x = (
+            mn.Line(square_n.get_bottom(), square_n.get_top())
+            .set_color(mn.GRAY_C)
+            .shift(0.4 * mn.LEFT)
+        )
+        net_y = (
+            mn.Line(square_n.get_bottom(), square_n.get_top())
+            .set_color(mn.GRAY_D)
+            .shift(0.4 * mn.RIGHT)
+        )
+
+        net_x_t = (
+            mn.Line(square_n.get_left(), square_n.get_right())
+            .set_color(mn.GRAY_C)
+            .shift(0.4 * mn.UP)
+        )
+        net_y_t = (
+            mn.Line(square_n.get_left(), square_n.get_right())
+            .set_color(mn.GRAY_D)
+            .shift(0.4 * mn.DOWN)
+        )
+
+        net_lines = mn.VGroup(net_x, net_y, net_x_t, net_y_t)
+        return net_lines
+
+    def graph_matrix(
+        self,
+    ) -> tuple[mn.Square, MatrixRect, mn.VGroup]:
+        square_n = cfg.matrix_square_width().set_color(mn.BLUE).shift(4 * mn.RIGHT)
+        mat_n = MatrixRect(
+            square_n,
+            square_n.get_vertices(),
+            MatParams(
+                square_n.color,
+                r"G",
+                r"n",
+                r"n",
+                0.2,
+                0.2,
+            ),
+        )
+        net_lines = self.net_lines(square_n)
+        return square_n, mat_n, net_lines
+
+    def lines_text(
+        self, shift_line_x, shift_line_y
+    ) -> tuple[mn.VGroup, mn.MathTex, mn.MathTex]:
+        fn_text = mn.VGroup(
+            mn.MathTex("MI(", fill_color=cfg.TXT_COLOR).move_to(
+                shift_line_x.get_end() + 0.2 * mn.LEFT + 0.35 * mn.UP, mn.RIGHT
+            ),
+            mn.MathTex(",", fill_color=cfg.TXT_COLOR).move_to(
+                0.5 * shift_line_x.get_end()
+                + 0.5 * shift_line_y.get_end()
+                + 0.25 * mn.UP,
+                mn.UP,
+            ),
+            mn.MathTex(")", fill_color=cfg.TXT_COLOR).move_to(
+                shift_line_y.get_end() + 0.2 * mn.RIGHT + 0.35 * mn.UP, mn.LEFT
+            ),
+        )
+        rv_text_x = mn.MathTex("X", fill_color=cfg.TXT_COLOR).move_to(
+            shift_line_x.get_end() + 0.2 * mn.UP, mn.DOWN
+        )
+        rv_text_y = mn.MathTex("Y", fill_color=cfg.TXT_COLOR).move_to(
+            shift_line_y.get_end() + 0.2 * mn.UP, mn.DOWN
+        )
+        return fn_text, rv_text_x, rv_text_y
+
     def construct(self) -> None:
-        rect_d = cfg.matrix_rect().set_color(cfg.DM_COLOR).shift(3 * mn.LEFT)
+        rect_d = cfg.matrix_rect().set_color(cfg.DM_COLOR).shift(4 * mn.LEFT)
         matrix_d = MatrixRect(
             rect_d,
             rect_d.get_vertices(),
@@ -95,19 +170,8 @@ class AllPairsMI(mn.Scene):
         group_y, _line_y = self.create_line_y(rect_d)
         shift_grp_x, shift_line_x = self.create_line_x(rect_d, -3.6)
         shift_grp_y, shift_line_y = self.create_line_y(rect_d, 4.4)
-        fn_text = mn.VGroup(
-            mn.MathTex("MI(", fill_color=cfg.TXT_COLOR).move_to(
-                shift_line_x.get_midpoint() + 0.2 * mn.LEFT, mn.RIGHT
-            ),
-            mn.MathTex(",", fill_color=cfg.TXT_COLOR).move_to(
-                0.5 * shift_line_x.get_midpoint() + 0.5 * shift_line_y.get_midpoint(),
-                mn.UP,
-            ),
-            mn.MathTex(")", fill_color=cfg.TXT_COLOR).move_to(
-                shift_line_y.get_midpoint() + 0.2 * mn.RIGHT, mn.LEFT
-
-            ),
-        )
+        fn_text, rv_text_x, rv_text_y = self.lines_text(shift_line_x, shift_line_y)
+        square_n, mat_n, net_lines = self.graph_matrix()
 
         self.play(mn.Create(rect_d), mn.Create(matrix_d.text))
         self.next_section()
@@ -121,7 +185,20 @@ class AllPairsMI(mn.Scene):
             mn.Transform(group_y.copy(), shift_grp_y),
         )
         self.next_section()
-        self.play(mn.FadeIn(fn_text))
+        self.play(
+            mn.Transform(shift_grp_x, rv_text_x), mn.Transform(shift_grp_y, rv_text_y)
+        )
+        self.next_section()
+        self.play(mn.Create(fn_text))
+        self.next_section()
+        self.play(mn.Create(net_lines))
+        self.next_section()
+        self.play(
+            mn.Create(square_n),
+        )
+        self.play(
+            mn.FadeIn(mat_n.text, *mat_n.arrows)
+        )
         self.wait()
 
 

@@ -25,3 +25,12 @@ def matrix_rect() -> mn.Rectangle:
     )
     d_rect.grid_lines.set_stroke(width=DM_GRID_STROKE)
     return d_rect
+
+def matrix_square_width() -> mn.Square:
+    d_rect = mn.Square(
+        DM_WIDTH,
+        grid_xstep=DM_GRID_STEP,
+        grid_ystep=DM_GRID_STEP,
+    )
+    d_rect.grid_lines.set_stroke(width=DM_GRID_STROKE)
+    return d_rect

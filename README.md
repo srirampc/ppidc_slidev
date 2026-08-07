@@ -134,11 +134,49 @@ server (nginx, Netlify, Vercel, GitHub Pages, `pnpm preview` locally, etc.),
 as long as the server does SPA fallback routing (unknown paths → serve
 `index.html`) and, if hosted under a subpath, `--base` is set to match.
 
+## Fast edit-build-view loops
+
+For rapid iteration, use the watcher scripts instead of running the build commands manually.
+
+### Animation-only loop
+
+Best for iterating on the animation itself. Watches `ppidc/*.py` and re-renders a single scene with `manim -ql` on every save.
+
+```bash
+uv run --group dev python scripts/watch_scene.py TransposeTransform
+```
+
+Keep a browser or video player open on the printed output file and refresh it after each render. The `-p` flag is intentionally omitted so the watcher does not spawn a new video player window on every save.
+
+For example, with `mpv` you can loop the output file so it automatically reloads the new render when the watcher finishes:
+
+```bash
+mpv --loop-file=inf media/videos/ppidc/slides/TransposeTransform.mp4
+```
+
+`watch_scene.py` prints the exact video path after each render. Save the source file, and `mpv` will pick up the updated clip on the next loop.
+
+### Full slide loop
+
+Best for checking pacing and click-sync inside the actual deck. Watches `ppidc/*.py` and re-runs `build_assets.py`, while `pnpm dev` hot-reloads the deck.
+
+```bash
+# terminal 1
+uv run --group dev python scripts/watch_assets.py
+
+# terminal 2
+cd slides
+pnpm dev
+```
+
+Then open `http://localhost:3030`.
+
 ## Adding a new animated slide
 
 1. Add a `Scene` subclass to `ppidc/` (new file or append to `slides.py`),
    using `self.next_section("label")` at each pause point.
-2. `uv run python scripts/build_assets.py`
+2. `uv run python scripts/build_assets.py`  
+   (while iterating, use `uv run --group dev python scripts/watch_assets.py` instead)
 3. Open `slides/snippets/<slug>.md`, copy the `clicks:` value and component
    tag it prints into the right spot in `slides/slides.md`.
 4. `cd slides && pnpm dev` to check it.

@@ -8,3 +8,8 @@ dependencies = [
     "jupyterlab>=4.6.1",
     "manim>=0.20.1",
 ]
+
+[dependency-groups]
+dev = [
+    "watchfiles>=1.2.0",
+]

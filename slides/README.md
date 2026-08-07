@@ -42,6 +42,18 @@ pnpm install
 - **`pages/`** — supplementary slide content pulled in via Slidev's
   multi-file `src:` imports, if the deck is split across files.
 
+## Fast iteration with watchers
+
+When iterating on Manim animations, you don't have to run `build_assets.py` manually after every edit.
+
+- **Animation-only:** from the project root,
+  run `uv run --group dev python scripts/watch_scene.py <SceneName>`.
+  It re-renders that scene on every save and prints the output path.
+- **Full deck:** run `uv run --group dev python scripts/watch_assets.py`
+  in one terminal, and `cd slides && pnpm dev` in another. The deck
+  hot-reloads after each asset rebuild.
+
+
 ## Hosting the built deck
 
 `pnpm build` produces a static SPA. Any static file server works, with two

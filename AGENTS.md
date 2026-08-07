@@ -1,0 +1,160 @@
+# AGENTS.md
+
+Context for coding agents (and future-you on the command line) working in
+this repo. Read this before making changes.
+
+## What this project is
+
+A presentation deck: animations authored as Manim scenes, rendered to
+video, and assembled/presented with Slidev. Two independent toolchains
+(`uv`-managed Python, `pnpm`-managed Node) bridged by one script.
+
+- **`ppidc/`** — Python package. Manim `Scene` subclasses + supporting code
+  (`cfg.py`, `data.py`). This is where animation content is authored.
+- **`scripts/build_assets.py`** — renders every scene, copies clips + a
+  manifest into `slides/`, and generates Vue wrapper components + reference
+  snippets. Run this after any change to `ppidc/`.
+- **`scripts/watch_scene.py`** — dev helper. Watches `ppidc/*.py`, re-renders
+  a single scene on every save, and prints the output video path for quick
+  animation review. Requires the `dev` dependency group (`watchfiles`).
+- **`scripts/watch_assets.py`** — dev helper. Watches `ppidc/*.py` and re-runs
+  `scripts/build_assets.py` on every save so the running `pnpm dev` deck
+  automatically picks up new assets. Requires the `dev` dependency group.
+- **`slides/`** — Slidev project. `slides.md` is the deck source. Own
+  `package.json`/`pnpm-lock.yaml`, independent of the Python side.
+- **`ext/slidev-theme-spc-gt/`** — the deck's theme. Its own independent
+  pnpm project (has its own `pnpm-workspace.yaml`), referenced from
+  `slides/slides.md` by relative path, not installed as a dependency of
+  `slides/`.
+
+Full narrative writeup: [`README.md`](README.md) (workflow) and
+[`docs/COMPONENTS.md`](docs/COMPONENTS.md) (Manim↔Slidev integration
+design + every bug fixed along the way).
+
+## Setup (one-time)
+
+```bash
+uv sync                                  # Python deps (Manim, etc.)
+uv sync --group dev                      # watcher helpers (watchfiles)
+cd slides && pnpm install && cd ..       # Slidev deps
+cd ext/slidev-theme-spc-gt && pnpm install && cd ../..   # theme deps (separate pnpm project)
+```
+
+`watchfiles` is declared in `pyproject.toml` under `[dependency-groups] dev`,
+so it is only installed when `--group dev` is used. Watcher scripts will fail to
+import it if the group is omitted.
+
+`ppidc` is installed editable via `uv sync` (see `pyproject.toml`'s
+`[build-system]` — hatchling auto-detects the `ppidc/` package). No
+`PYTHONPATH` manipulation needed; if `import ppidc` fails, that config is
+what to check first, not the environment.
+
+## Core workflow
+
+```bash
+# 1. Render scenes, sync into slides/ (run after any ppidc/ change)
+uv run python scripts/build_assets.py                # fast preview quality
+uv run python scripts/build_assets.py --quality h     # 1080p60, for final output
+uv run python scripts/build_assets.py --scene ppidc.slides.SomeSceneName  # one scene only
+uv run python scripts/build_assets.py --clean         # wipe slides/public/videos/ first
+
+# 2. Fast edit-build-view cycles (choose one)
+#    Animation-only loop: re-render one scene on every save, watch the file with a video player
+uv run --group dev python scripts/watch_scene.py SomeSceneName
+#    Full-deck loop: rebuild assets on every save, then refresh the Slidev page
+uv run --group dev python scripts/watch_assets.py
+
+# 3. Preview
+cd slides && pnpm dev          # http://localhost:3030
+
+# 4. Static build (servable by any static HTTP server, needs SPA fallback routing)
+cd slides && pnpm build        # -> slides/dist/
+```
+
+## Adding or editing an animated slide
+
+1. Edit/add a `Scene` subclass in `ppidc/` (e.g. `ppidc/slides.py`). Use
+   `self.next_section("label")` at each pause point within `construct()`.
+2. `uv run python scripts/build_assets.py`
+3. Open `slides/snippets/SNIPPETS.md` (generated — see
+   `slides/snippets/README.md` if it's missing, meaning step 2 hasn't run
+   yet). Copy the component tag and required `clicks:` frontmatter value for
+   that scene into `slides/slides.md`.
+4. `cd slides && pnpm dev` to verify.
+
+For fast iteration, keep a watcher running in the background while you edit:
+- **Animation-only loop:**
+  ```bash
+  uv run --group dev python scripts/watch_scene.py SomeSceneName
+  ```
+  In another terminal, loop the output video with a player such as `mpv` so the
+  latest render is replayed automatically:
+  ```bash
+  mpv --loop-file=inf path/to/media/videos/.../SomeSceneName.mp4
+  ```
+  `watch_scene.py` prints the exact path after each render. Save the source
+  file, and `mpv` will reload the new clip when the render finishes.
+- **Full-deck loop:**
+  ```bash
+  # terminal 1
+  uv run --group dev python scripts/watch_assets.py
+  # terminal 2
+  cd slides && pnpm dev
+  ```
+  Edit `ppidc/`, save, wait for the watcher to finish, then refresh the browser
+  tab at `http://localhost:3030`. `watch_assets.py` forwards `--quality` and
+  `--scene` to `build_assets.py` when needed.
+
+## Do not hand-edit (regenerated by `build_assets.py`, overwritten silently)
+
+- `slides/public/videos/`
+- `slides/components/generated/`
+- `slides/snippets/`
+
+Edit `ppidc/` and re-run the build instead.
+
+## Conventions / things that will bite you if skipped
+
+- **File writes in `scripts/build_assets.py`, `scripts/watch_scene.py`, and
+  `scripts/watch_assets.py` always pass `encoding="utf-8"` explicitly.** The
+  scripts emit `→`/`—`/`✓` in output; without explicit UTF-8 this raises
+  `UnicodeEncodeError` on Windows (default locale encoding there is `cp1252`,
+  not UTF-8). Keep this pattern in any new file-writing code added to the
+  scripts.
+- **`ManimClip.vue` (`slides/components/ManimClip.vue`) is hand-maintained**
+  — the only non-generated file under `slides/components/`. Don't let an
+  agent or a future build-script change overwrite it. See
+  `docs/COMPONENTS.md` for its design (double-buffered video swap, click
+  sync via `useNav().clicks`, `onSlideEnter`/`onSlideLeave` — not
+  `autoplay`).
+- **Use `useNav().clicks`, never `$clicksContext`.** The latter doesn't
+  exist on `useNav()`'s real return type and only ever worked, briefly, as
+  an implicit Slidev-injected global — it's a dead end, don't reintroduce
+  it if refactoring click-sync logic.
+- **Vue SFCs using TS generics (`defineProps<...>()`) need
+  `<script setup lang="ts">`** — plain `<script setup>` without `lang="ts"`
+  fails to compile on that syntax.
+- **`<video autoplay>` needs `muted`** or browsers silently block playback.
+- **The theme (`ext/slidev-theme-spc-gt/`) is a separate pnpm project**,
+  not a `slides/` workspace member. `slides/`'s `pnpm install` does not
+  install the theme's dependencies — that requires its own `pnpm install`
+  run inside `ext/slidev-theme-spc-gt/`.
+
+## Verifying a change before considering it done
+
+```bash
+# Python side: does the script still parse and run end-to-end?
+uv run python -c "import ast; ast.parse(open('scripts/build_assets.py', encoding='utf-8').read())"
+uv run python -c "import ast; ast.parse(open('scripts/watch_scene.py', encoding='utf-8').read())"
+uv run python -c "import ast; ast.parse(open('scripts/watch_assets.py', encoding='utf-8').read())"
+uv run python scripts/build_assets.py --scene <one scene, fast quality>
+uv run --group dev python scripts/watch_scene.py --help
+uv run --group dev python scripts/watch_assets.py --help
+
+# Vue side: does the deck still build clean?
+cd slides && pnpm build
+```
+
+There is currently no automated test suite — verification is "does the
+render pipeline complete without error" + "does the deck visually work in
+`pnpm dev`." If adding real tests, note that here.
