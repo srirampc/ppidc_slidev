@@ -10,7 +10,16 @@ class MINet(mn.Scene):
         return MatrixRect(
             rect_d,
             rect_d.get_vertices(),
-            MatParams(rect_d.color, r"D", r"m", r"n", 0.2, 0.2, text_pos=mn.ORIGIN),
+            MatParams(
+                rect_d.color,
+                r"D",
+                r"m",
+                r"n",
+                0.2,
+                0.2,
+                text_pos=mn.ORIGIN,
+                text_bg_rect=True,
+            ),
         )
 
     def adj_matrix(self, square_n: mn.Square) -> MatrixRect:
@@ -136,9 +145,11 @@ class MINet(mn.Scene):
         txt_groups = []
 
         self.play(
-            mn.Create(rect_d),
-            mn.Create(mn.BackgroundRectangle(matrix_d.text)),
-            mn.Create(matrix_d.text),
+            *(
+                mn.Create(mobj)
+                for mobj in [rect_d, matrix_d.text_bg_rect, matrix_d.text]
+                if mobj is not None
+            )
         )
         self.next_section()
         self.play(*[mn.Create(arx) for arx in matrix_d.arrows])

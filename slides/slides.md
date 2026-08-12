@@ -40,12 +40,12 @@ Extra content: Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 
 ---
 transition: fade-out
-clicks: 4
+clicks: 21
 ---
 
 # Example Animation
 
-<SlidesAllPairsEvaluation auto-start/>
+<AllpairsMINet auto-start />
 
 ---
 transition: fade-out
@@ -53,7 +53,7 @@ clicks: 3
 ---
 # Transpose Xform
 
-<SlidesTransposeTransform auto-start/>
+<TransposeDataT auto-start />
 
 
 ---
