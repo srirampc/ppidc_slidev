@@ -22,14 +22,6 @@ class MatrixRect:
         self.rect = rect
         self.vertices = vertices
         self.rp = params
-        if (params.text_pos == mn.DOWN).all():
-            self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
-                rect.get_bottom() + 0.2 * mn.DOWN, mn.UP
-            )
-        else:
-            self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
-                rect.get_center()
-            )
         col_arrow = (
             mn.DoubleArrow(vertices[2], vertices[1], stroke_width=2.5, tip_length=0.2)
             .set_color(params.color)
@@ -51,6 +43,18 @@ class MatrixRect:
             .move_to(row_arrow.get_midpoint())
             .shift(params.row_off * mn.UP)
         )
+        if (params.text_pos == mn.DOWN).all():
+            self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
+                rect.get_bottom() + 0.2 * mn.DOWN, mn.UP
+            )
+        elif (params.text_pos == mn.UP).all():
+            self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
+                row_txt.get_top() + 0.2 * mn.UP, mn.DOWN
+            )
+        else:
+            self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
+                rect.get_center()
+            )
         self.row_arrow = row_arrow
         self.col_arrow = col_arrow
         self.row_txt = row_txt
