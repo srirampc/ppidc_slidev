@@ -143,7 +143,7 @@ For rapid iteration, use the watcher scripts instead of running the build comman
 Best for iterating on the animation itself. Watches `ppidc/*.py` and re-renders a single scene with `manim -ql` on every save.
 
 ```bash
-uv run --group dev python scripts/watch_scene.py TransposeTransform
+uv run --group dev python scripts/watch_scene.py DataT --quality l
 ```
 
 Keep a browser or video player open on the printed output file and refresh it after each render. The `-p` flag is intentionally omitted so the watcher does not spawn a new video player window on every save.
@@ -151,7 +151,7 @@ Keep a browser or video player open on the printed output file and refresh it af
 For example, with `mpv` you can loop the output file so it automatically reloads the new render when the watcher finishes:
 
 ```bash
-mpv --loop-file=inf media/videos/ppidc/slides/TransposeTransform.mp4
+mpv --loop-file=inf media/videos/transpose/480p15/DataT.mp4
 ```
 
 `watch_scene.py` prints the exact video path after each render. Save the source file, and `mpv` will pick up the updated clip on the next loop.

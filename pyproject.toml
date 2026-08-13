@@ -1,15 +1,24 @@
 [project]
 name = "ppidc-slidev"
 version = "0.1.0"
-description = "Add your description here"
+description = "Slides for Parallel PIDC"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "jupyterlab>=4.6.3",
-    "manim>=0.21.0",
+    "manim>=0.20.1",
+    "manim-themes",
 ]
 
 [dependency-groups]
 dev = [
     "watchfiles>=1.2.0",
 ]
+
+[tool.uv.workspace]
+members = [
+    "ext/manim-themes",
+]
+
+[tool.uv.sources]
+manim-themes = { workspace = true }

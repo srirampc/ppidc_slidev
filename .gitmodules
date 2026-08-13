@@ -1,3 +1,6 @@
 [submodule "slides/ext/slidev-theme-spc-gt"]
 	path = slides/ext/slidev-theme-spc-gt
 	url = https://github.com/srirampc/slidev-theme-spc-gt.git
+[submodule "ext/manim-themes"]
+	path = ext/manim-themes
+	url = https://github.com/srirampc/manim-themes.git

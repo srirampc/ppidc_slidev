@@ -1,16 +1,20 @@
 import manim as mn
 import numpy as np
+from manim_themes import manim_theme as mtheme
 
-from ppidc import cfg
-from ppidc.data import MatParams, MatrixRect
+from ppidc import MatParams, MatrixRect, default_config, matrix_rect
 
 
 class DataT(mn.Scene):
+    def setup(self) -> None:
+        self.cfg = default_config()
+        mtheme.apply_theme(self, theme_name=self.cfg.manim_theme)
+
     def construct(self) -> None:
-        d_rect = cfg.matrix_rect().set_color(cfg.DM_COLOR).shift(3 * mn.LEFT)
+        d_rect = matrix_rect(self.cfg).set_color(self.cfg.d_color).shift(3 * mn.LEFT)
         d_rect_t = (
-            cfg.matrix_rect()
-            .set_color(cfg.G_COLOR)
+            matrix_rect(self.cfg)
+            .set_color(mn.GREEN)
             .shift(3 * mn.RIGHT)
             .rotate(-mn.PI / 2)
             .flip()
@@ -53,17 +57,9 @@ class DataT(mn.Scene):
                     [d_rect_t] + d_matrix_t.arrows,
                 )
             ),
-            # mn.Transform(d_rect.copy(), d_rect_t),
-            # mn.Transform(d_matrix.row_arrow.copy(), d_matrix_t.col_arrow),
-            # mn.Transform(d_matrix.col_arrow.copy(), d_matrix_t.row_arrow),
-            # mn.Transform(d_matrix.row_txt.copy(), d_matrix_t.col_txt),
-            # mn.Transform(d_matrix.col_txt.copy(), d_matrix_t.row_txt),
-            # mn.FadeIn(mat_d_t.text),
             run_time=3,
         )
         self.wait()
         self.next_section()
-        #if d_matrix_t.text_bg_rect:
-        #    self.add(d_matrix_t.text_bg_rect)
         self.play(mn.FadeIn(d_matrix_t.text_object()), run_time=3)
-        # self.wait()
+        self.wait()
