@@ -1,5 +1,6 @@
 import manim as mn
 import manim.typing as mnt
+from manim_themes import manim_theme as mtheme
 
 from ppidc import (
     MatParams,
@@ -13,6 +14,7 @@ from ppidc import (
 class MINet(mn.Scene):
     def setup(self) -> None:
         self.cfg = default_config()
+        mtheme.apply_theme(self, theme_name=self.cfg.manim_theme)
 
     def data_matrix(self, rect_d: mn.Rectangle) -> MatrixRect:
         return MatrixRect(
