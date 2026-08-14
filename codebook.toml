@@ -4,6 +4,11 @@ words = [
     "MANIM",
     "PIDC",
     "PPIDC",
+    "hline",
+    "iterm",
+    "itermcolors",
     "mnt",
     "mtheme",
+    "pyright",
+    "vline",
 ]
