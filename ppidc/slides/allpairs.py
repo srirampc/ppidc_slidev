@@ -1,3 +1,5 @@
+import typing as t
+
 import manim as mn
 import manim.typing as mnt
 from manim_themes import manim_theme as mtheme
@@ -12,9 +14,10 @@ from ppidc import (
 
 
 class MINet(mn.Scene):
+
+    @t.override
     def setup(self) -> None:
-        self.cfg = default_config()
-        mtheme.apply_theme(self, theme_name=self.cfg.manim_theme)
+        mtheme.apply_theme(self, theme_name=default_config().manim_theme)
 
     def data_matrix(self, rect_d: mn.Rectangle) -> MatrixRect:
         return MatrixRect(
@@ -47,7 +50,7 @@ class MINet(mn.Scene):
             .set_color(mn.GRAY_C)
             .shift(v_shift)
         )
-        txt_v = mn.MathTex(txt, fill_color=self.cfg.txt_color).move_to(
+        txt_v = mn.MathTex(txt, fill_color=default_config().txt_color).move_to(
             line_v.get_start() + 0.2 * mn.DOWN, mn.UP
         )
         group_v = mn.VGroup(line_v, txt_v)
@@ -102,26 +105,27 @@ class MINet(mn.Scene):
         )
 
     def mi_function_text(
-        self, shift_line_x, shift_line_y, y_rv: str
+        self, shift_line_x: mn.Line, shift_line_y: mn.Line, y_rv: str
     ) -> tuple[mn.VGroup, mn.MathTex, mn.MathTex]:
+        cfg = default_config()
         fn_text = mn.VGroup(
-            mn.MathTex("MI(", fill_color=self.cfg.txt_color).move_to(
+            mn.MathTex("MI(", fill_color=cfg.txt_color).move_to(
                 shift_line_x.get_end() + 0.2 * mn.LEFT + 0.35 * mn.UP, mn.RIGHT
             ),
-            mn.MathTex(",", fill_color=self.cfg.txt_color).move_to(
+            mn.MathTex(",", fill_color=cfg.txt_color).move_to(
                 0.5 * shift_line_x.get_end()
                 + 0.5 * shift_line_y.get_end()
                 + 0.25 * mn.UP,
                 mn.UP,
             ),
-            mn.MathTex(")", fill_color=self.cfg.txt_color).move_to(
+            mn.MathTex(")", fill_color=cfg.txt_color).move_to(
                 shift_line_y.get_end() + 0.2 * mn.RIGHT + 0.35 * mn.UP, mn.LEFT
             ),
         )
-        rv_text_x = mn.MathTex("X", fill_color=self.cfg.txt_color).move_to(
+        rv_text_x = mn.MathTex("X", fill_color=cfg.txt_color).move_to(
             shift_line_x.get_end() + 0.2 * mn.UP, mn.DOWN
         )
-        rv_text_y = mn.MathTex(y_rv, fill_color=self.cfg.txt_color).move_to(
+        rv_text_y = mn.MathTex(y_rv, fill_color=cfg.txt_color).move_to(
             shift_line_y.get_end() + 0.2 * mn.UP, mn.DOWN
         )
         return fn_text, rv_text_x, rv_text_y
@@ -138,10 +142,12 @@ class MINet(mn.Scene):
         net_lines = mn.VGroup(net_x, net_y, net_x_t, net_y_t)
         return net_lines
 
+    @t.override
     def construct(self) -> None:
+        cfg = default_config()
         x_name = r"\vec{x}"
-        rect_d = matrix_rect(self.cfg).set_color(self.cfg.d_color).shift(4 * mn.LEFT)
-        square_n = matrix_square_width(self.cfg).set_color(mn.BLUE).shift(4 * mn.RIGHT)
+        rect_d = matrix_rect(cfg).set_color(cfg.d_color).shift(4 * mn.LEFT)
+        square_n = matrix_square_width(cfg).set_color(mn.BLUE).shift(4 * mn.RIGHT)
         matrix_d = self.data_matrix(rect_d)
         mat_n = self.adj_matrix(square_n)
         y_names = [r"\vec{y}", r"\vec{w}", r"\vec{z}"]
@@ -152,7 +158,7 @@ class MINet(mn.Scene):
             self.dot_in_square(square_n, 0.4 * mn.LEFT, 0.4 * mn.UP, square_n.color),
             self.dot_in_square(square_n, 0.4 * mn.LEFT, 0.2 * mn.UP, square_n.color),
         ]
-        txt_groups = []
+        txt_groups: list[mn.VGroup] = []
 
         self.play(
             *(

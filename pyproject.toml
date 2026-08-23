@@ -22,3 +22,6 @@ members = [
 
 [tool.uv.sources]
 manim-themes = { workspace = true }
+
+[tool.pyright]
+extraPaths = ["ext/manim-themes"]

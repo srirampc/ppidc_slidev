@@ -5,6 +5,11 @@ words = [
     "PIDC",
     "PPIDC",
     "PUC",
+    "hline",
+    "iterm",
+    "itermcolors",
     "mnt",
     "mtheme",
+    "pyright",
+    "vline",
 ]

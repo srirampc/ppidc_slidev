@@ -1,3 +1,5 @@
+import typing as t
+
 import manim as mn
 import numpy as np
 from manim_themes import manim_theme as mtheme
@@ -6,14 +8,16 @@ from ppidc import MatParams, MatrixRect, default_config, matrix_rect
 
 
 class DataT(mn.Scene):
+    @t.override
     def setup(self) -> None:
-        self.cfg = default_config()
-        mtheme.apply_theme(self, theme_name=self.cfg.manim_theme)
+        mtheme.apply_theme(self, theme_name=default_config().manim_theme)
 
+    @t.override
     def construct(self) -> None:
-        d_rect = matrix_rect(self.cfg).set_color(self.cfg.d_color).shift(3 * mn.LEFT)
+        cfg = default_config()
+        d_rect = matrix_rect(cfg).set_color(cfg.d_color).shift(3 * mn.LEFT)
         d_rect_t = (
-            matrix_rect(self.cfg)
+            matrix_rect(cfg)
             .set_color(mn.GREEN)
             .shift(3 * mn.RIGHT)
             .rotate(-mn.PI / 2)
@@ -39,14 +43,14 @@ class DataT(mn.Scene):
             ),
         )
 
-        self.add(
+        _a = self.add(
             *(
                 mobj
                 for mobj in [d_rect, d_matrix.text_bg_rect, d_matrix.text]
                 if mobj is not None
             )
         )
-        self.add(*d_matrix.arrows)
+        _a = self.add(*d_matrix.arrows)
         self.wait()
         self.next_section()
         self.play(

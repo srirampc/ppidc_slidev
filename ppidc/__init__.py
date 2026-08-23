@@ -10,11 +10,11 @@ type ThemeType = t.Literal["dark", "light"]
 
 class Config:
     def __init__(self, theme: ThemeType = "dark"):
-        self.d_width = 2
-        self.d_height = 4
-        self.d_grid_step = 0.2
-        self.d_grid_stroke = 1
-        self.g_size = self.d_width
+        self.d_width : float  = 2
+        self.d_height : float  = 4
+        self.d_grid_step : float = 0.2
+        self.d_grid_stroke : float = 1
+        self.g_size : float = self.d_width
 
         self.theme: t.Literal["dark", "light"] = theme
         match self.theme:
@@ -22,11 +22,12 @@ class Config:
                 self.manim_theme: str = "Catppuccin Mocha"
             case "light":
                 self.manim_theme = "Catppuccin Latte"
-        theme = mtheme.load_iterm2_theme(theme_name=self.manim_theme)
-        # convert the theme colors to hex
-        theme_colors = mtheme.convert_colors_to_manim_colors(theme)
+        # load an convert the theme colors to hex
+        theme_colors = mtheme.convert_colors_to_manim_colors(  # pyright: ignore[reportUnknownMemberType]
+            mtheme.load_iterm2_theme(theme_name=self.manim_theme)  # pyright: ignore[reportAny]
+        )
 
-        self.txt_color = theme_colors["Ansi 7 Color"].to_hex()
+        self.txt_color: str = theme_colors["Ansi 7 Color"].to_hex()
         # m.BLACK = theme_manim_colors['Ansi 0 Color']
         self.bkg_color: mn.ManimColor = theme_colors["Background Color"]
         self.d_color: mn.ManimColor = theme_colors[
@@ -39,13 +40,24 @@ class Config:
         # Set background
         mn.config.background_color = self.bkg_color
 
+g_DEFAULT_THEME : ThemeType = "dark"
+g_DEFAULT_CONFIG : Config | None = None
 
 def default_theme() -> ThemeType:
-    return "dark"
+    return g_DEFAULT_THEME
+
+def set_default_theme(theme: ThemeType):
+    global g_DEFAULT_THEME
+    g_DEFAULT_THEME = theme
 
 
 def default_config(theme: ThemeType | None = None) -> Config:
-    return Config(theme=theme if theme else default_theme())
+    global g_DEFAULT_CONFIG
+    if g_DEFAULT_CONFIG is None:
+        g_DEFAULT_CONFIG =  Config(theme=theme if theme else default_theme())
+        return g_DEFAULT_CONFIG
+    else:
+        return g_DEFAULT_CONFIG
 
 
 def matrix_rect(cfg: Config) -> mn.Rectangle:
@@ -55,7 +67,7 @@ def matrix_rect(cfg: Config) -> mn.Rectangle:
         grid_xstep=cfg.d_grid_step,
         grid_ystep=cfg.d_grid_step,
     )
-    d_rect.grid_lines.set_stroke(width=cfg.d_grid_stroke)
+    _g = d_rect.grid_lines.set_stroke(width=cfg.d_grid_stroke)
     return d_rect
 
 
@@ -65,7 +77,7 @@ def matrix_square_width(cfg: Config) -> mn.Square:
         grid_xstep=cfg.d_grid_step,
         grid_ystep=cfg.d_grid_step,
     )
-    d_rect.grid_lines.set_stroke(width=cfg.d_grid_stroke)
+    _g = d_rect.grid_lines.set_stroke(width=cfg.d_grid_stroke)
     return d_rect
 
 
@@ -85,35 +97,35 @@ class MatrixRect:
     def __init__(
         self, rect: mn.Rectangle, vertices: mnt.Point3D_Array, params: MatParams
     ):
-        self.rect = rect
-        self.vertices = vertices
-        self.rp = params
-        self.col_arrow = (
+        self.rect: mn.Rectangle = rect
+        self.vertices: mnt.Point3D_Array = vertices
+        self.rp: MatParams = params
+        self.col_arrow: mn.DoubleArrow = (
             mn.DoubleArrow(vertices[2], vertices[1], stroke_width=2.5, tip_length=0.2)
             .set_color(params.color)
             .shift(params.col_off * mn.LEFT)
         )
-        self.row_arrow = (
+        self.row_arrow: mn.DoubleArrow = (
             mn.DoubleArrow(vertices[0], vertices[1], stroke_width=2.5, tip_length=0.2)
             .set_color(params.color)
             .shift(params.row_off * mn.UP)
         )
-        self.col_txt = (
+        self.col_txt: mn.MathTex = (
             mn.MathTex(params.col_name, fill_color=params.color)
             .move_to(self.col_arrow.get_midpoint())
             .rotate(mn.PI / 2)
             .shift(params.col_off * mn.LEFT)
         )
-        self.row_txt = (
+        self.row_txt: mn.MathTex = (
             mn.MathTex(params.row_name, fill_color=params.color)
             .move_to(self.row_arrow.get_midpoint())
             .shift(params.row_off * mn.UP)
         )
-        if (params.text_pos == mn.DOWN).all():
-            self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
+        if (params.text_pos == mn.DOWN).all():  # pyright: ignore[reportAny]
+            self.text : mn.MathTex = mn.MathTex(params.name, fill_color=params.color).move_to(
                 rect.get_bottom() + 0.2 * mn.DOWN, mn.UP
             )
-        elif (params.text_pos == mn.UP).all():
+        elif (params.text_pos == mn.UP).all():  # pyright: ignore[reportAny]
             self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
                 self.row_txt.get_top() + 0.2 * mn.UP, mn.DOWN
             )
@@ -121,8 +133,8 @@ class MatrixRect:
             self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
                 rect.get_center()
             )
-        self.arrows = [self.row_arrow, self.col_arrow, self.row_txt, self.col_txt]
-        self.text_bg_rect = None
+        self.arrows: list[mn.VMobject] = [self.row_arrow, self.col_arrow, self.row_txt, self.col_txt]
+        self.text_bg_rect: mn.BackgroundRectangle | None = None
         if params.text_bg_rect:
             self.text_bg_rect = mn.BackgroundRectangle(self.text)
 
