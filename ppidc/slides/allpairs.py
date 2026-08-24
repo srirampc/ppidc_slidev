@@ -17,7 +17,7 @@ class MINet(mn.Scene):
 
     @t.override
     def setup(self) -> None:
-        mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        mtheme.apply_theme(self, theme_name=default_config().manim_theme)  # pyright: ignore[reportUnknownMemberType]
 
     def data_matrix(self, rect_d: mn.Rectangle) -> MatrixRect:
         return MatrixRect(
