@@ -10,7 +10,7 @@ from ppidc import MatParams, MatrixRect, default_config, matrix_rect
 class DataT(mn.Scene):
     @t.override
     def setup(self) -> None:
-        mtheme.apply_theme(self, theme_name=default_config().manim_theme)  # pyright: ignore[reportUnknownMemberType]
+        mtheme.apply_theme(self, theme_name=default_config().manim_theme)
 
     @t.override
     def construct(self) -> None:

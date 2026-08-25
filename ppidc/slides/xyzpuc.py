@@ -30,7 +30,7 @@ class Tangents:
         pt_bottom: mnt.Vector3D = z_pt + r * mn.DOWN
         pt_top: mnt.Vector3D = z_pt + r * (
             mn.UP + mn.LEFT if src_pt[0] < 0 else mn.UP + mn.RIGHT
-        ) / float(np.sqrt(2))
+        ) / float(np.sqrt(2))  # pyright: ignore[reportAny]
         # Line aimed at the circle bottom
         self.line_bottom = mn.Line(src_pt, pt_bottom, color=color)
         self.line_bottom.z_index = z_circle.z_index - 1
@@ -58,7 +58,7 @@ class Tangents:
 class PUC(mn.Scene):
     @t.override
     def setup(self) -> None:
-        mtheme.apply_theme(self, theme_name=default_config().manim_theme)  # pyright: ignore[reportUnknownMemberType]
+        mtheme.apply_theme(self, theme_name=default_config().manim_theme)
 
     @t.override
     def construct(self) -> None:
