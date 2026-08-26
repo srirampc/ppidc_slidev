@@ -8,7 +8,7 @@ from manim_themes import manim_theme as mtheme
 from ppidc import default_config
 
 
-class UniqInfo(mn.Scene):
+class UniqC(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
@@ -22,20 +22,23 @@ class UniqInfo(mn.Scene):
         mid_xy = line_xy.get_midpoint()
         x_dot = mn.Dot(x_pt, color=cfg.txt_color)
         y_dot = mn.Dot(y_pt, color=cfg.txt_color)
+        z_pt = mid_xy + 3 * mn.UP
+        z_dot = mn.Dot(z_pt, color=cfg.txt_color)
         x_label = mn.MathTex("X", fill_color=cfg.txt_color).next_to(
             line_xy.get_start(), mn.LEFT
         )
         y_label = mn.MathTex("Y", fill_color=cfg.txt_color).next_to(
             line_xy.get_end(), mn.RIGHT
         )
-        z_pt = mid_xy + 3 * mn.UP
-        z_dot = mn.Dot(z_pt, color=cfg.txt_color)
+        z_label = mn.MathTex("Z", fill_color=cfg.txt_color).next_to(
+            z_pt, mn.UP
+        )
         self.play(
-            mn.Create(line_xy),
             mn.Create(x_dot),
             mn.Create(y_dot),
+            mn.Create(z_dot),
             mn.Write(x_label),
             mn.Write(y_label),
-            mn.Write(z_dot),
+            mn.Write(z_label),
         )
         self.next_section()
