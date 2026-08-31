@@ -6,6 +6,7 @@ dist/
 wheels/
 media/videos
 media/images
+media/texts
 media/TeX
 tmp/
 *.egg-info
