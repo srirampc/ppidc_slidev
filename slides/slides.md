@@ -57,6 +57,15 @@ clicks: 3
 
 
 ---
+transition: fade-out
+clicks: 6
+---
+# Specific Information $I_s(y; X)$
+
+<SpecificSpecificInfo auto-start />
+
+
+---
 
 # Powered by _**Slidev**_
 
