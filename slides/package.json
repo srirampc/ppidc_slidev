@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "build": "pnpm --dir ext/slidev-theme-spc-gt install && slidev build",
+    "build:teaser": "pnpm --dir ext/slidev-theme-spc-gt install && slidev build slides_teaser.md",
     "dev": "pnpm --dir ext/slidev-theme-spc-gt install && slidev --open",
+    "dev:teaser": "pnpm --dir ext/slidev-theme-spc-gt install && slidev slides_teaser.md --open --port 3033",
     "export": "slidev export",
     "postinstall": "cd ext/slidev-theme-spc-gt && pnpm install"
   },

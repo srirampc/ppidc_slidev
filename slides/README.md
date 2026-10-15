@@ -17,18 +17,25 @@ pnpm install
 
 ## Commands
 
-| Command        | What it does                                                              |
-| -------------- | ------------------------------------------------------------------------- |
-| `pnpm dev`     | Dev server with hot reload at `http://localhost:3030`                     |
-| `pnpm build`   | Static build to `dist/` (any static HTTP server can host it)              |
-| `pnpm preview` | Serves the `dist/` build locally, to sanity-check before deploying        |
-| `pnpm export`  | Exports to PDF/PNG/PPTX (requires `playwright-chromium`, see Slidev docs) |
+| Command                | What it does                                                              |
+| ---------------------- | ------------------------------------------------------------------------- |
+| `pnpm run dev`         | Main deck dev server with hot reload at `http://localhost:3030`           |
+| `pnpm run dev:teaser`  | Teaser dev server with hot reload at `http://localhost:3033`              |
+| `pnpm run build`       | Builds the main deck to `dist/`                                           |
+| `pnpm run build:teaser`| Builds the teaser deck to `dist/`                                         |
+| `pnpm preview`         | Serves the `dist/` build locally, to sanity-check before deploying        |
+| `pnpm export`          | Exports to PDF/PNG/PPTX (requires `playwright-chromium`, see Slidev docs) |
+
+Both build commands write to `dist/`; building either deck replaces the
+previous local build.
 
 ## Directory notes
 
 - **`slides.md`** — the deck itself. Component tags for animated slides come
   from `slides/snippets/SNIPPETS.md` (generated — check there for the exact
   tag + required `clicks:` value per scene before pasting into a slide).
+- **`slides_teaser.md`** — the teaser deck. Use `pnpm run dev:teaser` to preview
+  it or `pnpm run build:teaser` to build it.
 - **`components/generated/`** — one wrapper component per Manim scene,
   fully regenerated on every `build_assets.py` run. Don't hand-edit these;
   edit the source scene in `../ppidc/` instead and rebuild.
