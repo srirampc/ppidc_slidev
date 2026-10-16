@@ -5,8 +5,10 @@
   "scripts": {
     "build": "pnpm --dir ext/slidev-theme-spc-gt install && slidev build",
     "build:teaser": "pnpm --dir ext/slidev-theme-spc-gt install && slidev build slides_teaser.md",
+    "build:archive": "pnpm --dir ext/slidev-theme-spc-gt install && slidev build slides_archive.md",
     "dev": "pnpm --dir ext/slidev-theme-spc-gt install && slidev --open",
     "dev:teaser": "pnpm --dir ext/slidev-theme-spc-gt install && slidev slides_teaser.md --open --port 3033",
+    "dev:archive": "pnpm --dir ext/slidev-theme-spc-gt install && slidev slides_archive.md --open --port 3001",
     "export": "slidev export",
     "postinstall": "cd ext/slidev-theme-spc-gt && pnpm install"
   },

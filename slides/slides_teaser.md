@@ -22,75 +22,47 @@ transition: slide-left
 # enable Comark Syntax: https://comark.dev/syntax/markdown
 comark: true
 # duration of the presentation
-duration: 35min
-presenterName: Sriram, A, and B
+duration: 3min
+presenterName: Sriram Chockalingam 
 affiliation: Georgia Institute of Technology
 mdc: true
 ---
 
-# A _**Somewhat Long Title**_ for a Math Talk or Lecture
+## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from Single-Cell Datasets 
 
-### Some Subtitle, Maybe Software | _**Conference**_ @ Place, Country
+####   _**SC '26 @ Chicago, USA**_
 
 <template #extra>
 
-Extra content: Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
+Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 
 </template>
 
 ---
 transition: fade-out
-clicks: 21
 ---
 
-# Example Animation
+# Problem Definition
 
-<AllpairsMINet auto-start />
+- Gene Networks
+- Data in network out 
+- MI methods for every pair 
+
+---
+transition: fade-in
+---
+# Existing Solution
+
+- PIDC
+- Specific Information
+- Takes $O(n^3)$ 
 
 ---
 transition: fade-out
-clicks: 3
 ---
-# Transpose Xform
-
-<TransposeDataT auto-start />
-
+# Our Solution
 
 ---
-
-# Powered by _**Slidev**_
-
-Slidev is a slide maker and <span v-mark.yellow>presentation tool</span> designed for developers.
-
-This theme, leaning on the CD of the University of Graz, has been created by [Benjamin Hackl](https://benjamin-hackl.at).
-
-<div v-click>
-
-To start a new presentation, simply start a new file `slides.md`
-with a bit of content like
-
-</div>
-<div v-click="3">
-
-```md {none|1-5|all}{lines: true, at: '+1'}
+transition: fade-out
 ---
-theme: path/to/slidev-theme-behackl-kfu
-presenterName: Benjamin Hackl
-affiliation: Department of Mathematics and Scientific Computing / University of Graz
----
-
-# Fancy Main Title
-
-### With Some Subtitle
-
-```
-</div>
-<div v-click>
-
-Then startup the preview server using
-
-```bash
-$ npx slidev
-```
-
-</div>
+# Results
