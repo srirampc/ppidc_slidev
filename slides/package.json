@@ -10,12 +10,16 @@
     "dev:teaser": "pnpm --dir ext/slidev-theme-spc-gt install && slidev slides_teaser.md --open --port 3033",
     "dev:archive": "pnpm --dir ext/slidev-theme-spc-gt install && slidev slides_archive.md --open --port 3001",
     "export": "slidev export",
+    "export:archive": "slidev export slides_archive.md",
     "postinstall": "cd ext/slidev-theme-spc-gt && pnpm install"
   },
   "dependencies": {
-    "@slidev/cli": "^52.19.0",
+    "@slidev/cli": "^52.20.1",
     "@slidev/theme-default": "latest",
     "@slidev/theme-seriph": "latest",
-    "vue": "^3.5.41"
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.64.1"
   }
 }

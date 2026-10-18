@@ -23,9 +23,11 @@ transition: slide-left
 comark: true
 # duration of the presentation
 duration: 20min
-presenterName: Sriram Chockalingam 
+presenterName: Sriram P Chockalingam 
 affiliation: Georgia Institute of Technology
 mdc: true
+fonts:
+  sans: Concourse T3
 ---
 
 ## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from Single-Cell Datasets 
@@ -42,37 +44,124 @@ Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 transition: fade-out
 ---
 
-# Problem Definition
+# Gene Regulatory Networks (GRN) construction
 
-- Gene Networks
-- Data in network out 
-- MI methods for every pair 
-
+- Advances in single-cell gene expression data 
+  - Data size increased from tens of thousands to millions
+  - Data has missing values and noisy
+- Mutual Information (MI) based networks
+  - Higher MI implies a stronger correlation
+  - Focus on **PIDC**, a method tailored of single-cell data
+  - **PIDC** handles data characteristics via. partial-information decomposition. 
+  - **PIDC** takes $O(n^3)$ time 
+  
 ---
-transition: fade-in
+transition: fade-out
 ---
-# Existing Solution
+# Problem Definition and Contributions
 
-- PIDC
-- Specific Information
-- Takes $O(n^3)$ 
+- Formal Problem Definition:
+  - Input: $\mathsf{D} \in \mathbb{R}^{m \times n}$, $m$ observations of $n$ genes.  
+  - Output: $\mathsf{G} \in \mathbb{R}^{n \times n}$, adjacency matrix representing a network of $n$ genes,
+- Contributions
+  - $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
+  - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ parallel algorithm. 
+  - Achieves $158$X speedup over the existing method.
+  - Scales to a human-genome: $30,000$-gene network from $\approx800$K cells in $2.5$ hours using $2,048$ cores.
 
 ---
 transition: fade-out
 ---
-# Our Solution
+# Background : Random variables and MI
+
+- Notations
+  - Uppercase alphabet $X, Y, Z$: Random variables
+  - $\mathcal{X}, |\mathcal{X}|=n$: Set of discrete random variables, each representing a gene.
+  - $x \in X$ to also denote the distinct values, random variable $X$ can take.
+  - $P(X,Y)$ joint distribution of two genes represented by $X$ and $Y$.
+  - $p(x, y)$: probability value  $P(X=x,Y=y)$ 
+- Mutual Information:
+  $$I(X,Y) = \sum_{x \in X} \sum_{y \in Y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)$$
 
 ---
 transition: fade-out
 ---
-# Implementation : Algorithm difference
+# Background : Redundancy and Unique Contribution
+
+- Specific Information: Given $X \in \mathcal{X}, y \in Y$
+    $$
+        I_{s}(y; X) = \sum_{x \in X} \frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x) \cdot p(y)} \right)
+    $$
+- Redundancy
+  - $\rho((X, Y); Z) = \sum_{z \in Z} p(z) \min (I_{s}(z; X), I_{s}(z; Y) )$ 
+- Partial Information Decomposition
+  - Unique Contribution, $\nu((X, Z); Y)) =  I(X, Y) - \rho((X, Z); Y)$
+---
+transition: fade-out
+---
+# Background : PUC
+
+- Specific Information: Given $X \in \mathcal{X}, y \in Y$
+ 
+---
+transition: fade-out
+---
+# Algorithm : Key Insight
+- Tanles
+
+---
+transition: fade-out
+---
+# Algorithm : Sequential Algorithm
 - implementation
 
 ---
 transition: fade-out
 ---
-# Implementation : HDF5
+# Algorithm : Parallel Algorithm I
 - implementation
+
+---
+transition: fade-out
+---
+# Algorithm : Parallel Algorithm II
+- implementation
+
+---
+transition: fade-out
+---
+# Implementation 
+- implementation
+
+---
+transition: fade-out
+---
+# Implementation : Parallel Algorithm
+- implementation
+
+---
+transition: fade-out
+---
+# Implementation : Computing $P(X)$
+- implementation
+
+---
+transition: fade-out
+---
+# Implementation : Computing $P(X,Y)$
+- implementation
+
+---
+transition: fade-out
+---
+# Implementation : Algorithm
+- implementation
+
+---
+transition: fade-out
+---
+# Experiments: Datasets
+- 385 x
 
 ---
 transition: fade-out
