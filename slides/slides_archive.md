@@ -28,6 +28,7 @@ affiliation: Georgia Institute of Technology
 mdc: true
 fonts:
   sans: Concourse T3
+  local: Concourse T3
 ---
 
 ## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from Single-Cell Datasets 
@@ -173,7 +174,13 @@ transition: fade-out
 transition: fade-out
 ---
 # Results : Strong Scaling  and Weak Scaling
-- Strong and Weak
+- Strong
+
+---
+transition: fade-out
+---
+# Results : Weak Scaling
+- Weak
 ---
 transition: fade-out
 ---
