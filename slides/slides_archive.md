@@ -1,9 +1,10 @@
 ---
-# try also 'default' to start simple
 theme: ext/slidev-theme-spc-gt
 # addons, can be a list of package names or local paths
 # Learn more: https://sli.dev/guide/theme-addon.html#use-addon
-addons: []
+addons: 
+  - fancy-arrow
+  - tikzjax
 # random image from a curated Unsplash collection by Anthony
 # like them? see https://unsplash.com/collections/94734566/slidev
 background: https://cover.sli.dev
@@ -26,8 +27,10 @@ duration: 20min
 presenterName: Sriram P Chockalingam 
 affiliation: Georgia Institute of Technology
 mdc: true
+# Fonts
 fonts:
   sans: Concourse T3
+  serif: Equity Text B
   local: Concourse T3
 ---
 
@@ -103,7 +106,7 @@ transition: fade-out
 # Background : PUC
 
 - Specific Information: Given $X \in \mathcal{X}, y \in Y$
- 
+ <FancyArrow from="(10, 20)" to="(30, 40)" />
 ---
 transition: fade-out
 ---
@@ -151,6 +154,7 @@ transition: fade-out
 ---
 # Implementation : Computing $P(X,Y)$
 - implementation
+![](/img/block-dist.svg){width=300px lazy}
 
 ---
 transition: fade-out
@@ -167,25 +171,29 @@ transition: fade-out
 ---
 transition: fade-out
 ---
-# Results vs Sequential
+# Results for dataset $D1$
 - 385 x
-
+![](/img/strong-scaling-small-ai.svg){width=500px lazy}
 ---
 transition: fade-out
 ---
-# Results : Strong Scaling  and Weak Scaling
-- Strong
-
+# Results : Dataset $D2$
+- test
+  |A|B|
+  |--|--|
+  | ![](/img/relative-speedup-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
+  |--|--|
 ---
 transition: fade-out
 ---
 # Results : Weak Scaling
 - Weak
+![](/img/runtime-growth-n-ai.svg){width=500px lazy}
 ---
 transition: fade-out
 ---
 # Results : Big Datasets
-- x
+![](/img/strong-scaling-big-ai.svg){width=500px lazy}
 
 ---
 transition: fade-out

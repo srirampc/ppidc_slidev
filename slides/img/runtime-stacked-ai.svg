@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 305.95 190.97">
+  <defs>
+    <style>
+      .c {
+        fill: #ffa64d;
+      }
+
+      .d {
+        letter-spacing: 0em;
+      }
+
+      .e {
+        stroke: #99f;
+      }
+
+      .e, .f, .g, .h, .i, .j, .k, .l, .m {
+        fill: none;
+      }
+
+      .e, .f, .h, .i, .j, .k, .l, .m {
+        stroke-miterlimit: 10;
+      }
+
+      .e, .f, .h, .j, .k, .l, .m {
+        stroke-width: .4px;
+      }
+
+      .n {
+        font-family: ConcourseT3, 'Concourse T3';
+        font-size: 10.91px;
+      }
+
+      .o {
+        letter-spacing: .22em;
+      }
+
+      .p {
+        fill: #2626ff;
+      }
+
+      .f {
+        stroke: #ffb266;
+      }
+
+      .q {
+        letter-spacing: .22em;
+      }
+
+      .r {
+        letter-spacing: 0em;
+      }
+
+      .s {
+        fill: #fff;
+      }
+
+      .t {
+        letter-spacing: .22em;
+      }
+
+      .u {
+        fill: #fc9;
+      }
+
+      .h {
+        stroke: blue;
+      }
+
+      .v {
+        letter-spacing: 0em;
+      }
+
+      .i {
+        stroke: gray;
+        stroke-width: .2px;
+      }
+
+      .w {
+        letter-spacing: .29em;
+      }
+
+      .x {
+        clip-path: url(#b);
+      }
+
+      .y {
+        fill: #bfbfff;
+      }
+
+      .j {
+        stroke: #4d4dff;
+      }
+
+      .k {
+        stroke: #ff8000;
+      }
+
+      .z {
+        fill: #7373ff;
+      }
+
+      .l {
+        stroke: #ff8c1a;
+      }
+
+      .m {
+        stroke: #000;
+      }
+
+      .aa {
+        letter-spacing: 0em;
+      }
+
+      .ab {
+        fill: #ff8000;
+      }
+
+      .ac {
+        letter-spacing: 0em;
+      }
+    </style>
+    <clipPath id="b">
+      <rect class="g" x="38.76" y="4.25" width="266.98" height="153.6"/>
+    </clipPath>
+  </defs>
+  <path class="i" d="M274.94,0v4.25M240.71,0v4.25M206.48,0v4.25M172.26,0v4.25M138.03,0v4.25M103.8,0v4.25M69.57,0v4.25M274.94,162.11v-4.25M240.71,162.11v-4.25M206.48,162.11v-4.25M172.26,162.11v-4.25M138.03,162.11v-4.25M103.8,162.11v-4.25M69.57,162.11v-4.25"/>
+  <path class="i" d="M305.75,37.33h-4.25M305.75,77.51h-4.25M305.75,117.68h-4.25M305.75,157.85h-4.25M38.76,37.33h4.25M38.76,77.51h4.25M38.76,117.68h4.25M38.76,157.85h4.25"/>
+  <rect class="m" x="38.76" y="4.25" width="266.98" height="153.6"/>
+  <text class="n" transform="translate(64.11 172.97)"><tspan x="0" y="0">16</tspan></text>
+  <text class="n" transform="translate(98.34 172.97)"><tspan x="0" y="0">32</tspan></text>
+  <text class="n" transform="translate(132.57 172.97)"><tspan x="0" y="0">64</tspan></text>
+  <text class="n" transform="translate(164.07 172.97)"><tspan x="0" y="0">128</tspan></text>
+  <text class="n" transform="translate(198.3 172.97)"><tspan x="0" y="0">256</tspan></text>
+  <text class="n" transform="translate(232.53 172.97)"><tspan x="0" y="0">512</tspan></text>
+  <text class="n" transform="translate(264.03 172.97)"><tspan x="0" y="0">1024</tspan></text>
+  <text class="n" transform="translate(29.47 161.37)"><tspan x="0" y="0">0</tspan></text>
+  <text class="n" transform="translate(18.57 121.19)"><tspan x="0" y="0">200</tspan></text>
+  <text class="n" transform="translate(18.57 81.02)"><tspan x="0" y="0">400</tspan></text>
+  <text class="n" transform="translate(18.57 40.85)"><tspan x="0" y="0">600</tspan></text>
+  <g class="x">
+    <path class="u" d="M261.99,157.85h7.97v-5.67h-7.97v5.67ZM227.76,157.85h7.97v-3.37h-7.97v3.37ZM193.53,157.85h7.97v-3.94h-7.97v3.94ZM159.3,157.85h7.97v-4.19h-7.97v4.19ZM125.08,157.85h7.97v-6.76h-7.97v6.76ZM90.85,157.85h7.97v-12.55h-7.97v12.55ZM56.62,157.85h7.97v-23.82h-7.97v23.82Z"/>
+    <path class="f" d="M261.99,157.85h7.97v-5.67h-7.97v5.67ZM227.76,157.85h7.97v-3.37h-7.97v3.37ZM193.53,157.85h7.97v-3.94h-7.97v3.94ZM159.3,157.85h7.97v-4.19h-7.97v4.19ZM125.08,157.85h7.97v-6.76h-7.97v6.76ZM90.85,157.85h7.97v-12.55h-7.97v12.55ZM56.62,157.85h7.97v-23.82h-7.97v23.82Z"/>
+    <path class="y" d="M261.99,157.85h7.97v-.65h-7.97v.65ZM227.76,157.85h7.97v-1.02h-7.97v1.02ZM193.53,157.85h7.97v-1.86h-7.97v1.86ZM159.3,157.85h7.97v-3.53h-7.97v3.53ZM125.08,157.85h7.97v-6.17h-7.97v6.17ZM90.85,157.85h7.97v-11.8h-7.97v11.8ZM56.62,157.85h7.97v-22.63h-7.97v22.63Z"/>
+    <path class="e" d="M261.99,157.85h7.97v-.65h-7.97v.65ZM227.76,157.85h7.97v-1.02h-7.97v1.02ZM193.53,157.85h7.97v-1.86h-7.97v1.86ZM159.3,157.85h7.97v-3.53h-7.97v3.53ZM125.08,157.85h7.97v-6.17h-7.97v6.17ZM90.85,157.85h7.97v-11.8h-7.97v11.8ZM56.62,157.85h7.97v-22.63h-7.97v22.63Z"/>
+    <path class="c" d="M270.96,157.85h7.97v-9.7h-7.97v9.7ZM236.73,157.85h7.97v-8.86h-7.97v8.86ZM202.5,157.85h7.97v-11.71h-7.97v11.71ZM168.27,157.85h7.97v-17.05h-7.97v17.05ZM134.04,157.85h7.97v-28.45h-7.97v28.45ZM99.81,157.85h7.97v-51.75h-7.97v51.75ZM65.58,157.85h7.97V60.6h-7.97v97.25Z"/>
+    <path class="l" d="M270.96,157.85h7.97v-9.7h-7.97v9.7ZM236.73,157.85h7.97v-8.86h-7.97v8.86ZM202.5,157.85h7.97v-11.71h-7.97v11.71ZM168.27,157.85h7.97v-17.05h-7.97v17.05ZM134.04,157.85h7.97v-28.45h-7.97v28.45ZM99.81,157.85h7.97v-51.75h-7.97v51.75ZM65.58,157.85h7.97V60.6h-7.97v97.25Z"/>
+    <path class="z" d="M270.96,157.85h7.97v-2.27h-7.97v2.27ZM236.73,157.85h7.97v-3.69h-7.97v3.69ZM202.5,157.85h7.97v-6.75h-7.97v6.75ZM168.27,157.85h7.97v-12.62h-7.97v12.62ZM134.04,157.85h7.97v-23.27h-7.97v23.27ZM99.81,157.85h7.97v-44.64h-7.97v44.64ZM65.58,157.85h7.97v-87.17h-7.97v87.17Z"/>
+    <path class="j" d="M270.96,157.85h7.97v-2.27h-7.97v2.27ZM236.73,157.85h7.97v-3.69h-7.97v3.69ZM202.5,157.85h7.97v-6.75h-7.97v6.75ZM168.27,157.85h7.97v-12.62h-7.97v12.62ZM134.04,157.85h7.97v-23.27h-7.97v23.27ZM99.81,157.85h7.97v-44.64h-7.97v44.64ZM65.58,157.85h7.97v-87.17h-7.97v87.17Z"/>
+    <path class="ab" d="M279.92,157.85h7.97v-14.09h-7.97v14.09ZM245.69,157.85h7.97v-14.41h-7.97v14.41ZM211.47,157.85h7.97v-15.22h-7.97v15.22ZM177.24,157.85h7.97v-22.19h-7.97v22.19ZM143.01,157.85h7.97v-39.73h-7.97v39.73ZM108.78,157.85h7.97v-73.31h-7.97v73.31ZM74.55,157.85h7.97V18.22h-7.97v139.64Z"/>
+    <path class="k" d="M279.92,157.85h7.97v-14.09h-7.97v14.09ZM245.69,157.85h7.97v-14.41h-7.97v14.41ZM211.47,157.85h7.97v-15.22h-7.97v15.22ZM177.24,157.85h7.97v-22.19h-7.97v22.19ZM143.01,157.85h7.97v-39.73h-7.97v39.73ZM108.78,157.85h7.97v-73.31h-7.97v73.31ZM74.55,157.85h7.97V18.22h-7.97v139.64Z"/>
+    <path class="p" d="M279.92,157.85h7.97v-3.06h-7.97v3.06ZM245.69,157.85h7.97v-5.09h-7.97v5.09ZM211.47,157.85h7.97v-9.47h-7.97v9.47ZM177.24,157.85h7.97v-17.37h-7.97v17.37ZM143.01,157.85h7.97v-33.82h-7.97v33.82ZM108.78,157.85h7.97v-64.95h-7.97v64.95ZM74.55,157.85h7.97V30.82h-7.97v127.03Z"/>
+    <path class="h" d="M279.92,157.85h7.97v-3.06h-7.97v3.06ZM245.69,157.85h7.97v-5.09h-7.97v5.09ZM211.47,157.85h7.97v-9.47h-7.97v9.47ZM177.24,157.85h7.97v-17.37h-7.97v17.37ZM143.01,157.85h7.97v-33.82h-7.97v33.82ZM108.78,157.85h7.97v-64.95h-7.97v64.95ZM74.55,157.85h7.97V30.82h-7.97v127.03Z"/>
+  </g>
+  <text class="n" transform="translate(128.98 188.46)"><tspan x="0" y="0">Numbe</tspan><tspan class="q" x="31.85" y="0">r</tspan><tspan x="37.75" y="0">o</tspan><tspan class="o" x="43.09" y="0">f</tspan><tspan class="aa" x="48.98" y="0">co</tspan><tspan class="v" x="58.69" y="0">r</tspan><tspan x="62.09" y="0">e</tspan><tspan class="t" x="67" y="0">s</tspan><tspan x="73.42" y="0">(</tspan></text>
+  <text class="n" transform="translate(206.22 188.46)"><tspan x="0" y="0">p</tspan></text>
+  <text class="n" transform="translate(211.71 188.46)"><tspan x="0" y="0">)</tspan></text>
+  <text class="n" transform="translate(9.16 105.87) rotate(-90)"><tspan x="0" y="0">Ru</tspan><tspan class="r" x="11.45" y="0">n</tspan><tspan class="aa" x="16.59" y="0">tim</tspan><tspan class="t" x="30.67" y="0">e</tspan><tspan x="37.95" y="0">(s)</tspan></text>
+  <rect class="s" x="114.9" y="9.06" width="189.47" height="43.76"/>
+  <rect class="m" x="114.9" y="9.06" width="189.47" height="43.76"/>
+  <rect class="u" x="118.09" y="12.01" width="8.5" height="8.5"/>
+  <rect class="f" x="118.09" y="12.01" width="8.5" height="8.5"/>
+  <text class="n" transform="translate(137.49 20.68)"><tspan x="0" y="0">5</tspan><tspan class="o" x="5.89" y="0">K</tspan><tspan x="14.84" y="0">Comm</tspan><tspan class="w" x="43.75" y="0">.</tspan><tspan class="q" x="49.89" y="0">+</tspan><tspan x="58.07" y="0">I/O</tspan></text>
+  <rect class="y" x="222.82" y="12.01" width="8.5" height="8.5"/>
+  <rect class="e" x="222.82" y="12.01" width="8.5" height="8.5"/>
+  <text class="n" transform="translate(242.22 20.64)"><tspan x="0" y="0">5</tspan><tspan class="o" x="5.89" y="0">K</tspan><tspan x="14.84" y="0">Compute</tspan></text>
+  <rect class="c" x="118.09" y="25.27" width="8.5" height="8.5"/>
+  <rect class="l" x="118.09" y="25.27" width="8.5" height="8.5"/>
+  <text class="n" transform="translate(134.76 33.94)"><tspan x="0" y="0">10</tspan><tspan class="q" x="11.35" y="0">K</tspan><tspan class="d" x="20.29" y="0">Comm</tspan><tspan class="w" x="49.2" y="0">.</tspan><tspan class="o" x="55.34" y="0">+</tspan><tspan x="63.52" y="0">I/O</tspan></text>
+  <rect class="z" x="222.82" y="25.27" width="8.5" height="8.5"/>
+  <rect class="j" x="222.82" y="25.27" width="8.5" height="8.5"/>
+  <text class="n" transform="translate(239.49 33.9)"><tspan x="0" y="0">10</tspan><tspan class="o" x="11.35" y="0">K</tspan><tspan class="ac" x="20.29" y="0">Compute</tspan></text>
+  <rect class="ab" x="118.09" y="38.53" width="8.5" height="8.5"/>
+  <rect class="k" x="118.09" y="38.53" width="8.5" height="8.5"/>
+  <text class="n" transform="translate(135.03 47.2)"><tspan x="0" y="0">12</tspan><tspan class="q" x="10.8" y="0">K</tspan><tspan class="d" x="19.75" y="0">Comm</tspan><tspan class="w" x="48.65" y="0">.</tspan><tspan class="q" x="54.8" y="0">+</tspan><tspan x="62.98" y="0">I/O</tspan></text>
+  <rect class="p" x="222.82" y="38.53" width="8.5" height="8.5"/>
+  <rect class="h" x="222.82" y="38.53" width="8.5" height="8.5"/>
+  <text class="n" transform="translate(239.77 47.16)"><tspan x="0" y="0">12</tspan><tspan class="o" x="10.8" y="0">K</tspan><tspan x="19.75" y="0">Compute</tspan></text>
+</svg>

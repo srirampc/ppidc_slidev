@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 242.22 197.72">
+  <defs>
+    <style>
+      .c {
+        letter-spacing: 0em;
+      }
+
+      .d {
+        stroke: #0081b2;
+      }
+
+      .d, .e, .f, .g, .h, .i, .j {
+        fill: none;
+      }
+
+      .d, .e, .f, .h, .i, .j {
+        stroke-miterlimit: 10;
+      }
+
+      .d, .e, .f, .i, .j {
+        stroke-width: .4px;
+      }
+
+      .d, .e, .i {
+        stroke-dasharray: 2.99 2.99;
+      }
+
+      .e {
+        stroke: #b22222;
+      }
+
+      .k {
+        font-family: ConcourseT3, 'Concourse T3';
+        font-size: 10.91px;
+      }
+
+      .l {
+        letter-spacing: .22em;
+      }
+
+      .m {
+        fill: #b22222;
+      }
+
+      .f {
+        stroke: #170a21;
+      }
+
+      .n {
+        letter-spacing: .22em;
+      }
+
+      .o {
+        letter-spacing: 0em;
+      }
+
+      .p {
+        fill: #0081b2;
+      }
+
+      .q {
+        fill: #fff;
+      }
+
+      .r {
+        letter-spacing: .22em;
+      }
+
+      .s {
+        letter-spacing: 0em;
+      }
+
+      .h {
+        stroke: gray;
+        stroke-width: .2px;
+      }
+
+      .t {
+        letter-spacing: -.02em;
+      }
+
+      .i {
+        stroke: #bfbfbf;
+      }
+
+      .u {
+        clip-path: url(#b);
+      }
+
+      .v {
+        fill: #170a21;
+      }
+
+      .w {
+        letter-spacing: .02em;
+      }
+
+      .x {
+        letter-spacing: -.1em;
+      }
+
+      .y {
+        letter-spacing: .29em;
+      }
+
+      .j {
+        stroke: #000;
+      }
+
+      .z {
+        letter-spacing: 0em;
+      }
+
+      .aa {
+        letter-spacing: -.02em;
+      }
+    </style>
+    <clipPath id="b">
+      <rect class="g" x="42" y="2.53" width="194.28" height="161.4"/>
+    </clipPath>
+  </defs>
+  <path class="i" d="M236.28,163.93V2.53M203.9,163.93V2.53M171.52,163.93V2.53M139.14,163.93V2.53M106.76,163.93V2.53M74.38,163.93V2.53M42,163.93V2.53"/>
+  <path class="i" d="M42,5.45h194.28M42,28.09h194.28M42,50.73h194.28M42,73.37h194.28M42,96.01h194.28M42,118.65h194.28M42,141.29h194.28M42,163.93h194.28"/>
+  <path class="h" d="M236.28,168.18v-4.25M203.9,168.18v-4.25M171.52,168.18v-4.25M139.14,168.18v-4.25M106.76,168.18v-4.25M74.38,168.18v-4.25M42,168.18v-4.25"/>
+  <path class="h" d="M240.52,5.45h-4.25M240.52,28.09h-4.25M240.52,50.73h-4.25M240.52,73.37h-4.25M240.52,96.01h-4.25M240.52,118.65h-4.25M240.52,141.29h-4.25M240.52,163.93h-4.25M37.76,5.45h4.25M37.76,28.09h4.25M37.76,50.73h4.25M37.76,73.37h4.25M37.76,96.01h4.25M37.76,118.65h4.25M37.76,141.29h4.25M37.76,163.93h4.25"/>
+  <rect class="j" x="42" y="2.53" width="194.28" height="161.4"/>
+  <text class="k" transform="translate(39.55 179.52)"><tspan x="0" y="0">1</tspan></text>
+  <text class="k" transform="translate(71.43 179.58)"><tspan x="0" y="0">2</tspan></text>
+  <text class="k" transform="translate(103.76 179.43)"><tspan x="0" y="0">4</tspan></text>
+  <text class="k" transform="translate(136.25 179.58)"><tspan x="0" y="0">8</tspan></text>
+  <text class="k" transform="translate(166.12 179.58)"><tspan x="0" y="0">16</tspan></text>
+  <text class="k" transform="translate(198.23 179.58)"><tspan class="aa" x="0" y="0">3</tspan><tspan class="c" x="5.48" y="0">2</tspan></text>
+  <text class="k" transform="translate(230.33 179.58)"><tspan x="0" y="0">64</tspan></text>
+  <text class="k" transform="translate(18.87 167.64)"><tspan class="t" x="0" y="0">0</tspan><tspan x="6.24" y="0">.5</tspan></text>
+  <text class="k" transform="translate(29.01 145.04)"><tspan x="0" y="0">1</tspan></text>
+  <text class="k" transform="translate(28.03 122.43)"><tspan x="0" y="0">2</tspan></text>
+  <text class="k" transform="translate(27.92 99.72)"><tspan x="0" y="0">4</tspan></text>
+  <text class="k" transform="translate(28.14 77.08)"><tspan x="0" y="0">8</tspan></text>
+  <text class="k" transform="translate(23.12 54.44)"><tspan x="0" y="0">16</tspan></text>
+  <text class="k" transform="translate(22.58 31.8)"><tspan class="aa" x="0" y="0">3</tspan><tspan class="c" x="5.48" y="0">2</tspan></text>
+  <text class="k" transform="translate(22.03 9.16)"><tspan x="0" y="0">64</tspan></text>
+  <g class="u">
+    <polyline class="d" points="42 141.29 74.38 119.82 106.76 94.73 139.14 72.8 171.52 52.71 203.9 30.81 236.28 9.69"/>
+    <polyline class="e" points="42 141.29 74.38 158.52 106.76 140.64 139.14 122.46 171.52 100.19 203.9 79.41 236.28 62.21"/>
+    <polyline class="f" points="42 141.29 74.38 121.56 106.76 97.18 139.14 75.61 171.52 55.31 203.9 33.51 236.28 12.81"/>
+  </g>
+  <polygon class="p" points="42 139.3 43.73 142.29 40.28 142.29 42 139.3"/>
+  <polygon class="d" points="42 139.3 43.73 142.29 40.28 142.29 42 139.3"/>
+  <polygon class="p" points="74.38 117.83 76.1 120.81 72.65 120.81 74.38 117.83"/>
+  <polygon class="d" points="74.38 117.83 76.1 120.81 72.65 120.81 74.38 117.83"/>
+  <polygon class="p" points="106.76 92.74 108.49 95.73 105.04 95.73 106.76 92.74"/>
+  <polygon class="d" points="106.76 92.74 108.49 95.73 105.04 95.73 106.76 92.74"/>
+  <polygon class="p" points="139.14 70.81 140.87 73.8 137.42 73.8 139.14 70.81"/>
+  <polygon class="d" points="139.14 70.81 140.87 73.8 137.42 73.8 139.14 70.81"/>
+  <polygon class="p" points="171.52 50.72 173.24 53.71 169.79 53.71 171.52 50.72"/>
+  <polygon class="d" points="171.52 50.72 173.24 53.71 169.79 53.71 171.52 50.72"/>
+  <polygon class="p" points="203.9 28.81 205.62 31.8 202.17 31.8 203.9 28.81"/>
+  <polygon class="d" points="203.9 28.81 205.62 31.8 202.17 31.8 203.9 28.81"/>
+  <polygon class="p" points="236.28 7.69 238 10.68 234.55 10.68 236.28 7.69"/>
+  <polygon class="d" points="236.28 7.69 238 10.68 234.55 10.68 236.28 7.69"/>
+  <rect class="m" x="40.01" y="139.3" width="3.99" height="3.99"/>
+  <rect class="e" x="40.01" y="139.3" width="3.99" height="3.99"/>
+  <rect class="m" x="72.39" y="156.53" width="3.99" height="3.99"/>
+  <rect class="e" x="72.39" y="156.53" width="3.99" height="3.99"/>
+  <rect class="m" x="104.77" y="138.65" width="3.99" height="3.99"/>
+  <rect class="e" x="104.77" y="138.65" width="3.99" height="3.99"/>
+  <rect class="m" x="137.15" y="120.47" width="3.99" height="3.99"/>
+  <rect class="e" x="137.15" y="120.47" width="3.99" height="3.99"/>
+  <rect class="m" x="169.53" y="98.2" width="3.99" height="3.99"/>
+  <rect class="e" x="169.53" y="98.2" width="3.99" height="3.99"/>
+  <rect class="m" x="201.91" y="77.42" width="3.99" height="3.99"/>
+  <rect class="e" x="201.91" y="77.42" width="3.99" height="3.99"/>
+  <rect class="m" x="234.29" y="60.21" width="3.99" height="3.99"/>
+  <rect class="e" x="234.29" y="60.21" width="3.99" height="3.99"/>
+  <circle class="v" cx="42" cy="141.29" r="1.99"/>
+  <circle class="f" cx="42" cy="141.29" r="1.99"/>
+  <circle class="v" cx="74.38" cy="121.56" r="1.99" transform="translate(-9.77 6.55) rotate(-4.73)"/>
+  <circle class="f" cx="74.38" cy="121.56" r="1.99" transform="translate(-9.77 6.55) rotate(-4.73)"/>
+  <circle class="v" cx="106.76" cy="97.18" r="1.99" transform="translate(-19.47 27.13) rotate(-13.28)"/>
+  <circle class="f" cx="106.76" cy="97.18" r="1.99" transform="translate(-19.47 27.13) rotate(-13.28)"/>
+  <circle class="v" cx="139.14" cy="75.61" r="1.99"/>
+  <circle class="f" cx="139.14" cy="75.61" r="1.99"/>
+  <circle class="v" cx="171.52" cy="55.31" r="1.99"/>
+  <circle class="f" cx="171.52" cy="55.31" r="1.99"/>
+  <circle class="v" cx="203.9" cy="33.51" r="1.99"/>
+  <circle class="f" cx="203.9" cy="33.51" r="1.99"/>
+  <circle class="v" cx="236.28" cy="12.81" r="1.99"/>
+  <circle class="f" cx="236.28" cy="12.81" r="1.99"/>
+  <text class="k" transform="translate(95.94 195.21)"><tspan x="0" y="0">Numbe</tspan><tspan class="n" x="31.85" y="0">r</tspan><tspan x="37.75" y="0">o</tspan><tspan class="l" x="43.09" y="0">f</tspan><tspan class="z" x="48.98" y="0">co</tspan><tspan class="s" x="58.69" y="0">r</tspan><tspan x="62.09" y="0">e</tspan><tspan class="r" x="67" y="0">s</tspan><tspan class="w" x="73.42" y="0">(</tspan><tspan class="aa" x="77.45" y="0">p</tspan><tspan class="c" x="82.6" y="0">)</tspan></text>
+  <text class="k" transform="translate(9.16 101.56) rotate(-90)"><tspan x="0" y="0">Speedup</tspan></text>
+  <rect class="q" x="48.03" y="7.57" width="86.97" height="43.6"/>
+  <rect class="j" x="48.03" y="7.57" width="86.97" height="43.6"/>
+  <polyline class="d" points="51.22 16.15 59.72 16.15 68.23 16.15"/>
+  <polygon class="p" points="59.72 14.16 61.45 17.15 58 17.15 59.72 14.16"/>
+  <polygon class="d" points="59.72 14.16 61.45 17.15 58 17.15 59.72 14.16"/>
+  <text class="k" transform="translate(80.42 19.12)"><tspan x="0" y="0">Compute</tspan></text>
+  <polyline class="e" points="51.22 29.37 59.72 29.37 68.23 29.37"/>
+  <rect class="m" x="57.73" y="27.38" width="3.99" height="3.99"/>
+  <rect class="e" x="57.73" y="27.38" width="3.99" height="3.99"/>
+  <text class="k" transform="translate(70.42 32.37)"><tspan x="0" y="0">Comm</tspan><tspan class="y" x="28.91" y="0">.</tspan><tspan class="n" x="35.05" y="0">+</tspan><tspan x="43.23" y="0">I/O</tspan></text>
+  <polyline class="f" points="51.22 42.59 59.72 42.59 68.23 42.59"/>
+  <circle class="v" cx="59.72" cy="42.59" r="1.99" transform="translate(-8.19 14.86) rotate(-13.28)"/>
+  <circle class="f" cx="59.72" cy="42.59" r="1.99" transform="translate(-8.19 14.86) rotate(-13.28)"/>
+  <text class="k" transform="translate(89.69 45.54)"><tspan class="x" x="0" y="0">T</tspan><tspan x="5.04" y="0">o</tspan><tspan class="o" x="10.39" y="0">t</tspan><tspan x="13.67" y="0">al</tspan></text>
+</svg>
