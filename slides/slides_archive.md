@@ -70,7 +70,7 @@ transition: fade-out
 - Contributions
   - $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
   - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ parallel algorithm. 
-  - Achieves $158$X speedup over the existing method.
+  - Achieves $158$X speedup over the existing PIDC implementation.
   - Scales to a human-genome: $30,000$-gene network from $\approx800$K cells in $2.5$ hours using $2,048$ cores.
 
 ---
@@ -105,8 +105,15 @@ transition: fade-out
 ---
 # Background : PUC
 
-- Specific Information: Given $X \in \mathcal{X}, y \in Y$
- <FancyArrow from="(10, 20)" to="(30, 40)" />
+- Unique Contribution, $\nu((X, Z); Y)) =  I(X, Y) - \rho((X, Z); Y)$
+- PUC, $\gamma(X, Y)$, is formally defined as,
+  $$
+  \begin{aligned}
+  \gamma(X, Y) &=  \sum_{Z \in \mathcal{T}} \frac{\nu((X, Z); Y) + \nu((Y, Z); X)}{I(X, Y)}\\
+   &= \sum_{Z \in \mathcal{T}} \frac{2I(X, Y) - \rho((X, Z); Y) - \rho((Y, Z); X)}{I(X, Y)} \\
+   &=  \frac{1}{I(X, Y)} \left( 2(n-2) I(X, Y) - \sum_{Z \in \mathcal{T}} \rho((X, Z); Y) + \rho((Y, Z); X) \right)
+  \end{aligned}
+  $$
 ---
 transition: fade-out
 ---
@@ -116,32 +123,48 @@ transition: fade-out
 ---
 transition: fade-out
 ---
-# Algorithm : Sequential Algorithm
-- implementation
+# Sequential Algorithm
+
+  ||Given: $P(X), \forall X \in \mathcal{X}$; $P(X, Y),\forall (X, Y)$ ||
+  |--|--|--|
+  |1| Compute Mutual Information, $I(X,Y)$ |$O(n^2)$|
+  |2| Compute tables $\mu(y; X), \forall (y, X)$ |$O(n^2 d)=O(n^2)$|
+  |3| $\forall y \in Y, Y \in \mathcal{X}, \mathbf{S}_y \gets$ Sorted $\mu(y; X)$ table | $O(n^2 \log n)$|
+  |3| $\forall y \in Y,Y \in \mathcal{X}, \mathbf{P}_y \gets$ Prefix summed $\mathbf{S}_y$ table | $O(n^2)$|
+  |4| $\forall (X,Y)$, Compute (a) $\sum_Z\nu((X,Z); Y)$, (b)$\sum_Z\nu((Y,Z); X)$  |  $O(n^2)$|
+  |5| $\forall (X,Y)$, Compute PUC  | $O(n^2)$|
 
 ---
 transition: fade-out
 ---
-# Algorithm : Parallel Algorithm I
-- implementation
+# Parallel Algorithm : Data Structures
+
+- Flat arrays, uniformly distributed across $p$ processes
+  - $\mathbf{S}$, concatenation of all the $\mathbf{S}_y$
+  - $\mathbf{P}$, concatenation of all the $\mathbf{P}_y$
+  - $\mathbf{Q}$,  an array of size $|\mathbf{S}|$
+    - $\mathbf{Q}[i]$ holds the value $y$ corresponding to the $\mu(y; X)$ value in $\mathbf{S}[i]$.
+  - $\mathbf{R}$,  an array of size $|\mathbf{S}|$
+    -  $\mathbf{R}[i]$ holds the variable $X$ corresponding to the $\mu(y; X)$ value in $\mathbf{S}[i]$.
+ - Each array size of $n\sum_{Y \in \mathcal{X}} |Y| = O(n^2)$
+---
+transition: fade-out
+---
+# Parallel Algorithm 
+  ||Given $\mathbf{S}, \mathbf{P}, \mathbf{Q}, \mathbf{R}$||
+  |-|-|-|
+  |1|Let $j \gets$ processor's rank||
+  |2| Compute $\langle X, Y,  \sum \nu((X, Z); Y) \rangle$ for each entry $\mathbf{S}^{(j)}, \mathbf{P}^{(j)}, \mathbf{Q}^{(j)}, \mathbf{R}^{(j)}$|$O(n^2/p)$|
+  |3|Insert $\langle X, Y,  \sum \nu((X, Z); Y) \rangle$ to $\mathbf{R}^{(j)}$|$O(n^2/p)$|
+  |4|Insert $\langle X, Y,  I(X, Y) \rangle$ to $\mathbf{R}^{(j)}$|$O(n^2/p)$|
+  |5|Parallel Sort the distributed $\mathbf{R}$|$\mathsf{T}_{\mathtt{sort}}(n^2, p))$|
+  |6|Compute PUC from sorted $\mathbf{R}^{(j)}$ |$O(n^2/p)$|
 
 ---
 transition: fade-out
 ---
-# Algorithm : Parallel Algorithm II
-- implementation
-
----
-transition: fade-out
----
-# Implementation 
-- implementation
-
----
-transition: fade-out
----
-# Implementation : Parallel Algorithm
-- implementation
+# Implementation : Platform and Data Processing   
+- fa 
 
 ---
 transition: fade-out
@@ -159,30 +182,41 @@ transition: fade-out
 ---
 transition: fade-out
 ---
-# Implementation : Algorithm
+# Implementation : Parallel Algorithm
 - implementation
 
 ---
 transition: fade-out
 ---
 # Experiments: Datasets
-- 385 x
+| Dataset | Tissue | $m$ | $n$ | $\mathsf{D}$ (GB) | $\sum \|P(X,Y)\|$ (GB) |
+|:-|:-:|-:|-:|-:|-:|
+|D1 |  PBMC |  23,766 |   5,000 |   0.44 |     47.38 |  
+|D2 |  Lung |  91,068 |   5,000 |   1.82 |    121.10 | 
+|   |   "   |         |  10,000 |   3.39 |    476.46 | 
+|   |   "   |         |  15,000 |   5.08 |  1,131.42 | 
+|D3 | PBMC  | 794,170 |  20,000 |  57.63 |  8,828.66 | 
+|   |   "   |         |  30,000 |  86.45 | 19,570.00 | 
 
 ---
 transition: fade-out
+layout: two-cols
+image: /img/strong-scaling-small-ai.svg
 ---
 # Results for dataset $D1$
 - 385 x
-![](/img/strong-scaling-small-ai.svg){width=500px lazy}
+- 385 x
+ 
+::right::
+### Speedup vs. number of cores
+![](/img/strong-scaling-small-ai.svg){width=800px lazy}
 ---
 transition: fade-out
 ---
 # Results : Dataset $D2$
-- test
-  |A|B|
+  | ![](/img/strong-scaling-big-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
   |--|--|
-  | ![](/img/relative-speedup-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
-  |--|--|
+- Max speedup of 
 ---
 transition: fade-out
 ---
@@ -193,7 +227,7 @@ transition: fade-out
 transition: fade-out
 ---
 # Results : Big Datasets
-![](/img/strong-scaling-big-ai.svg){width=500px lazy}
+![](/img/relative-speedup-ai.svg){width=500px lazy}
 
 ---
 transition: fade-out
