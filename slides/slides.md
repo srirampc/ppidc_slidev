@@ -66,6 +66,15 @@ clicks: 6
 
 
 ---
+transition: fade-out
+clicks: 7
+---
+# Algorithm Insight
+
+<InsightAlgoInsight auto-start />
+
+
+---
 
 # Powered by _**Slidev**_
 

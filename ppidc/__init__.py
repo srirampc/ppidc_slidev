@@ -167,9 +167,16 @@ class PxTable:
         row_names: list[str],
         col_names: list[str],
         corner_name: str | None = None,
+        body: list[list[str]] | None = None,
     ) -> None:
+        """A table of `n_rows` x `n_cols` body cells. `body` gives the tex of
+        every body cell, row-major; without it each cell holds a `·`
+        placeholder for the caller to animate into."""
         assert len(col_names) == n_cols
         assert len(row_names) == n_rows
+        if body is not None:
+            assert len(body) == n_rows
+            assert all(len(row) == n_cols for row in body)
         t_entries = [
             [mn.MathTex(r"\cdot", fill_color=cfg.txt_color) for _y in range(n_cols + 1)]
             for _x in range(n_rows + 1)
@@ -181,6 +188,10 @@ class PxTable:
         ]
         for rx, r_name in zip(range(n_rows), row_names):
             t_entries[rx + 1][0] = mn.MathTex(r_name, fill_color=cfg.txt_color)
+        if body is not None:
+            for rx, row_tex in enumerate(body):
+                for cx, tex in enumerate(row_tex):
+                    t_entries[rx + 1][cx + 1] = mn.MathTex(tex, fill_color=cfg.txt_color)
 
         mobj_gen: t.Callable[[mn.VMobject], mn.VMobject] = lambda m: m
 
@@ -229,6 +240,17 @@ class PxTable:
         top-left cell below/right of the header row and corner column)."""
         rows, ys = self._grouped_entries()
         return rows[ys[row + 1]][col + 1]
+
+    def row_labels(self) -> list[mn.Mobject]:
+        """The entry naming each body row, top to bottom."""
+        rows, ys = self._grouped_entries()
+        return [rows[y][0] for y in ys[1:]]
+
+    def column_headers(self) -> list[mn.Mobject]:
+        """The header entry above each body column, left to right. The corner
+        cell heading the row labels is not one of them."""
+        rows, ys = self._grouped_entries()
+        return rows[ys[0]][1:]
 
     def add_grid(self, cfg: Config) -> None:
         """Draw every grid line of the table: strong (width 6) for the
