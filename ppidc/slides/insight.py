@@ -340,16 +340,28 @@ class AlgoInsight(mn.Scene):
             stroke_width=4,
             buff=0.12,
         )
-        row_sum = mn.MathTex(
-            rf"{p_cells[boxed]} + {s_cells[boxed]} \times (n - 5)",
-            fill_color=cfg.txt_color,
-        )
-        # The margin right of the tables is narrow, so the annotation is sized
-        # to it rather than to the equations. Anchor it to the table's edge, not
-        # to the box (the box sits inside the table), then line it up with the
-        # box vertically.
+        # The margin right of the tables is narrow, so the sum is stacked one
+        # row per term instead of written on one line: the width it must fit is
+        # then the widest row's — the product alone, not the whole sum — which
+        # is what lets it set at a readable size.
+        row_sum = mn.VGroup(
+            mn.MathTex(p_cells[boxed], fill_color=cfg.txt_color),
+            mn.MathTex(r"+", fill_color=cfg.txt_color),
+            mn.MathTex(
+                rf"{s_cells[boxed]} \times (n - 5)",
+                fill_color=cfg.txt_color,
+            ),
+        ).arrange(mn.DOWN, buff=0.12)
+        # Anchor it to the table's edge, not to the box (the box sits inside
+        # the table), then centre it on the boxed row.
         _ = row_sum.scale_to_fit_width(_ROW_SUM_WIDTH)
         _ = row_sum.next_to(vmsp_table.table, mn.RIGHT, buff=0.18)
         _ = row_sum.set_y(box.get_center()[1])
-        self.play(mn.Create(box), mn.Write(row_sum))
+        sum_box = mn.SurroundingRectangle(
+            row_sum,
+            color=mn.GREEN,
+            stroke_width=4,
+            buff=0.12,
+        )
+        self.play(mn.Create(box), mn.Create(sum_box), mn.Write(row_sum))
         self.wait()
