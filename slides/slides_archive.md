@@ -164,7 +164,11 @@ transition: fade-out
 transition: fade-out
 ---
 # Implementation : Platform and Data Processing   
-- fa 
+- PIDC implementation in julia 
+- Our Implementation in Rust 
+  - `rsmpi` : MPI 3.1 wrapper (Experiments use `openmpi`)
+  - `sope` : Convenience library features include generic struct types, sorting etc  
+  - `hdf5-rs` : with updates for parallel I/O 
 
 ---
 transition: fade-out
