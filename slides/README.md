@@ -42,9 +42,9 @@ previous local build.
 - **`components/ManimClip.vue`** — the actual video player all generated
   wrapper components delegate to (double-buffered, click-synced). This one
   _is_ hand-maintained — see `../docs/COMPONENTS.md` for its design.
-- **`public/videos/`** — rendered clips + `manifest.json`. Generated;
-  gitignore-friendly if you'd rather rebuild than commit binary video
-  assets.
+- **`public/videos/`** — rendered clips + per-scene `poster.png` last-frame
+  images + `manifest.json`. Generated; gitignore-friendly if you'd rather
+  rebuild than commit binary video assets.
 - **`ext/`** — the deck's theme.
 - **`pages/`** — supplementary slide content pulled in via Slidev's
   multi-file `src:` imports, if the deck is split across files.

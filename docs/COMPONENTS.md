@@ -27,7 +27,11 @@ rather than assuming filenames.
 2. **Renders** each with `uv run manim render --save_sections`.
 3. **Copies** the resulting clips into `slides/public/videos/<slug>/`,
    alongside a per-scene `clips.json` and a global `manifest.json`.
-4. **Generates a wrapper component** per scene in
+4. **Renders each scene's last frame** with a second `manim render
+   --save_last_frame` (`-s`) invocation — manim forces `write_to_movie=False`
+   under `-s`, so the PNG can't share the video render — and copies it to
+   `slides/public/videos/<slug>/poster.png`. Pass `--no-poster` to skip.
+5. **Generates a wrapper component** per scene in
    `slides/components/generated/<ComponentName>.vue` — a thin shim around
    `ManimClip.vue` with that scene's `clips` array baked in, so `slides.md`
    only ever needs a one-line tag:
@@ -38,7 +42,7 @@ rather than assuming filenames.
     common file/class overlap (`proof_walkthrough.py` + `ProofWalkthrough` →
     just `ProofWalkthrough`), and disambiguate when they genuinely differ
     (`diagram.py` + `ForceDiagram` → `DiagramForceDiagram`).
-5. **Writes reference snippets** to `slides/snippets/` — the one thing that
+6. **Writes reference snippets** to `slides/snippets/` — the one thing that
    _can't_ be auto-inserted into `slides.md` is the `clicks:` frontmatter
    value, since Slidev has no partial-content include mechanism (`src:`
    frontmatter imports a whole slide, not a fragment spliced into one you're

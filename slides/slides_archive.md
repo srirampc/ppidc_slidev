@@ -1,5 +1,6 @@
 ---
 theme: ext/slidev-theme-spc-gt
+#theme: none
 # addons, can be a list of package names or local paths
 # Learn more: https://sli.dev/guide/theme-addon.html#use-addon
 addons: 
@@ -7,7 +8,7 @@ addons:
   - tikzjax
 # random image from a curated Unsplash collection by Anthony
 # like them? see https://unsplash.com/collections/94734566/slidev
-background: https://cover.sli.dev
+#background: https://cover.sli.dev
 # some information about your slides (markdown enabled)
 title: Parallel PIDC
 info: false
@@ -30,7 +31,6 @@ mdc: true
 # Fonts
 fonts:
   sans: Concourse T3
-  serif: Equity Text B
   local: Concourse T3
 ---
 
@@ -114,11 +114,15 @@ transition: fade-out
    &=  \frac{1}{I(X, Y)} \left( 2(n-2) I(X, Y) - \sum_{Z \in \mathcal{T}} \rho((X, Z); Y) + \rho((Y, Z); X) \right)
   \end{aligned}
   $$
+- Term of Interest: $\sum_{Z \in \mathcal{T}} \rho((X, Z); Y)  = \sum_Z \sum_y p(y) \min (I_s(y;X), I_s(y; Z))$
+
 ---
 transition: fade-out
+layout: center
 ---
 # Algorithm : Key Insight
-- Tanles
+
+![](/img/insight_poster.png)
 
 ---
 transition: fade-out
@@ -181,6 +185,7 @@ transition: fade-out
 ---
 # Implementation : Computing $P(X,Y)$
 - implementation
+::right::
 ![](/img/block-dist.svg){width=300px lazy}
 
 ---

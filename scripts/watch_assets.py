@@ -10,6 +10,7 @@ Usage:
     uv run --group dev python scripts/watch_assets.py
     uv run --group dev python scripts/watch_assets.py --quality l
     uv run --group dev python scripts/watch_assets.py --scene TransposeTransform
+    uv run --group dev python scripts/watch_assets.py --no-poster --theme light
 """
 from __future__ import annotations
 
@@ -30,6 +31,10 @@ def build(args: argparse.Namespace) -> None:
         cmd.extend(["--quality", args.quality])
     if args.scene:
         cmd.extend(["--scene", args.scene])
+    if args.no_poster:
+        cmd.append("--no-poster")
+    if args.theme:
+        cmd.extend(["--theme", args.theme])
     print(f"→ {' '.join(cmd)}")
     result = subprocess.run(cmd, cwd=ROOT, check=False)
     if result.returncode != 0:
@@ -50,6 +55,17 @@ def main() -> None:
         "--scene",
         default=None,
         help="only render one scene, passed through to build_assets.py",
+    )
+    parser.add_argument(
+        "--no-poster",
+        action="store_true",
+        help="skip last-frame poster images, passed through to build_assets.py (default: on)",
+    )
+    parser.add_argument(
+        "--theme",
+        choices=["dark", "light"],
+        default="dark",
+        help="color theme, passed through to build_assets.py (default: dark)",
     )
     args = parser.parse_args()
 

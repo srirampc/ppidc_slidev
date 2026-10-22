@@ -7,6 +7,17 @@ Discovers Manim Scene subclasses under `MANIM_SRC`, renders each with
 next_section() checkpoint), and copies the resulting clips + a
 per-scene manifest into `slides/public/videos/` for Slidev to consume.
 
+Each scene is also rendered a second time with `--save_last_frame` (manim's
+`-s`) and that final frame is copied to `slides/public/videos/<slug>/poster.png`.
+The second render is required because `-s` forces manim's
+write_to_movie=False, so the image can't share the video render. Pass
+`--no-poster` to skip poster generation.
+
+`--theme` selects the deck's color theme (dark/light) — the package's
+default-ThemeType global defaults to `dark`. The theme is passed to the
+manim subprocess through the `PPIDC_THEME` environment variable, which
+`ppidc/__init__.py` reads to seed its default config.
+
 Also writes ready-to-paste Slidev markdown snippets to `slides/snippets/`
 for each scene, one for "auto-start on slide enter" and one for "wait for
 a click", each with the correct `clicks:` frontmatter value already
@@ -17,6 +28,8 @@ Usage:
     uv run python scripts/build_assets.py --quality h
     uv run python scripts/build_assets.py --scene proof_walkthrough.ProofWalkthrough
     uv run python scripts/build_assets.py --clean
+    uv run python scripts/build_assets.py --no-poster   # videos only, no last-frame images
+    uv run python scripts/build_assets.py --theme light # render with the light color theme
 
 Requires manim to be a dependency in your uv-managed project
 (`uv add manim`).
@@ -27,6 +40,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -119,7 +133,16 @@ def filter_scenes(scenes: list[SceneRef], selector: str | None) -> list[SceneRef
 # Rendering
 # ---------------------------------------------------------------------------
 
-def render_scene(scene: SceneRef, quality_flag: str) -> Path:
+def _manim_env(theme: str) -> dict[str, str]:
+    """Environment for `manim render` subprocesses: the caller's env plus
+    PPIDC_THEME, which ppidc/__init__.py reads to seed its default config
+    (the theme is a Python-level global, not a manim config option)."""
+    env = os.environ.copy()
+    env["PPIDC_THEME"] = theme
+    return env
+
+
+def render_scene(scene: SceneRef, quality_flag: str, theme: str) -> Path:
     """Runs `uv run manim render --save_sections ...` for one scene.
     Returns the path to the sections/ dir manim wrote."""
     print(f"→ rendering {scene.file.relative_to(ROOT)}::{scene.class_name}")
@@ -131,7 +154,7 @@ def render_scene(scene: SceneRef, quality_flag: str) -> Path:
         str(scene.file),
         scene.class_name,
     ]
-    result = subprocess.run(cmd, cwd=ROOT)  # noqa: PLW1510
+    result = subprocess.run(cmd, cwd=ROOT, env=_manim_env(theme))  # noqa: PLW1510
     if result.returncode != 0:
         raise RuntimeError(f"manim render failed for {scene.slug} (exit {result.returncode})")
 
@@ -144,6 +167,43 @@ def render_scene(scene: SceneRef, quality_flag: str) -> Path:
             "MEDIA_DIR / quality dir naming matches your manim config)"
         )
     return sections_dir
+
+
+def render_poster(scene: SceneRef, quality_flag: str, theme: str) -> Path:
+    """Runs `uv run manim render --save_last_frame ...` for one scene to save
+    its final frame as a PNG. A second manim invocation is required because
+    `-s` forces write_to_movie=False, so it can't share the video render.
+
+    `-o poster.png` pins the output name: without it manim suffixes the file
+    with _ManimCE_v<version>, which would make the path unpredictable.
+
+    Returns the path manim wrote:
+    media/images/<filestem>/poster.png."""
+    print(f"→ rendering poster {scene.file.relative_to(ROOT)}::{scene.class_name}")
+
+    cmd = [
+        "uv", "run", "manim", "render",
+        quality_flag,
+        "--save_last_frame",
+        "-o", "poster.png",
+        str(scene.file),
+        scene.class_name,
+    ]
+    result = subprocess.run(cmd, cwd=ROOT, env=_manim_env(theme))  # noqa: PLW1510
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"manim poster render failed for {scene.slug} (exit {result.returncode})"
+        )
+
+    # manim's images_dir is media/images/<filestem>/ — note: no quality
+    # subdir, unlike videos_dir (see images_dir in manim's default.cfg).
+    poster = MEDIA_DIR / "images" / scene.file.stem / "poster.png"
+    if not poster.exists():
+        raise FileNotFoundError(
+            f"expected poster image not found: {poster}\n"
+            "(check that MEDIA_DIR/images naming matches your manim config)"
+        )
+    return poster
 
 
 # ---------------------------------------------------------------------------
@@ -191,6 +251,14 @@ def copy_clips(scene: SceneRef, sections_dir: Path) -> list[str]:
     (dest_dir / "clips.json").write_text(json.dumps(web_paths, indent=2), encoding="utf-8")
 
     return web_paths
+
+
+def copy_poster(scene: SceneRef, poster_path: Path) -> Path:
+    """Copies the rendered last-frame image into slides/public/videos/<slug>/,
+    next to the clips. Returns the web-visible dest path."""
+    dest = SLIDES_PUBLIC_VIDEOS / scene.slug / "poster.png"
+    shutil.copy2(poster_path, dest)
+    return dest
 
 
 def write_global_manifest(manifest: dict[str, list[str]]) -> None:
@@ -333,6 +401,14 @@ def main() -> None:
         "--clean", action="store_true",
         help="remove slides/public/videos/ before building",
     )
+    parser.add_argument(
+        "--no-poster", action="store_true",
+        help="skip rendering each scene's last-frame image (default: on)",
+    )
+    parser.add_argument(
+        "--theme", choices=["dark", "light"], default="dark",
+        help="color theme for the deck: dark (default) or light — passed to manim as PPIDC_THEME",
+    )
     args = parser.parse_args()
 
     if args.clean and SLIDES_PUBLIC_VIDEOS.exists():
@@ -358,12 +434,18 @@ def main() -> None:
     scene_results: list[tuple[SceneRef, list[str]]] = []
 
     for scene in scenes:
-        sections_dir = render_scene(scene, quality_flag)
+        sections_dir = render_scene(scene, quality_flag, args.theme)
         web_paths = copy_clips(scene, sections_dir)
         global_manifest[scene.slug] = web_paths
         scene_results.append((scene, web_paths))
         print(f"  ✓ {scene.slug}: {len(web_paths)} clip(s) -> "
               f"{(SLIDES_PUBLIC_VIDEOS / scene.slug).relative_to(ROOT)}")
+
+        if not args.no_poster:
+            poster = render_poster(scene, quality_flag, args.theme)
+            copy_poster(scene, poster)
+            print(f"  ✓ {scene.slug}: poster -> "
+                  f"{(SLIDES_PUBLIC_VIDEOS / scene.slug / 'poster.png').relative_to(ROOT)}")
 
     write_global_manifest(global_manifest)
     write_snippets(scene_results)

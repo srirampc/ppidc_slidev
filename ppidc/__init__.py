@@ -1,3 +1,4 @@
+import os
 import typing as t
 from dataclasses import dataclass, field
 
@@ -44,6 +45,11 @@ g_DEFAULT_THEME : ThemeType = "dark"
 g_DEFAULT_CONFIG : Config | None = None
 
 def default_theme() -> ThemeType:
+    """The current default theme: PPIDC_THEME env override, else the
+    module global (build_assets.py sets PPIDC_THEME per manim render)."""
+    env_theme = os.environ.get("PPIDC_THEME")
+    if env_theme in ("dark", "light"):
+        return env_theme
     return g_DEFAULT_THEME
 
 def set_default_theme(theme: ThemeType):
@@ -53,7 +59,7 @@ def set_default_theme(theme: ThemeType):
 
 def default_config(theme: ThemeType | None = None) -> Config:
     global g_DEFAULT_CONFIG
-    if g_DEFAULT_CONFIG is None:
+    if g_DEFAULT_CONFIG is None or g_DEFAULT_CONFIG.theme != theme:
         g_DEFAULT_CONFIG =  Config(theme=theme if theme else default_theme())
         return g_DEFAULT_CONFIG
     else:
