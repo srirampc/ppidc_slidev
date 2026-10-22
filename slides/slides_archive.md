@@ -44,34 +44,59 @@ Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 
 </template>
 
+
+---
+transition: fade-out
+layout: two-cols-header
+image:  /img/Network_Construction.svg
+---
+
+# Construction of Gene Regulatory Networks (GRN) 
+
+
+::left::
+
+- **Goal :** Learn gene interactions from gene expression data.
+- **Gene Expression Data:** Snapshots of gene activity across different samples or conditions.
+- Single-cell gene expression datasets:
+  - Large datasets with millions of cells. 
+  - Sparse, has missing values and noisy.
+  - Understand cell-specific interactions.
+ 
+
+::right::
+
+<div class="h-full flex flex-col justify-center items-center">
+
+![](/img/Network_Construction.svg){width=600px}
+
+</div>
+
+<style>
+.two-cols-header {
+  column-gap: 0px; /* Adjust the gap size as needed */
+}
+</style>
+
+
+ 
 ---
 transition: fade-out
 ---
+# Problem Definition and Key Contributions
 
-# Gene Regulatory Networks (GRN) construction
+- **Problem Definition:** Given $\mathsf{D} \in \mathbb{R}^{m \times n}$, $m$ observations of $n$ genes, 
+  - Construct $\mathsf{G} \in \mathbb{R}^{n \times n}$, adjacency matrix representing a network of $n$ genes.
 
-- Advances in single-cell gene expression data 
-  - Data size increased from tens of thousands to millions
-  - Data has missing values and noisy
-- Mutual Information (MI) based networks
-  - Higher MI implies a stronger correlation
-  - Focus on **PIDC**, a method tailored of single-cell data
-  - **PIDC** handles data characteristics via. partial-information decomposition. 
+- **PIDC**, a gene network construction method tailored of single-cell data
+  - Handles single-cell data characteristics via. partial-information decomposition. 
   - **PIDC** takes $O(n^3)$ time 
-  
----
-transition: fade-out
----
-# Problem Definition and Contributions
 
-- Formal Problem Definition:
-  - Input: $\mathsf{D} \in \mathbb{R}^{m \times n}$, $m$ observations of $n$ genes.  
-  - Output: $\mathsf{G} \in \mathbb{R}^{n \times n}$, adjacency matrix representing a network of $n$ genes,
-- Contributions
+- Key Contributions
   - $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
-  - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ parallel algorithm. 
+  - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm on $p$ processors. 
   - Achieves $158$X speedup over the existing PIDC implementation.
-  - Scales to a human-genome: $30,000$-gene network from $\approx800$K cells in $2.5$ hours using $2,048$ cores.
+  - Scale to Human Genome: $30$K-gene network from $\approx800$K cells in $2.5$ hrs w. $2,048$ cores.
 
 ---
 transition: fade-out
@@ -79,11 +104,11 @@ transition: fade-out
 # Background : Random variables and MI
 
 - Notations
-  - Uppercase alphabet $X, Y, Z$: Random variables
   - $\mathcal{X}, |\mathcal{X}|=n$: Set of discrete random variables, each representing a gene.
-  - $x \in X$ to also denote the distinct values, random variable $X$ can take.
+  - Uppercase $X, Y, Z, \ldots$ for random variables
   - $P(X,Y)$ joint distribution of two genes represented by $X$ and $Y$.
-  - $p(x, y)$: probability value  $P(X=x,Y=y)$ 
+  - $p(x, y)$: Probability  $P(X=x,Y=y)$ 
+  - Lower case $x \in X$ also denote the distinct values, random variable $X$ can take.
 - Mutual Information:
   $$I(X,Y) = \sum_{x \in X} \sum_{y \in Y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)$$
 
@@ -97,7 +122,7 @@ transition: fade-out
         I_{s}(y; X) = \sum_{x \in X} \frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x) \cdot p(y)} \right)
     $$
 - Redundancy
-  - $\rho((X, Y); Z) = \sum_{z \in Z} p(z) \min (I_{s}(z; X), I_{s}(z; Y) )$ 
+  $$ \rho((X, Y); Z) = \sum_{z \in Z} p(z) \min (I_{s}(z; X), I_{s}(z; Y))$$ 
 - Partial Information Decomposition
   - Unique Contribution, $\nu((X, Z); Y)) =  I(X, Y) - \rho((X, Z); Y)$
 ---
@@ -186,7 +211,7 @@ transition: fade-out
   - Block distribute $n$ genes across $p$ processes
   - Compute histogram with BayesianBlocks method for $n/p$ genes
 - Joint Distribution
-  - Copy of $P(X), \forall X$ (Only 26MB for 30K genes).
+  - Copy of $P(X), \forall X$ in every process (Only 26MB for 30K genes).
   - Each process computes $P(X, Y)$ $\approx \binom{n}{2}$ genes.
   - Sorted order of $(X, Y)$ enable constant time ownership id.
 
@@ -240,19 +265,22 @@ layout: two-cols-header
 # Results for dataset $D1$
 
 ::left::
-- 385 x
-- 385 x
- 
+- Machine:  Shared memory machine with 72-core Intel® Xeon® E7-8870 2.7 GHz CPU 
+-  Max. speedup of 52 on 64 cores 
+- Communication and I/O times are a small fraction (at most 11% with 64 cores)
+- 158X times faster than PIDC, reducing the runtime from 10.8 hours to about $4$ minutes.
+to about 4 minutes.
 ::right::
 ##### Speedup vs. number of cores
 ![](/img/strong-scaling-small-ai.svg){width=800px lazy}
 ---
 transition: fade-out
 ---
-# Results : Dataset $D2$
+# Results : Dataset $D2$ w. 5K genes
   | ![](/img/strong-scaling-big-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
   |--|--|
-- Max speedup of 
+-  484-node cluster where each node has a 24-core Intel® Xeon® 6226 2.7 GHz processor 
+- Max speedup of  speedup of 96 with 512 cores, which then drops to 55 with 1, 024 cores
 ---
 transition: fade-out
 layout: two-cols-header
@@ -260,7 +288,10 @@ layout: two-cols-header
 # Results : Runtime vs. number of gene Weak Scaling
 
 ::left::
-- Weak
+- D2 using 256 cores, varying network size from 1, 000 genes
+to 18, 000 genes. 
+-  Observed growth is close to $O(n^2)$ rather than $O(n^2 \log n)$
+   because parallel sort does not dominate the run-time .
 
 ::right::
 
@@ -269,10 +300,32 @@ layout: two-cols-header
 transition: fade-out
 ---
 # Results : Big Datasets
-![](/img/relative-speedup-ai.svg){width=500px lazy}
+
+||n = 20, 000|x| n = 30, 000|x|
+|-|-|-|-|-|
+||p = 1, 024 |p = 2, 048| p = 1, 024| p = 2, 048|
+|Distributions, µ| 116.89| 71.08| 243.39| 149.36|
+|µ →PUC | 0.91 | 1.02 | 1.63 | 1.90 |
+|Total Runtime |117.80 |72.10 | 245.02 |151.26 |
 
 ---
 transition: fade-out
 ---
 # Conclusion
-- conclude
+
+- our knowledge, this is the largest network
+  covering the complete human genome constructed from single-
+  cell datasets.
+- PIDC could not accommodate such a run due
+  to its memory requirements, and estimates based on smaller
+  problem sizes indicate that it would have taken months to
+  compute the network, even if it could run.
+- Potential future work can improve the scalability of the
+  computation of joint distributions and marginal distributions
+  by better assigning computations across the processes using
+  the summary statistics of discretized gene expression vectors.
+- Other directions for future work include addressing the cases
+  where our key assumptions do not hold, i.e.,, when the number
+  of distinct expression values per gene can no longer be
+  regarded as a constant, or when the gene expression values
+  need to be treated as continuous.
