@@ -109,7 +109,7 @@ class MINet(mn.Scene):
     ) -> tuple[mn.VGroup, mn.MathTex, mn.MathTex]:
         cfg = default_config()
         fn_text = mn.VGroup(
-            mn.MathTex("MI(", fill_color=cfg.txt_color).move_to(
+            mn.MathTex("f(", fill_color=cfg.txt_color).move_to(
                 shift_line_x.get_end() + 0.2 * mn.LEFT + 0.35 * mn.UP, mn.RIGHT
             ),
             mn.MathTex(",", fill_color=cfg.txt_color).move_to(
@@ -163,18 +163,18 @@ class MINet(mn.Scene):
         self.play(
             *(
                 mn.Create(mobj)
-                for mobj in [rect_d, matrix_d.text_bg_rect, matrix_d.text]
+                for mobj in [rect_d, matrix_d.text_bg_rect, matrix_d.text, *matrix_d.arrows]
                 if mobj is not None
             )
         )
         self.next_section()
-        self.play(*[mn.Create(arx) for arx in matrix_d.arrows])
-        self.next_section()
+        #self.play(*[mn.Create(arx) for arx in matrix_d.arrows])
+        #self.next_section()
         group_x, _line_x = self.vec_with_name(rect_d, 0.4 * mn.LEFT, x_name)
         self.play(mn.Create(group_x))
-        for y_name, y_rv, mi_dot, r_shift in zip(
+        for ix, (y_name, y_rv, mi_dot, r_shift) in enumerate(zip(
             y_names, rv_names, mi_points, y_shifts
-        ):
+        )):
             shift_grp_x, shift_line_x = self.vec_with_name(
                 rect_d, 3.6 * mn.RIGHT, x_name
             )
@@ -188,12 +188,12 @@ class MINet(mn.Scene):
             x_copy = group_x.copy()
             y_copy = group_y.copy()
             self.play(mn.Create(group_y))
-            self.next_section()
+            #self.next_section()
             self.play(
                 mn.Transform(x_copy, shift_grp_x),
                 mn.Transform(y_copy, shift_grp_y),
             )
-            self.next_section()
+            #self.next_section()
             self.play(
                 mn.Transform(shift_grp_x, rv_text_x),
                 mn.Transform(shift_grp_y, rv_text_y),
@@ -204,7 +204,8 @@ class MINet(mn.Scene):
             txt_g = mn.VGroup(mi_fn_txt, rv_text_x, rv_text_y)
             self.play(mn.Transform(txt_g, mi_dot))
             txt_groups.append(txt_g)
-            self.next_section()
+            if ix == 0:
+                self.next_section()
             self.play(
                 *[
                     mn.Uncreate(mobj)
@@ -222,7 +223,8 @@ class MINet(mn.Scene):
                     ]
                 ]
             )
-            self.next_section()
+            if ix == 0:
+              self.next_section()
         net_vx, _net_hx = self.square_lines(
             square_n, 0.4 * mn.LEFT, 0.4 * mn.UP, mn.GRAY_C
         )

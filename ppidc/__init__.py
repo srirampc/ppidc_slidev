@@ -41,7 +41,7 @@ class Config:
         # Set background
         mn.config.background_color = self.bkg_color
 
-g_DEFAULT_THEME : ThemeType = "dark"
+g_DEFAULT_THEME : ThemeType = "light"
 g_DEFAULT_CONFIG : Config | None = None
 
 def default_theme() -> ThemeType:
