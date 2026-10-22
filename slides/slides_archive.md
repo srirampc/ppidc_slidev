@@ -114,7 +114,7 @@ transition: fade-out
    &=  \frac{1}{I(X, Y)} \left( 2(n-2) I(X, Y) - \sum_{Z \in \mathcal{T}} \rho((X, Z); Y) + \rho((Y, Z); X) \right)
   \end{aligned}
   $$
-- Term of Interest: $\sum_{Z \in \mathcal{T}} \rho((X, Z); Y)  = \sum_Z \sum_y p(y) \min (I_s(y;X), I_s(y; Z))$
+- Bottleneck: $\sum_{Z \in \mathcal{T}} \rho((X, Z); Y)  = \sum_Z \sum_y p(y) \min (I_s(y;X), I_s(y; Z))$
 
 ---
 transition: fade-out
@@ -169,30 +169,56 @@ transition: fade-out
 ---
 # Implementation : Platform and Data Processing   
 - PIDC implementation in julia 
-- Our Implementation in Rust 
-  - `rsmpi` : MPI 3.1 wrapper (Experiments use `openmpi`)
+  - Read input data from `HDF5` input instead of `csv` files
+- Our MPI Implementation 
+  - Rust programming language  
+  - `rsmpi` : MPI 3.1 wrapper (Experiments use `OpenMPI`)
   - `sope` : Convenience library features include generic struct types, sorting etc  
-  - `hdf5-rs` : with updates for parallel I/O 
+  - `hdf5-rs` : Updated for parallel I/O 
+- `anndata` I/O
+  - Save $\mathsf{D}^T$ with genes as rows for faster parallel I/O
 
 ---
 transition: fade-out
 ---
-# Implementation : Computing $P(X)$
-- implementation
+# Implementation : Computing $P(X)$ and $P(X,Y)$
+- Marginal distributions, $P(X)$
+  - Block distribute $n$ genes across $p$ processes
+  - Compute histogram with BayesianBlocks method for $n/p$ genes
+- Joint Distribution
+  - Copy of $P(X), \forall X$ (Only 26MB for 30K genes).
+  - Each process computes $P(X, Y)$ $\approx \binom{n}{2}$ genes.
+  - Sorted order of $(X, Y)$ enable constant time ownership id.
 
 ---
 transition: fade-out
+layout: two-cols-header
 ---
-# Implementation : Computing $P(X,Y)$
-- implementation
-::right::
+# Implementation : Handling large datasets
+
+::left::
 ![](/img/block-dist.svg){width=300px lazy}
+
+::right::
+- Datasets with $m$ exceeding millions of cells.
+- Batch-wise processing of pair blocks with only $O(mn/p)$ data per process.
+- Row/column-wise distribution 
+  - Parallel I/O of non-contiguous overlapping rows of $\mathsf{D}^T$.
+- Diagonal distribution 
+  -  Uniform block-distributed parallel read of the input HDF5 
 
 ---
 transition: fade-out
 ---
 # Implementation : Parallel Algorithm
-- implementation
+- Compute MI and $\mu(\cdot, \cdot)$
+  -  $I(X, Y )$
+  -  $\mu(x; Y) \forall x \in Y$, and  $\mu(y; X), \forall y \in Y$.
+  - Distribute $\mu(x; Y)$ values in the order of $Y$ , followed by $y$, and then by X. 
+- Compute PUC, $\gamma(X, Y)$
+  - $\mathbf{Q}$ and $\mathbf{R}$ are not explicitly computed
+    - Derived from the ordering of $X$ and $x \in X$
+  - Radix sorting with a single `MPI_all2allv`
 
 ---
 transition: fade-out
@@ -209,15 +235,16 @@ transition: fade-out
 
 ---
 transition: fade-out
-layout: two-cols
-image: /img/strong-scaling-small-ai.svg
+layout: two-cols-header
 ---
 # Results for dataset $D1$
+
+::left::
 - 385 x
 - 385 x
  
 ::right::
-### Speedup vs. number of cores
+##### Speedup vs. number of cores
 ![](/img/strong-scaling-small-ai.svg){width=800px lazy}
 ---
 transition: fade-out
@@ -228,9 +255,15 @@ transition: fade-out
 - Max speedup of 
 ---
 transition: fade-out
+layout: two-cols-header
 ---
-# Results : Weak Scaling
+# Results : Runtime vs. number of gene Weak Scaling
+
+::left::
 - Weak
+
+::right::
+
 ![](/img/runtime-growth-n-ai.svg){width=500px lazy}
 ---
 transition: fade-out
