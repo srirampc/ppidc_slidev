@@ -301,31 +301,28 @@ transition: fade-out
 ---
 # Results : Big Datasets
 
-||n = 20, 000|x| n = 30, 000|x|
-|-|-|-|-|-|
-||p = 1, 024 |p = 2, 048| p = 1, 024| p = 2, 048|
-|Distributions, µ| 116.89| 71.08| 243.39| 149.36|
-|µ →PUC | 0.91 | 1.02 | 1.63 | 1.90 |
-|Total Runtime |117.80 |72.10 | 245.02 |151.26 |
+|$n$|20K| 20K|30K| 30K|
+|-|-:|-:|-:|-:|
+|$p$| 1, 024 | 2, 048| 1, 024|  2, 048|
+|Distributions, µ (min.)| 116.89| 71.08| 243.39| 149.36|
+|µ →PUC (min.)| 0.91 | 1.02 | 1.63 | 1.90 |
+|Total Runtime (min.)|117.80 |72.10 | 245.02 |151.26 |
 
+-  20K-gene network took 1.9 hours and 1.2 hours, respectively, with 1, 024 cores and 2, 048 cores.
+-  30K-gene network took 4.1 hours and 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- No linear scaling from 1, 024 to 2, 048 cores due to the increase in I/O time.
 ---
 transition: fade-out
 ---
-# Conclusion
+# Conclusions
 
-- our knowledge, this is the largest network
-  covering the complete human genome constructed from single-
-  cell datasets.
-- PIDC could not accommodate such a run due
-  to its memory requirements, and estimates based on smaller
-  problem sizes indicate that it would have taken months to
-  compute the network, even if it could run.
-- Potential future work can improve the scalability of the
-  computation of joint distributions and marginal distributions
-  by better assigning computations across the processes using
-  the summary statistics of discretized gene expression vectors.
-- Other directions for future work include addressing the cases
-  where our key assumptions do not hold, i.e.,, when the number
-  of distinct expression values per gene can no longer be
-  regarded as a constant, or when the gene expression values
-  need to be treated as continuous.
+- Key Contributions
+  - $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
+  - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm on $p$ processors. 
+  - To our knowledge, the 30K network is the largest network covering the complete human genome.
+- Future work
+  - Improve scalability of computing the distributions by better 
+    process assignment.
+  - Address the cases where  the gene expression values
+    need to be treated as continuous.
+  - I/O scalability via asynchronous read/writes.
