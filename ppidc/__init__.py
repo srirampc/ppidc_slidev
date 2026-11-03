@@ -258,10 +258,11 @@ class PxTable:
         rows, ys = self._grouped_entries()
         return rows[ys[0]][1:]
 
-    def add_grid(self, cfg: Config) -> None:
+    def add_grid(self, cfg: Config, column: bool=True, row: bool=True) -> None:
         """Draw every grid line of the table: strong (width 6) for the
         outer border, the header-row separator, and the first-column
         separator; thin (width 2) for all remaining inner lines."""
+        assert column == True or row == True
         rows, ys = self._grouped_entries()
 
         thin, _strong = 2, 6
@@ -289,7 +290,7 @@ class PxTable:
         # indices 0 and len-1 are the outer border; index 1 is the header
         # row / first column separator — those are strong, the rest thin
         grid = mn.VGroup(
-            *(self.h_line(y, thin, cfg) for _i, y in enumerate(row_borders[1:2])),
-            *(self.v_line(x, thin, cfg) for _i, x in enumerate(col_borders[1:2])),
+            *(self.h_line(y, thin, cfg) for _i, y in enumerate(row_borders[1:2])) if row else (),
+            *(self.v_line(x, thin, cfg) for _i, x in enumerate(col_borders[1:2])) if column else (),
         )
         _ = self.table.add(grid)

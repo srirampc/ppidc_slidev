@@ -90,7 +90,7 @@ def _residue(line: mn.MathTex, *handled: mn.Mobject) -> mn.VGroup:
     its reading order, so transforming these glyphs maps them one-to-one
     instead of smearing two whole equations into each other."""
     skip = {id(glyph) for mob in handled for glyph in mob.family_members_with_points()}
-    return mn.VGroup(*(g for g in line.family_members_with_points() if id(g) not in skip))
+    return mn.VGroup(*(g for g in line.family_members_with_points() if id(g) not in skip))  # pyright: ignore[reportArgumentType]
 
 
 def _source_rows(original: list[str], reordered: list[str]) -> list[int]:
@@ -225,8 +225,8 @@ class AlgoInsight(mn.Scene):
             for row in range(len(_VMSP_LABELS))
         ]
         sp_columns = mn.VGroup(
-            *vmsp_table.column_headers(),
-            *(cell for pair in sp_rows for cell in pair),
+            *vmsp_table.column_headers(),  # pyright: ignore[reportArgumentType]
+            *(cell for pair in sp_rows for cell in pair),  # pyright: ignore[reportArgumentType]
             sp_divider,
         )
         for mob in sp_columns:
@@ -335,7 +335,7 @@ class AlgoInsight(mn.Scene):
         boxed = _VMSP_LABELS.index(_BOXED_LABEL)
         s_cell, p_cell = sp_rows[boxed]
         box = mn.SurroundingRectangle(
-            mn.VGroup(s_cell, p_cell),
+            mn.VGroup(t.cast(mn.VMobject, s_cell), t.cast(mn.VMobject, p_cell)),
             color=mn.ORANGE,
             stroke_width=4,
             buff=0.12,

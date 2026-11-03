@@ -6,26 +6,25 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "jupyterlab>=4.6.3",
-    "manim>=0.20.1",
-    "manim-themes",
+    "manim>=0.22.1",
+    "manim-themes @  {root:uri}/ext/manim-themes"
 ]
 
 [dependency-groups]
-dev = [
-    "watchfiles>=1.2.0",
-]
+dev = ["watchfiles>=1.2.0"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.metadata]
+allow-direct-references=true
+
 [tool.hatch.build.targets.wheel]
 packages = ["ppidc"]
 
 [tool.uv.workspace]
-members = [
-    "ext/manim-themes",
-]
+members = ["ext/manim-themes"]
 
 [tool.uv.sources]
 manim-themes = { workspace = true }
