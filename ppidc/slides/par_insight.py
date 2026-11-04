@@ -19,9 +19,10 @@ _VMSP_LABELS = [
     [*sorted(vm_dict, key=vm_dict.__getitem__), r"\vdots"] for vm_dict in _VM_VALUES
 ]
 #
+#
 
 
-def _const_cells(c_val: str, labels: list[str],  vm_dict: dict[str, float]) -> list[str]:
+def _const_cells(c_val: str, labels: list[str], vm_dict: dict[str, float]) -> list[str]:
     return [c_val if label in vm_dict else r"\vdots" for label in labels]
 
 
@@ -29,8 +30,7 @@ def _value_cells(labels: list[str], vm_dict: dict[str, float]) -> list[str]:
     """The tex of each row's μ(y=1; ·), top to bottom — a row that stands for
     others gets the column's continuation marker instead of a number."""
     return [
-        f"{vm_dict[label]:.2f}" if label in vm_dict else r"\vdots"
-        for label in labels
+        f"{vm_dict[label]:.2f}" if label in vm_dict else r"\vdots" for label in labels
     ]
 
 
@@ -62,6 +62,14 @@ def _vm_table_cells(y: int) -> tuple[list[str], list[str], list[str], list[str]]
     return vm_labels, y_cells, s_cells, p_cells
 
 
+def _vm_label_cells(y: int) -> list[str]:
+    vm_dict = _VM_VALUES[y]
+    return [
+        f"{vm_dict[label]:.2f}" if label in vm_dict else r"\vdots"
+        for label in _VM_LABELS
+    ]
+
+
 class ParAlgoInsight(mn.Scene):
     @t.override
     def setup(self) -> None:
@@ -79,11 +87,37 @@ class ParAlgoInsight(mn.Scene):
             y_cells1,
             [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
             corner_name=r"\mathsf{Q}",
-            body=[[c, s, p] for c, s, p in zip(labels1, s_cells1, p_cells1, strict=True)],
+            body=[
+                [c, s, p] for c, s, p in zip(labels1, s_cells1, p_cells1, strict=True)
+            ],
         )
         vms1_table.add_grid(cfg, column=False)
         _ = vms1_table.table.scale_to_fit_height(_VM_HEIGHT)
         _ = vms1_table.table.move_to(3 * mn.LEFT + 2 * mn.UP)
+
+        vm1_table = PxTable(
+            cfg,
+            len(_VM_LABELS),
+            1,
+            _VM_LABELS,
+            [r"\mu(y=1; \cdot)"],
+            body=[[cell] for cell in _vm_label_cells(0)],
+        )
+        vm1_table.add_grid(cfg)
+        _ = vm1_table.table.scale_to_fit_height(_VM_HEIGHT)
+        _ = vm1_table.table.next_to(vms1_table.table, mn.RIGHT, buff=0.2)
+        vmsp1_table = PxTable(
+            cfg,
+            len(labels1),
+            2,
+            labels1,
+            [r"\mathsf{S}_{y=1}", r"\mathsf{P}_{y=1}"],
+            body=[[s, p] for s, p in zip(s_cells1, p_cells1, strict=True)],
+        )
+        vmsp1_table.add_grid(cfg)
+        _ = vmsp1_table.table.scale_to_fit_height(_VM_HEIGHT)
+        _ = vmsp1_table.table.next_to(vm1_table.table, mn.RIGHT, buff=0.2)
+        vm1_group = mn.VGroup(vm1_table.table, vmsp1_table.table);
 
         labels2, y_cells2, s_cells2, p_cells2 = _vm_table_cells(1)
         vms2_table = PxTable(
@@ -93,14 +127,22 @@ class ParAlgoInsight(mn.Scene):
             y_cells2,
             [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
             corner_name=r"\mathsf{Q}",
-            body=[[c, s, p] for c, s, p in zip(labels2, s_cells2, p_cells2, strict=True)],
+            body=[
+                [c, s, p] for c, s, p in zip(labels2, s_cells2, p_cells2, strict=True)
+            ],
         )
         vms2_table.add_grid(cfg, column=False)
         _ = vms2_table.table.scale_to_fit_height(_VM_HEIGHT)
         _ = vms2_table.table.move_to(3 * mn.LEFT + 2 * mn.DOWN)
 
         self.play(
-            mn.Create(vms1_table.table),
-            mn.Create(vms2_table.table),
+            mn.Create(vm1_group),
         )
         self.wait()
+        self.play(
+            mn.Transform(vm1_group.copy(), vms1_table.table),
+        )
+        self.wait()
+        self.play(
+            mn.Create(vms2_table.table),
+        )
