@@ -3,6 +3,7 @@ import typing as t
 import manim as mn
 import manim.typing as mnt
 from manim_themes import manim_theme as mtheme
+from numpy.matlib import rec
 
 from ppidc import (
     MatParams,
@@ -14,7 +15,6 @@ from ppidc import (
 
 
 class MINet(mn.Scene):
-
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
@@ -145,6 +145,10 @@ class MINet(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = mn.Text(
+            "Network Construction by Pair-wise Evaluation", font="Concourse T3"
+        ).set_color(cfg.txt_color)
+
         x_name = r"\vec{x}"
         rect_d = matrix_rect(cfg).set_color(cfg.d_color).shift(4 * mn.LEFT)
         square_n = matrix_square_width(cfg).set_color(mn.BLUE).shift(4 * mn.RIGHT)
@@ -160,21 +164,28 @@ class MINet(mn.Scene):
         ]
         txt_groups: list[mn.VGroup] = []
 
+        _ = header_txt.move_to(3.5 * mn.UP)
+        self.play(mn.Create(header_txt))
         self.play(
             *(
                 mn.Create(mobj)
-                for mobj in [rect_d, matrix_d.text_bg_rect, matrix_d.text, *matrix_d.arrows]
+                for mobj in [
+                    rect_d,
+                    matrix_d.text_bg_rect,
+                    matrix_d.text,
+                    *matrix_d.arrows,
+                ]
                 if mobj is not None
             )
         )
         self.next_section()
-        #self.play(*[mn.Create(arx) for arx in matrix_d.arrows])
-        #self.next_section()
+        # self.play(*[mn.Create(arx) for arx in matrix_d.arrows])
+        # self.next_section()
         group_x, _line_x = self.vec_with_name(rect_d, 0.4 * mn.LEFT, x_name)
         self.play(mn.Create(group_x))
-        for ix, (y_name, y_rv, mi_dot, r_shift) in enumerate(zip(
-            y_names, rv_names, mi_points, y_shifts
-        )):
+        for ix, (y_name, y_rv, mi_dot, r_shift) in enumerate(
+            zip(y_names, rv_names, mi_points, y_shifts)
+        ):
             shift_grp_x, shift_line_x = self.vec_with_name(
                 rect_d, 3.6 * mn.RIGHT, x_name
             )
@@ -188,12 +199,12 @@ class MINet(mn.Scene):
             x_copy = group_x.copy()
             y_copy = group_y.copy()
             self.play(mn.Create(group_y))
-            #self.next_section()
+            # self.next_section()
             self.play(
                 mn.Transform(x_copy, shift_grp_x),
                 mn.Transform(y_copy, shift_grp_y),
             )
-            #self.next_section()
+            # self.next_section()
             self.play(
                 mn.Transform(shift_grp_x, rv_text_x),
                 mn.Transform(shift_grp_y, rv_text_y),
@@ -224,7 +235,7 @@ class MINet(mn.Scene):
                 ]
             )
             if ix == 0:
-              self.next_section()
+                self.next_section()
         net_vx, _net_hx = self.square_lines(
             square_n, 0.4 * mn.LEFT, 0.4 * mn.UP, mn.GRAY_C
         )

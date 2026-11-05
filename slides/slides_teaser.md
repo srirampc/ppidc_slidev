@@ -46,7 +46,6 @@ Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 ---
 transition: fade-out
 layout: two-cols-header
-image:  /img/Network_Construction.svg
 ---
 
 # Construction of Gene Regulatory Networks (GRN) 
@@ -83,7 +82,6 @@ image:  /img/Network_Construction.svg
 transition: fade-out
 clicks: 10
 ---
-## Gene Network from Data
 <AllpairsMINet auto-start />
 
 
