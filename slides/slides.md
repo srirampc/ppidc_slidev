@@ -28,24 +28,61 @@ affiliation: Georgia Institute of Technology
 mdc: true
 ---
 
-# A _**Somewhat Long Title**_ for a Math Talk or Lecture
 
-### Some Subtitle, Maybe Software | _**Conference**_ @ Place, Country
+## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from Single-Cell Datasets 
+
+####   _**SC '26 @ Chicago, USA**_
 
 <template #extra>
 
-Extra content: Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
+Joint work with [Maneesha Aluru](#) and [Srinivas Aluru](#)
 
 </template>
 
+
 ---
 transition: fade-out
-clicks: 21
+layout: two-cols-header
 ---
 
-# Example Animation
+# Construction of Gene Regulatory Networks (GRN) 
 
-<AllpairsMINet auto-start />
+
+::left::
+
+<v-clicks>
+
+- **Goal :** Learn gene interactions from gene expression data.
+- **Gene Expression Data:** Snapshots of gene activity across different samples or conditions.
+- Single-cell gene expression datasets:
+  - Large datasets with millions of cells. 
+  - Sparse, has missing values and noisy.
+  - Understand cell-specific interactions.
+ 
+</v-clicks>
+
+::right::
+
+<div class="h-full flex flex-col justify-center items-center">
+
+![](/img/Network_Construction.svg){width=600px}
+
+</div>
+
+<style>
+.two-cols-header {
+  column-gap: 0px; /* Adjust the gap size as needed */
+}
+</style>
+
+---
+transition: fade-out
+layout: none
+clicks: 10
+---
+<AllpairsMINet auto-start class="absolute inset-0" />
+
+
 
 ---
 transition: fade-out

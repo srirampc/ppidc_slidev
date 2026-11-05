@@ -24,7 +24,7 @@ comark: true
 # duration of the presentation
 duration: 3min
 presenterName: Sriram Chockalingam 
-affiliation: Georgia Institute of Technology
+affiliation: Inst. for Data Engineering and Sciences, Georgia Institute of Technology
 mdc: true
 # Fonts
 fonts:
@@ -33,7 +33,9 @@ fonts:
 ---
 
 
-## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from Single-Cell Datasets 
+## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from 
+## Single-Cell Datasets 
+
 
 ####   _**SC '26 @ Chicago, USA**_
 
@@ -80,9 +82,10 @@ layout: two-cols-header
 
 ---
 transition: fade-out
+layout: none
 clicks: 10
 ---
-<AllpairsMINet auto-start />
+<AllpairsMINet auto-start class="absolute inset-0" />
 
 
 ---
