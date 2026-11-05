@@ -80,6 +80,7 @@ class ParAlgoInsight(mn.Scene):
         cfg = default_config()
 
         labels1, y_cells1, s_cells1, p_cells1 = _vm_table_cells(0)
+        labels2, y_cells2, s_cells2, p_cells2 = _vm_table_cells(1)
         vms1_table = PxTable(
             cfg,
             len(y_cells1),
@@ -94,6 +95,36 @@ class ParAlgoInsight(mn.Scene):
         vms1_table.add_grid(cfg, column=False)
         _ = vms1_table.table.scale_to_fit_height(_VM_HEIGHT)
         _ = vms1_table.table.move_to(3 * mn.LEFT + 2 * mn.UP)
+
+        vms2_table = PxTable(
+            cfg,
+            len(y_cells2),
+            3,
+            y_cells2,
+            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
+            corner_name=r"\mathsf{Q}",
+            body=[
+                [c, s, p] for c, s, p in zip(labels2, s_cells2, p_cells2, strict=True)
+            ],
+        )
+        vms2_table.add_grid(cfg, column=False)
+        _ = vms2_table.table.scale_to_fit_height(_VM_HEIGHT)
+        _ = vms2_table.table.move_to(3 * mn.LEFT + 2 * mn.DOWN)
+
+        vms_full_table = PxTable(
+            cfg,
+            len(y_cells1 + y_cells2),
+            3,
+            y_cells1 + y_cells2,
+            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
+            corner_name=r"\mathsf{Q}",
+            body=[
+                [c, s, p] for c, s, p in zip(labels1 + labels2, s_cells1 + s_cells2, p_cells1 + p_cells2, strict=True)
+            ],
+        )
+        vms_full_table.add_grid(cfg, column=False)
+        _ = vms_full_table.table.scale_to_fit_height(2 * _VM_HEIGHT)
+        _ = vms_full_table.table.move_to(3 * mn.LEFT)
 
         vm1_table = PxTable(
             cfg,
@@ -117,32 +148,45 @@ class ParAlgoInsight(mn.Scene):
         vmsp1_table.add_grid(cfg)
         _ = vmsp1_table.table.scale_to_fit_height(_VM_HEIGHT)
         _ = vmsp1_table.table.next_to(vm1_table.table, mn.RIGHT, buff=0.2)
-        vm1_group = mn.VGroup(vm1_table.table, vmsp1_table.table);
-
-        labels2, y_cells2, s_cells2, p_cells2 = _vm_table_cells(1)
-        vms2_table = PxTable(
+        vm1_group = mn.VGroup(vm1_table.table, vmsp1_table.table)
+        vm2_table = PxTable(
             cfg,
-            len(y_cells2),
-            3,
-            y_cells2,
-            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
-            corner_name=r"\mathsf{Q}",
-            body=[
-                [c, s, p] for c, s, p in zip(labels2, s_cells2, p_cells2, strict=True)
-            ],
+            len(_VM_LABELS),
+            1,
+            _VM_LABELS,
+            [r"\mu(y=1; \cdot)"],
+            body=[[cell] for cell in _vm_label_cells(1)],
         )
-        vms2_table.add_grid(cfg, column=False)
-        _ = vms2_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vms2_table.table.move_to(3 * mn.LEFT + 2 * mn.DOWN)
-
+        vm2_table.add_grid(cfg)
+        _ = vm2_table.table.scale_to_fit_height(_VM_HEIGHT)
+        _ = vm2_table.table.next_to(vm1_table.table, mn.DOWN, buff=0.2)
+        vmsp2_table = PxTable(
+            cfg,
+            len(labels2),
+            2,
+            labels1,
+            [r"\mathsf{S}_{y=1}", r"\mathsf{P}_{y=1}"],
+            body=[[s, p] for s, p in zip(s_cells2, p_cells2, strict=True)],
+        )
+        vmsp2_table.add_grid(cfg)
+        _ = vmsp2_table.table.scale_to_fit_height(_VM_HEIGHT)
+        _ = vmsp2_table.table.next_to(vm2_table.table, mn.RIGHT, buff=0.2)
+        vm2_group = mn.VGroup(vm2_table.table, vmsp2_table.table)
         self.play(
             mn.Create(vm1_group),
+            mn.Create(vm2_group),
         )
-        self.wait()
+        self.next_section()
         self.play(
             mn.Transform(vm1_group.copy(), vms1_table.table),
         )
-        self.wait()
+        self.next_section()
         self.play(
-            mn.Create(vms2_table.table),
+            mn.Transform(vm2_group.copy(), vms2_table.table),
         )
+        self.next_section()
+        self.play(
+            mn.Uncreate(vms1_table.table), mn.Uncreate(vms2_table.table),
+            mn.Create(vms_full_table.table),
+        )
+        self.wait()
