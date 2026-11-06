@@ -11,6 +11,8 @@ from ppidc import (
     default_config,
     matrix_rect,
     matrix_square_width,
+    scene_header,
+    theme_background,
 )
 
 
@@ -18,6 +20,7 @@ class MINet(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     def data_matrix(self, rect_d: mn.Rectangle) -> MatrixRect:
         return MatrixRect(
@@ -145,9 +148,9 @@ class MINet(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = mn.Text(
-            "Network Construction by Pair-wise Evaluation", font="Concourse T3"
-        ).set_color(cfg.txt_color)
+        header_txt = scene_header(
+            "Network Construction by Pair-wise Evaluation", cfg
+        )
 
         x_name = r"\vec{x}"
         rect_d = matrix_rect(cfg).set_color(cfg.d_color).shift(4 * mn.LEFT)
@@ -164,7 +167,6 @@ class MINet(mn.Scene):
         ]
         txt_groups: list[mn.VGroup] = []
 
-        _ = header_txt.move_to(3.5 * mn.UP)
         self.play(mn.Create(header_txt))
         self.play(
             *(

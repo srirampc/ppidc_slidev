@@ -86,29 +86,26 @@ clicks: 10
 
 ---
 transition: fade-out
-clicks: 3
+layout: none
+clicks: 2
 ---
-# Transpose Xform
-
-<TransposeDataT auto-start />
+<DataB auto-start class="absolute inset-0" />
 
 
 ---
 transition: fade-out
+layout: none
 clicks: 6
 ---
-# Specific Information $I_s(y; X)$
-
-<SpecificSpecificInfo auto-start />
+<SpecificSpecificInfo auto-start class="absolute inset-0" />
 
 
 ---
 transition: fade-out
+layout: none
 clicks: 7
 ---
-# Algorithm Insight
-
-<InsightAlgoInsight auto-start />
+<InsightAlgoInsight auto-start class="absolute inset-0" />
 
 
 ---

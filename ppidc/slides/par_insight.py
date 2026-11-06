@@ -3,9 +3,16 @@ import typing as t
 import manim as mn
 from manim_themes import manim_theme as mtheme
 
-from ppidc import Config, PxTable, default_config, parts_by_tex
+from ppidc import (
+    Config,
+    PxTable,
+    default_config,
+    parts_by_tex,
+    scene_header,
+    theme_background,
+)
 
-_VM_HEIGHT = 3.8
+_VM_HEIGHT = 2.9
 # the values of the rows the tables spell out; ⋮ stands for the rows they leave
 # out, which have no value of their own
 _VM_VALUES = [
@@ -74,10 +81,12 @@ class ParAlgoInsight(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = scene_header("Parallel Algorithm", cfg)
 
         labels1, y_cells1, s_cells1, p_cells1 = _vm_table_cells(0)
         labels2, y_cells2, s_cells2, p_cells2 = _vm_table_cells(1)
@@ -94,7 +103,7 @@ class ParAlgoInsight(mn.Scene):
         )
         vms1_table.add_grid(cfg, column=False)
         _ = vms1_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vms1_table.table.move_to(3 * mn.LEFT + 2 * mn.UP)
+        _ = vms1_table.table.move_to(3 * mn.LEFT + 1.45 * mn.UP)
 
         vms2_table = PxTable(
             cfg,
@@ -109,7 +118,7 @@ class ParAlgoInsight(mn.Scene):
         )
         vms2_table.add_grid(cfg, column=False)
         _ = vms2_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vms2_table.table.move_to(3 * mn.LEFT + 2 * mn.DOWN)
+        _ = vms2_table.table.move_to(3 * mn.LEFT + 1.45 * mn.DOWN)
 
         vms_full_table = PxTable(
             cfg,
@@ -172,6 +181,7 @@ class ParAlgoInsight(mn.Scene):
         _ = vmsp2_table.table.scale_to_fit_height(_VM_HEIGHT)
         _ = vmsp2_table.table.next_to(vm2_table.table, mn.RIGHT, buff=0.2)
         vm2_group = mn.VGroup(vm2_table.table, vmsp2_table.table)
+        self.play(mn.Create(header_txt))
         self.play(
             mn.Create(vm1_group),
             mn.Create(vm2_group),

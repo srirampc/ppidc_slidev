@@ -5,17 +5,19 @@ import manim.typing as mnt
 import numpy as np
 from manim_themes import manim_theme as mtheme
 
-from ppidc import default_config
+from ppidc import default_config, scene_header, theme_background
 
 
 class UniqC(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = scene_header("Unique Contribution", cfg)
         x_pt = 3 * mn.LEFT + 1 * mn.DOWN
         y_pt = 3 * mn.RIGHT + 1 * mn.DOWN
         line_xy = mn.Line(x_pt, y_pt).set_color(cfg.txt_color)
@@ -33,6 +35,7 @@ class UniqC(mn.Scene):
         z_label = mn.MathTex("Z", fill_color=cfg.txt_color).next_to(
             z_pt, mn.UP
         )
+        self.play(mn.Create(header_txt))
         self.play(
             mn.Create(x_dot),
             mn.Create(y_dot),

@@ -4,17 +4,27 @@ import manim as mn
 import numpy as np
 from manim_themes import manim_theme as mtheme
 
-from ppidc import MatParams, MatrixRect, default_config, matrix_rect
+from ppidc import (
+    MatParams,
+    MatrixRect,
+    default_config,
+    matrix_rect,
+    scene_header,
+    theme_background,
+)
 
 
-class DataT(mn.Scene):
+class DataB(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = scene_header("Handling Large Datasets", cfg)
+        self.play(mn.Create(header_txt))
         d_rect = matrix_rect(cfg).set_color(cfg.d_color).shift(3 * mn.LEFT)
         d_rect_t = (
             matrix_rect(cfg)

@@ -3,7 +3,14 @@ import typing as t
 import manim as mn
 from manim_themes import manim_theme as mtheme
 
-from ppidc import Config, PxTable, default_config, parts_by_tex
+from ppidc import (
+    Config,
+    PxTable,
+    default_config,
+    parts_by_tex,
+    scene_header,
+    theme_background,
+)
 
 # The three lines of the derivation. B is A with the two summations swapped
 # and p(y) distributed into both min arguments; C writes each resulting
@@ -112,10 +119,12 @@ class AlgoInsight(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = scene_header("Algorithm Insight", cfg)
 
         # All three equations share a font size, fitted to the column left of
         # the tables, and a common left edge, so that each derivation reads as
@@ -185,7 +194,8 @@ class AlgoInsight(mn.Scene):
         )
         vm1_table.add_grid(cfg)
         _ = vm1_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vm1_table.table.move_to(mn.RIGHT + 1.8 * mn.DOWN)
+        # Keep the lower-right table and its row sum clear of the theme logo.
+        _ = vm1_table.table.move_to(0.7 * mn.RIGHT + 1.8 * mn.DOWN)
 
         s_cells = _value_cells(_VMSP_LABELS)
         p_cells = _prefix_cells(_VMSP_LABELS)
@@ -233,6 +243,7 @@ class AlgoInsight(mn.Scene):
             if any(entry is mob for entry in entries):
                 entries.remove(mob)
 
+        self.play(mn.Create(header_txt))
         self.play(mn.Write(eq_a))
         self.wait()
         self.next_section()

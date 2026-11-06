@@ -5,17 +5,19 @@ import manim.typing as mnt
 import numpy as np
 from manim_themes import manim_theme as mtheme
 
-from ppidc import PxTable, default_config
+from ppidc import PxTable, default_config, scene_header, theme_background
 
 
 class Redundancy(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = scene_header("Redundancy", cfg)
 
         pxz_table = PxTable(
             cfg,
@@ -70,6 +72,7 @@ class Redundancy(mn.Scene):
             .scale(0.8)
         )
 
+        self.play(mn.Create(header_txt))
         self.play(
             mn.Create(table_xz),
             mn.Write(pxz_title),

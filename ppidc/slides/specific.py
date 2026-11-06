@@ -4,7 +4,13 @@ from collections.abc import Iterable
 import manim as mn
 from manim_themes import manim_theme as mtheme
 
-from ppidc import PxTable, default_config, parts_by_tex
+from ppidc import (
+    PxTable,
+    default_config,
+    parts_by_tex,
+    scene_header,
+    theme_background,
+)
 
 _EXPR_TEX = r"\frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x)\cdot p(y)} \right)"
 
@@ -14,10 +20,12 @@ class SpecificInfo(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
+        self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
+        header_txt = scene_header("Specific Information", cfg)
 
         pxy_table = PxTable(
             cfg,
@@ -86,6 +94,7 @@ class SpecificInfo(mn.Scene):
             table, px_marginal, py_marginal, pxy_title, px_title, py_title, expr
         ).move_to(mn.ORIGIN)
 
+        self.play(mn.Create(header_txt))
         self.play(mn.Create(table), mn.Write(pxy_title))
         self.wait()
         self.next_section()

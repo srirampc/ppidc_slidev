@@ -1,6 +1,7 @@
 import os
 import typing as t
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import manim as mn
 import manim.typing as mnt
@@ -64,6 +65,26 @@ def default_config(theme: ThemeType | None = None) -> Config:
         return g_DEFAULT_CONFIG
     else:
         return g_DEFAULT_CONFIG
+
+
+def theme_background() -> mn.ImageMobject:
+    """The default Slidev theme background, fitted to the Manim frame."""
+    background_path = (
+        Path(__file__).resolve().parent.parent
+        / "slides/ext/slidev-theme-spc-gt/assets/default-background.png"
+    )
+    background = mn.ImageMobject(str(background_path)).set(
+        width=mn.config.frame_width, height=mn.config.frame_height
+    )
+    # Scene objects can deliberately use negative z-indices (PUC's tangents do).
+    return background.set_z_index(-100)
+
+
+def scene_header(title: str, cfg: Config) -> mn.Text:
+    """A consistently positioned header for the animated slides."""
+    return mn.Text(title, font="Concourse T3").set_color(cfg.txt_color).move_to(
+        3.5 * mn.UP
+    )
 
 
 def matrix_rect(cfg: Config) -> mn.Rectangle:

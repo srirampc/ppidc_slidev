@@ -108,15 +108,15 @@ uv run python scripts/build_assets.py --theme light       # light color theme (d
 ```
 
 For testing purposes, individual manim-animated scenes can be built.
-The following is an example of building the `DataT` scene using manim
+The following is an example of building the `DataB` scene using manim
 (scenes live one-per-file under `ppidc/slides/`; `build_assets.py`
 discovers them automatically). To pick the color theme, set
 `PPIDC_THEME` to `dark` or `light` (the same env var `build_assets.py`
 sets from its `--theme` flag):
 
 ```sh
-uv run manim -pql ppidc/slides/transpose.py DataT
-PPIDC_THEME=light uv run manim -pql ppidc/slides/transpose.py DataT
+uv run manim -pql ppidc/slides/datab.py DataB
+PPIDC_THEME=light uv run manim -pql ppidc/slides/datab.py DataB
 ```
 
 **2. Author/preview the deck:**
@@ -152,7 +152,7 @@ For rapid iteration, use the watcher scripts instead of running the build comman
 Best for iterating on the animation itself. Watches `ppidc/*.py` and re-renders a single scene with `manim -ql` on every save.
 
 ```bash
-uv run --group dev python scripts/watch_scene.py DataT --quality l
+uv run --group dev python scripts/watch_scene.py DataB --quality l
 ```
 
 Keep a browser or video player open on the printed output file and refresh it after each render. The `-p` flag is intentionally omitted so the watcher does not spawn a new video player window on every save.
@@ -160,7 +160,7 @@ Keep a browser or video player open on the printed output file and refresh it af
 For example, with `mpv` you can loop the output file so it automatically reloads the new render when the watcher finishes:
 
 ```bash
-mpv --loop-file=inf media/videos/transpose/480p15/DataT.mp4
+mpv --loop-file=inf media/videos/datab/480p15/DataB.mp4
 ```
 
 `watch_scene.py` prints the exact video path after each render. Save the source file, and `mpv` will pick up the updated clip on the next loop.
