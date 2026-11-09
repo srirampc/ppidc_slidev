@@ -59,7 +59,7 @@ class PUC(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
-        self.add(theme_background())
+        _ = self.add(theme_background())
 
     @t.override
     def construct(self) -> None:

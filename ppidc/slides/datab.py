@@ -8,26 +8,41 @@ from ppidc import (
     MatParams,
     MatrixRect,
     default_config,
-    matrix_rect,
     scene_header,
     theme_background,
 )
+
+_D_WIDTH : float  = 2
+_D_HEIGHT : float  = 4
+_D_GRID_STEP : float = 0.2
+_D_GRID_STROKE : float = 1
+
+def _matrix_rect() -> mn.Rectangle:
+    d_rect = mn.Rectangle(
+        width=_D_WIDTH,
+        height=_D_HEIGHT,
+        grid_xstep=_D_GRID_STEP,
+        grid_ystep=_D_GRID_STEP,
+    )
+    _g = d_rect.grid_lines.set_stroke(width=_D_GRID_STROKE)
+    return d_rect
+
 
 
 class DataB(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
-        self.add(theme_background())
+        _ = self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
         header_txt = scene_header("Handling Large Datasets", cfg)
         self.play(mn.Create(header_txt))
-        d_rect = matrix_rect(cfg).set_color(cfg.d_color).shift(3 * mn.LEFT)
+        d_rect = _matrix_rect().set_color(cfg.d_color).shift(3 * mn.LEFT)
         d_rect_t = (
-            matrix_rect(cfg)
+            _matrix_rect()
             .set_color(mn.GREEN)
             .shift(3 * mn.RIGHT)
             .rotate(-mn.PI / 2)

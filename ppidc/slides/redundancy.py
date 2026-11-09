@@ -1,16 +1,16 @@
 import typing as t
 
 import manim as mn
-import manim.typing as mnt
-import numpy as np
 from manim_themes import manim_theme as mtheme
 
 from ppidc import PxTable, default_config, scene_header, theme_background
 
-
-_TEX_RED = r" \sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
+_TEX_RED = r"\sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
+_TEX_RED_RHO = r"\rho((X, Z); Y) = \sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
+_TEX_PID = r"\rho((X, Z); Y) = I(X, Z) - \rho((X, Z); Y)"
 _TABLE_WIDTH : float = 4.0
 _TABLE_HEIGHT : float = 3.0
+_TEXT_WIDTH : float = 4.0
 
 class Redundancy(mn.Scene):
     @t.override
@@ -29,6 +29,7 @@ class Redundancy(mn.Scene):
             1,
             [r"y=1", r"y=2", r"y=3"],
             [r"I_s(y; X)"],
+            body=[["1.12"], ["2.22"], ["0.85"]],
         )
         mx_table.add_grid(cfg)
         _ = mx_table.table.scale_to_fit_height(_TABLE_HEIGHT)
@@ -40,6 +41,7 @@ class Redundancy(mn.Scene):
             1,
             [r"y=1", r"y=2", r"y=3"],
             [r"I_s(y; Z)"],
+            body=[["3.38"], ["1.29"], ["1.35"]],
         )
         mz_table.add_grid(cfg)
         _ = mz_table.table.scale_to_fit_height(_TABLE_HEIGHT)
@@ -52,14 +54,18 @@ class Redundancy(mn.Scene):
             1,
             [r"y=1", r"y=2", r"y=3"],
             [r"\min(I_s(y; Z), I_s(y; Z))"],
+            body=[["3.38"], ["1.29"], ["1.35"]],
         )
         minxz_table.add_grid(cfg)
         _ = minxz_table.table.scale_to_fit_height(_TABLE_HEIGHT)
         _ = minxz_table.table.next_to(mz_table.table, mn.RIGHT, buff=1.2)
 
 
-        red_txt = mn.MathTex(_TEX_RED, fill_color=cfg.txt_color)
+        red_txt = mn.MathTex(_TEX_RED, fill_color=cfg.txt_color).scale_to_fit_width(_TEXT_WIDTH)
         _ = red_txt.next_to(minxz_table.table, mn.DOWN, buff = 0.3)
+
+        pid_txt = mn.MathTex(_TEX_PID, fill_color=cfg.txt_color)
+        _ = pid_txt.move_to(2.5 * mn.DOWN)
         self.play(mn.Create(header_txt))
         self.play(
             mn.Create(mx_table.table),
@@ -69,7 +75,10 @@ class Redundancy(mn.Scene):
         self.play(
             mn.Create(minxz_table.table),
         )
-        self.wait()
         self.play(
             mn.Write(red_txt),
+        )
+        self.wait()
+        self.play(
+            mn.Write(pid_txt),
         )

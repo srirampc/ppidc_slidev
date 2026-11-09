@@ -3,24 +3,48 @@ import typing as t
 import manim as mn
 import manim.typing as mnt
 from manim_themes import manim_theme as mtheme
-from numpy.matlib import rec
 
 from ppidc import (
     MatParams,
     MatrixRect,
     default_config,
-    matrix_rect,
-    matrix_square_width,
     scene_header,
     theme_background,
 )
+
+_D_WIDTH: float = 2
+_D_HEIGHT: float = 4
+_D_GRID_STEP: float = 0.2
+_D_GRID_STROKE: float = 1
+_G_SIZE: float = _D_WIDTH
+
+
+def _matrix_rect() -> mn.Rectangle:
+    d_rect = mn.Rectangle(
+        width=_D_WIDTH,
+        height=_D_HEIGHT,
+        grid_xstep=_D_GRID_STEP,
+        grid_ystep=_D_GRID_STEP,
+    )
+    _g = d_rect.grid_lines.set_stroke(width=_D_GRID_STROKE)
+    return d_rect
+
+
+def _matrix_square_width() -> mn.Square:
+    d_rect = mn.Square(
+        _D_WIDTH,
+        grid_xstep=_D_GRID_STEP,
+        grid_ystep=_D_GRID_STEP,
+    )
+    _g = d_rect.grid_lines.set_stroke(width=_D_GRID_STROKE)
+    return d_rect
 
 
 class MINet(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
-        self.add(theme_background())
+        _ = self.add(theme_background())
 
     def data_matrix(self, rect_d: mn.Rectangle) -> MatrixRect:
         return MatrixRect(
@@ -148,13 +172,11 @@ class MINet(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header(
-            "Network Construction by Pair-wise Evaluation", cfg
-        )
+        header_txt = scene_header("Network Construction by Pair-wise Evaluation", cfg)
 
         x_name = r"\vec{x}"
-        rect_d = matrix_rect(cfg).set_color(cfg.d_color).shift(4 * mn.LEFT)
-        square_n = matrix_square_width(cfg).set_color(mn.BLUE).shift(4 * mn.RIGHT)
+        rect_d = _matrix_rect().set_color(cfg.d_color).shift(4 * mn.LEFT)
+        square_n = _matrix_square_width().set_color(mn.BLUE).shift(4 * mn.RIGHT)
         matrix_d = self.data_matrix(rect_d)
         mat_n = self.adj_matrix(square_n)
         y_names = [r"\vec{y}", r"\vec{w}", r"\vec{z}"]

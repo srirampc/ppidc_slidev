@@ -12,12 +12,7 @@ type ThemeType = t.Literal["dark", "light"]
 
 class Config:
     def __init__(self, theme: ThemeType = "dark"):
-        self.d_width : float  = 2
-        self.d_height : float  = 4
-        self.d_grid_step : float = 0.2
-        self.d_grid_stroke : float = 1
-        self.g_size : float = self.d_width
-
+        # Setup theme
         self.theme: t.Literal["dark", "light"] = theme
         match self.theme:
             case "dark":
@@ -42,8 +37,10 @@ class Config:
         # Set background
         mn.config.background_color = self.bkg_color
 
-g_DEFAULT_THEME : ThemeType = "light"
-g_DEFAULT_CONFIG : Config | None = None
+
+g_DEFAULT_THEME: ThemeType = "light"
+g_DEFAULT_CONFIG: Config | None = None
+
 
 def default_theme() -> ThemeType:
     """The current default theme: PPIDC_THEME env override, else the
@@ -53,6 +50,7 @@ def default_theme() -> ThemeType:
         return env_theme
     return g_DEFAULT_THEME
 
+
 def set_default_theme(theme: ThemeType):
     global g_DEFAULT_THEME
     g_DEFAULT_THEME = theme
@@ -61,7 +59,7 @@ def set_default_theme(theme: ThemeType):
 def default_config(theme: ThemeType | None = None) -> Config:
     global g_DEFAULT_CONFIG
     if g_DEFAULT_CONFIG is None or g_DEFAULT_CONFIG.theme != theme:
-        g_DEFAULT_CONFIG =  Config(theme=theme if theme else default_theme())
+        g_DEFAULT_CONFIG = Config(theme=theme if theme else default_theme())
         return g_DEFAULT_CONFIG
     else:
         return g_DEFAULT_CONFIG
@@ -82,30 +80,11 @@ def theme_background() -> mn.ImageMobject:
 
 def scene_header(title: str, cfg: Config) -> mn.Text:
     """A consistently positioned header for the animated slides."""
-    return mn.Text(title, font="Concourse T3").set_color(cfg.txt_color).move_to(
-        3.5 * mn.UP
+    return (
+        mn.Text(title, font="Concourse T3")
+        .set_color(cfg.txt_color)
+        .move_to(3.5 * mn.UP)
     )
-
-
-def matrix_rect(cfg: Config) -> mn.Rectangle:
-    d_rect = mn.Rectangle(
-        width=cfg.d_width,
-        height=cfg.d_height,
-        grid_xstep=cfg.d_grid_step,
-        grid_ystep=cfg.d_grid_step,
-    )
-    _g = d_rect.grid_lines.set_stroke(width=cfg.d_grid_stroke)
-    return d_rect
-
-
-def matrix_square_width(cfg: Config) -> mn.Square:
-    d_rect = mn.Square(
-        cfg.d_width,
-        grid_xstep=cfg.d_grid_step,
-        grid_ystep=cfg.d_grid_step,
-    )
-    _g = d_rect.grid_lines.set_stroke(width=cfg.d_grid_stroke)
-    return d_rect
 
 
 def parts_by_tex(expr: mn.MathTex, tex: str) -> list[mn.VGroup]:
@@ -160,9 +139,9 @@ class MatrixRect:
             .shift(params.row_off * mn.UP)
         )
         if (params.text_pos == mn.DOWN).all():  # pyright: ignore[reportAny]
-            self.text : mn.MathTex = mn.MathTex(params.name, fill_color=params.color).move_to(
-                rect.get_bottom() + 0.2 * mn.DOWN, mn.UP
-            )
+            self.text: mn.MathTex = mn.MathTex(
+                params.name, fill_color=params.color
+            ).move_to(rect.get_bottom() + 0.2 * mn.DOWN, mn.UP)
         elif (params.text_pos == mn.UP).all():  # pyright: ignore[reportAny]
             self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
                 self.row_txt.get_top() + 0.2 * mn.UP, mn.DOWN
@@ -171,7 +150,12 @@ class MatrixRect:
             self.text = mn.MathTex(params.name, fill_color=params.color).move_to(
                 rect.get_center()
             )
-        self.arrows: list[mn.VMobject] = [self.row_arrow, self.col_arrow, self.row_txt, self.col_txt]
+        self.arrows: list[mn.VMobject] = [
+            self.row_arrow,
+            self.col_arrow,
+            self.row_txt,
+            self.col_txt,
+        ]
         self.text_bg_rect: mn.BackgroundRectangle | None = None
         if params.text_bg_rect:
             self.text_bg_rect = mn.BackgroundRectangle(self.text)
@@ -180,7 +164,6 @@ class MatrixRect:
         if self.text_bg_rect is None:
             return self.text
         return mn.VGroup(self.text_bg_rect, self.text)
-
 
 
 class PxTable:
@@ -218,7 +201,9 @@ class PxTable:
         if body is not None:
             for rx, row_tex in enumerate(body):
                 for cx, tex in enumerate(row_tex):
-                    t_entries[rx + 1][cx + 1] = mn.MathTex(tex, fill_color=cfg.txt_color)
+                    t_entries[rx + 1][cx + 1] = mn.MathTex(
+                        tex, fill_color=cfg.txt_color
+                    )
 
         mobj_gen: t.Callable[[mn.VMobject], mn.VMobject] = lambda m: m
 
@@ -234,16 +219,16 @@ class PxTable:
 
     def h_line(self, y: float, width: int, cfg: Config) -> mn.Line:
         return mn.Line(
-            (float(self.table.get_left()[0]), y, 0.0),
-            (float(self.table.get_right()[0]), y, 0),
+            (float(self.table.get_left()[0]), y, 0.0),  # pyright: ignore[reportAny]
+            (float(self.table.get_right()[0]), y, 0),  # pyright: ignore[reportAny]
             color=cfg.txt_color,
             stroke_width=width,
         )
 
     def v_line(self, x: float, width: int, cfg: Config) -> mn.Line:
         return mn.Line(
-            (x, float(self.table.get_top()[1]), 0),
-            (x, float(self.table.get_bottom()[1]), 0),
+            (x, float(self.table.get_top()[1]), 0),  # pyright: ignore[reportAny]
+            (x, float(self.table.get_bottom()[1]), 0),  # pyright: ignore[reportAny]
             color=cfg.txt_color,
             stroke_width=width,
         )
@@ -255,11 +240,11 @@ class PxTable:
         # group cells by row via their y-coordinate (robust, no label API needed)
         rows: dict[float, list[mn.Mobject]] = {}
         for e in entries:
-            y = round(float(e.get_center()[1]), 6)
+            y = round(float(e.get_center()[1]), 6)  # pyright: ignore[reportAny]
             rows.setdefault(y, []).append(e)
         ys = sorted(rows.keys(), reverse=True)
         for row in rows.values():
-            row.sort(key=lambda e: float(e.get_center()[0]))
+            row.sort(key=lambda e: float(e.get_center()[0]))  # pyright: ignore[reportAny]
         return rows, ys
 
     def cell(self, row: int, col: int) -> mn.Mobject:
@@ -279,7 +264,7 @@ class PxTable:
         rows, ys = self._grouped_entries()
         return rows[ys[0]][1:]
 
-    def add_grid(self, cfg: Config, column: bool=True, row: bool=True) -> None:
+    def add_grid(self, cfg: Config, column: bool = True, row: bool = True) -> None:
         """Draw every grid line of the table: strong (width 6) for the
         outer border, the header-row separator, and the first-column
         separator; thin (width 2) for all remaining inner lines."""
@@ -311,7 +296,11 @@ class PxTable:
         # indices 0 and len-1 are the outer border; index 1 is the header
         # row / first column separator — those are strong, the rest thin
         grid = mn.VGroup(
-            *(self.h_line(y, thin, cfg) for _i, y in enumerate(row_borders[1:2])) if row else (),
-            *(self.v_line(x, thin, cfg) for _i, x in enumerate(col_borders[1:2])) if column else (),
+            *(self.h_line(y, thin, cfg) for _i, y in enumerate(row_borders[1:2]))
+            if row
+            else (),
+            *(self.v_line(x, thin, cfg) for _i, x in enumerate(col_borders[1:2]))
+            if column
+            else (),
         )
         _ = self.table.add(grid)

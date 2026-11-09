@@ -221,7 +221,7 @@ class AlgoInsight(mn.Scene):
         # vmsp starts as its index column alone, holding the rows in the order
         # they appear in the μ table; S, P and the divider are held back until
         # the sort has happened, then revealed as one group.
-        labels = vmsp_table.row_labels()
+        labels = t.cast(list[mn.VMobject] , vmsp_table.row_labels())
         label_slots = [label.get_center().copy() for label in labels]
         row_order = _source_rows(_VM_LABELS, _VMSP_LABELS)
         for row, from_row in enumerate(row_order):
@@ -299,8 +299,8 @@ class AlgoInsight(mn.Scene):
         # the real B so the next section can cut B up by sub-expression; the
         # part groups above were registered with the scene, so they have to go
         # with the line they were cut from.
-        self.remove(a_at_b, py_front, residue_a, *sums_a, b_py[1])
-        self.add(eq_b)
+        self.remove(a_at_b, py_front, residue_a, *sums_a, b_py[1])  # pyright: ignore[reportUnusedCallResult]
+        self.add(eq_b)  # pyright: ignore[reportUnusedCallResult]
         self.wait()
         self.next_section()
         # B -> C: a copy of B drops into C's slot, then each p(y)·I_s prefix
@@ -329,7 +329,7 @@ class AlgoInsight(mn.Scene):
         # other on opposite sides (same arc sign, opposite directions)
         self.play(
             *(
-                labels[row].animate(path_arc=mn.PI / 2).move_to(label_slots[row])
+                labels[row].animate(path_arc=mn.PI / 2).move_to(label_slots[row])  # pyright: ignore[reportCallIssue]
                 for row, from_row in enumerate(row_order)
                 if from_row != row
             )
