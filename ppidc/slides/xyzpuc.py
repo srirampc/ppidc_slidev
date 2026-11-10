@@ -64,7 +64,7 @@ class PUC(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Partial Information Decomposition", cfg)
+        header_txt = scene_header("Partial Unique Contribution (PUC)", cfg)
         x_pt = 3 * mn.LEFT + 1 * mn.DOWN
         y_pt = 3 * mn.RIGHT + 1 * mn.DOWN
         line_xy = mn.Line(x_pt, y_pt).set_color(cfg.txt_color)
