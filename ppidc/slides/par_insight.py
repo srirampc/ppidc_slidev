@@ -1,3 +1,4 @@
+import itertools
 import typing as t
 
 import manim as mn
@@ -63,7 +64,7 @@ def _prefix_cells(labels: list[str], vm_dict: dict[str, float]) -> list[str]:
 def _vm_table_cells(y: int) -> tuple[list[str], list[str], list[str], list[str]]:
     vm_dict = _VM_VALUES[y]
     vm_labels = _VMSP_LABELS[y]
-    y_cells = _const_cells(str(y + 1), vm_labels, vm_dict)
+    y_cells = _const_cells("y=" + str(y + 1), vm_labels, vm_dict)
     s_cells = _value_cells(vm_labels, vm_dict)
     p_cells = _prefix_cells(vm_labels, vm_dict)
     return vm_labels, y_cells, s_cells, p_cells
@@ -103,7 +104,7 @@ class ParAlgoInsight(mn.Scene):
         )
         vms1_table.add_grid(cfg, column=False)
         _ = vms1_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vms1_table.table.move_to(3 * mn.LEFT + 1.45 * mn.UP)
+        _ = vms1_table.table.move_to(4.5 * mn.LEFT + 1.45 * mn.UP)
 
         vms2_table = PxTable(
             cfg,
@@ -118,22 +119,7 @@ class ParAlgoInsight(mn.Scene):
         )
         vms2_table.add_grid(cfg, column=False)
         _ = vms2_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vms2_table.table.move_to(3 * mn.LEFT + 1.45 * mn.DOWN)
-
-        vms_full_table = PxTable(
-            cfg,
-            len(y_cells1 + y_cells2),
-            3,
-            y_cells1 + y_cells2,
-            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
-            corner_name=r"\mathsf{Q}",
-            body=[
-                [c, s, p] for c, s, p in zip(labels1 + labels2, s_cells1 + s_cells2, p_cells1 + p_cells2, strict=True)
-            ],
-        )
-        vms_full_table.add_grid(cfg, column=False)
-        _ = vms_full_table.table.scale_to_fit_height(2 * _VM_HEIGHT)
-        _ = vms_full_table.table.move_to(3 * mn.LEFT)
+        _ = vms2_table.table.next_to(vms1_table.table, mn.DOWN, buff=0.2)
 
         vm1_table = PxTable(
             cfg,
@@ -180,7 +166,79 @@ class ParAlgoInsight(mn.Scene):
         vmsp2_table.add_grid(cfg)
         _ = vmsp2_table.table.scale_to_fit_height(_VM_HEIGHT)
         _ = vmsp2_table.table.next_to(vm2_table.table, mn.RIGHT, buff=0.2)
+
         vm2_group = mn.VGroup(vm2_table.table, vmsp2_table.table)
+
+        vms_full_table = PxTable(
+            cfg,
+            len(y_cells1 + y_cells2),
+            3,
+            y_cells1 + y_cells2,
+            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
+            corner_name=r"\mathsf{Q}",
+            body=[
+                [c, s, p]
+                for c, s, p in zip(
+                    labels1 + labels2,
+                    s_cells1 + s_cells2,
+                    p_cells1 + p_cells2,
+                    strict=True,
+                )
+            ],
+        )
+        vms_full_table.add_grid(cfg, column=False)
+        _ = vms_full_table.table.scale_to_fit_height(2.2 * _VM_HEIGHT)
+        _ = vms_full_table.table.next_to(vm1_table.table, mn.LEFT, buff=0.2).shift(
+            0.5 * vms1_table.table.height * mn.DOWN
+        )
+
+        tuple_list = [
+            [yl.replace('y=',''), str(idx), c, s, p] if s != r"\vdots" else ["9", idx, "Z", "", ""]
+            for yl, idx, c, s, p in zip(
+                y_cells1 + y_cells2,
+                itertools.chain(range(len(y_cells1)), range(len(y_cells2))),
+                labels1 + labels2,
+                s_cells1 + s_cells2,
+                p_cells1 + p_cells2,
+                strict=True,
+            )
+        ]
+        sorted_tuple_list = sorted(tuple_list, key=lambda x: (x[2], x[0]))
+
+        tuple_table = PxTable(
+            cfg,
+            len(y_cells1 + y_cells2),
+            1,
+            [r"" for _ in range(len(y_cells1 + y_cells2))],
+            [r"\rho \mathsf{-tuples}"],
+            body=[
+                [rf"\langle Y, {c}, {yl}, g({s}, {p}) \rangle"]
+                if s
+                else [r"\langle \dots, \dots, \dots, \dots   \rangle"]
+                for yl, _idx, c, s, p in tuple_list
+            ],
+        )
+        tuple_table.add_grid(cfg, column=False)
+        _ = tuple_table.table.scale_to_fit_height(2.2 * _VM_HEIGHT)
+        _ = tuple_table.table.next_to(vms_full_table.table, mn.RIGHT, buff=0.3)
+
+        sorted_tuple_table = PxTable(
+            cfg,
+            len(y_cells1 + y_cells2),
+            1,
+            [r"" for _ in range(len(y_cells1 + y_cells2))],
+            [r"\textrm{sorted } \rho \mathsf{-tuples}"],
+            body=[
+                [rf"\langle Y, {c}, {yl.replace('y=', '')}, g({s}, {p}) \rangle"]
+                if s
+                else [r"\langle \dots, \dots, \dots, \dots   \rangle"]
+                for yl, _idx, c, s, p in sorted_tuple_list
+            ],
+        )
+        sorted_tuple_table.add_grid(cfg, column=False)
+        _ = sorted_tuple_table.table.scale_to_fit_height(2.2 * _VM_HEIGHT)
+        _ = sorted_tuple_table.table.next_to(tuple_table.table, mn.RIGHT, buff=0.3)
+
         self.play(mn.Create(header_txt))
         self.play(
             mn.Create(vm1_group),
@@ -188,15 +246,23 @@ class ParAlgoInsight(mn.Scene):
         )
         self.next_section()
         self.play(
-            mn.Transform(vm1_group.copy(), vms1_table.table),
+            mn.TransformFromCopy(vm1_group, vms1_table.table),
         )
         self.next_section()
         self.play(
-            mn.Transform(vm2_group.copy(), vms2_table.table),
+            mn.TransformFromCopy(vm2_group, vms2_table.table),
         )
         self.next_section()
         self.play(
-            mn.Uncreate(vms1_table.table), mn.Uncreate(vms2_table.table),
+            mn.Uncreate(vm1_group),
+            mn.Uncreate(vm2_group),
+            mn.Uncreate(vms1_table.table),
+            mn.Uncreate(vms2_table.table),
             mn.Create(vms_full_table.table),
+        )
+        self.next_section()
+        self.play(
+            mn.Create(tuple_table.table),
+            mn.Create(sorted_tuple_table.table),
         )
         self.wait()

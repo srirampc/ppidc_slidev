@@ -1,6 +1,7 @@
 import typing as t
 
 import manim as mn
+from manim.mobject.types.vectorized_mobject import VMobject
 from manim_themes import manim_theme as mtheme
 
 from ppidc import PxTable, default_config, scene_header, theme_background
@@ -63,8 +64,12 @@ class Redundancy(mn.Scene):
         )
         py_table.add_grid(cfg)
         _ = py_table.table.scale_to_fit_width(1.25 * _TABLE_WIDTH)
-        _ = py_table.table.next_to(mx_table.table, mn.DOWN, buff=0.3).shift(0.6 * mn.RIGHT)
-        py_cells = [py_table.cell(0, column) for column in range(3)]
+        _ = py_table.table.next_to(mx_table.table, mn.DOWN, buff=0.3).shift(
+            0.6 * mn.RIGHT
+        )
+        py_cells = t.cast(
+            list[VMobject], [py_table.cell(0, column) for column in range(3)]
+        )
 
         minxz_table = PxTable(
             cfg,
@@ -79,10 +84,12 @@ class Redundancy(mn.Scene):
         _ = minxz_table.table.next_to(mz_table.table, mn.RIGHT, buff=1.2)
         # Keep references to all values before hiding them from the initial
         # table; cell() needs the complete table for its row lookup.
-        min_cells = [minxz_table.cell(row, 0) for row in range(3)]
+        min_cells = t.cast(
+            list[VMobject], [minxz_table.cell(row, 0) for row in range(3)]
+        )
         min_entries = minxz_table.table.get_entries()
         for cell in min_cells:
-            min_entries.remove(cell)
+            min_entries.remove(cell)  # pyright: ignore[reportUnusedCallResult]
 
         x_boxes = [
             mn.SurroundingRectangle(
@@ -133,7 +140,7 @@ class Redundancy(mn.Scene):
                 run_time=1.5,
             )
             # x_fly has become the result box; retire the duplicate Z copy.
-            self.remove(z_fly)
+            self.remove(z_fly)  # pyright: ignore[reportUnusedCallResult]
             result_boxes.append(x_fly)
             self.play(mn.Write(min_cells[row]))
             self.next_section()

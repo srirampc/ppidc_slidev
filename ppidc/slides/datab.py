@@ -12,10 +12,12 @@ from ppidc import (
     theme_background,
 )
 
-_D_WIDTH : float  = 2
-_D_HEIGHT : float  = 4
-_D_GRID_STEP : float = 0.2
-_D_GRID_STROKE : float = 1
+_D_WIDTH: float = 3
+_D_HEIGHT: float = 6
+_D_GRID_STEP: float = 0.1
+_D_GRID_STROKE: float = 0.8
+_S_GRID_STEP: float = 0.6
+
 
 def _matrix_rect() -> mn.Rectangle:
     d_rect = mn.Rectangle(
@@ -28,6 +30,11 @@ def _matrix_rect() -> mn.Rectangle:
     return d_rect
 
 
+def _matrix_square() -> mn.Square:
+    d_square = mn.Square(_D_WIDTH, grid_xstep=_S_GRID_STEP, grid_ystep=_S_GRID_STEP)
+    _g = d_square.grid_lines.set_stroke(width=1)
+    return d_square
+
 
 class DataB(mn.Scene):
     @t.override
@@ -38,35 +45,31 @@ class DataB(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Handling Large Datasets", cfg)
+        header_txt = scene_header("Handling Large Datasets", cfg).shift(2.5 * mn.RIGHT)
         self.play(mn.Create(header_txt))
-        d_rect = _matrix_rect().set_color(cfg.d_color).shift(3 * mn.LEFT)
+        d_rect = (
+            _matrix_rect().set_color(cfg.d_color).shift(3.5 * mn.LEFT + 2.75 * mn.UP)
+        )
         d_rect_t = (
             _matrix_rect()
             .set_color(mn.GREEN)
-            .shift(3 * mn.RIGHT)
+            .shift(2 * mn.RIGHT + 2.2 * mn.DOWN)
             .rotate(-mn.PI / 2)
             .flip()
         )
         d_matrix = MatrixRect(
             d_rect,
             d_rect.get_vertices(),
-            MatParams(d_rect.color, r"D", "m", r"n", 0.2, 0.2, text_bg_rect=True),
+            MatParams(d_rect.color, r"D", "m", r"n", 0.2, -_D_HEIGHT + 0.2, text_bg_rect=True),
         )
 
         d_matrix_t = MatrixRect(
             d_rect_t,
             np.roll(d_rect_t.get_vertices(), shift=-1, axis=0),
-            MatParams(
-                d_rect_t.color,
-                r"D^T",
-                r"n",
-                r"m",
-                -0.2,
-                0.2,
-                text_bg_rect=True
-            ),
+            MatParams(d_rect_t.color, r"D^T", r"n", r"m", -0.2, 0.2, col_text_off=-0.2, text_bg_rect=True),
         )
+
+        d_square = _matrix_square().shift(3.5 * mn.LEFT + 2.2 * mn.DOWN)
 
         _a = self.add(
             *(
@@ -90,5 +93,7 @@ class DataB(mn.Scene):
         )
         self.wait()
         self.next_section()
-        self.play(mn.FadeIn(d_matrix_t.text_object()), run_time=3)
+        self.play(mn.FadeIn(d_matrix_t.text_object()))
+        self.next_section()
+        self.play(mn.Create(d_square))
         self.wait()

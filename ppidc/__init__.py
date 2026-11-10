@@ -104,8 +104,10 @@ class MatParams:
     name: str
     col_name: str
     row_name: str
-    col_off: float
-    row_off: float
+    col_arrow_off: float
+    row_arrow_off: float
+    col_text_off: float = 0.2
+    row_text_off: float = 0.2
     text_pos: mnt.Vector3D = field(default_factory=lambda: mn.ORIGIN)
     text_bg_rect: bool = True
 
@@ -120,23 +122,23 @@ class MatrixRect:
         self.col_arrow: mn.DoubleArrow = (
             mn.DoubleArrow(vertices[2], vertices[1], stroke_width=2.5, tip_length=0.2)
             .set_color(params.color)
-            .shift(params.col_off * mn.LEFT)
+            .shift(params.col_arrow_off * mn.LEFT)
         )
         self.row_arrow: mn.DoubleArrow = (
             mn.DoubleArrow(vertices[0], vertices[1], stroke_width=2.5, tip_length=0.2)
             .set_color(params.color)
-            .shift(params.row_off * mn.UP)
+            .shift(params.row_arrow_off * mn.UP)
         )
         self.col_txt: mn.MathTex = (
             mn.MathTex(params.col_name, fill_color=params.color)
             .move_to(self.col_arrow.get_midpoint())
             .rotate(mn.PI / 2)
-            .shift(params.col_off * mn.LEFT)
+            .shift(params.col_text_off * mn.LEFT)
         )
         self.row_txt: mn.MathTex = (
             mn.MathTex(params.row_name, fill_color=params.color)
             .move_to(self.row_arrow.get_midpoint())
-            .shift(params.row_off * mn.UP)
+            .shift(params.row_text_off * mn.UP)
         )
         if (params.text_pos == mn.DOWN).all():  # pyright: ignore[reportAny]
             self.text: mn.MathTex = mn.MathTex(
