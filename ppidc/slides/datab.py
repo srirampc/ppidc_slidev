@@ -38,6 +38,28 @@ def _matrix_square() -> mn.Square:
     return d_square
 
 
+def _upper_triangular_cells(d_square: mn.Square) -> mn.VGroup:
+    cells_per_side = round(_D_WIDTH / _S_GRID_STEP)
+    top_left = d_square.get_corner(mn.UP + mn.LEFT)
+    return mn.VGroup(
+        *(
+            mn.Square(
+                side_length=_S_GRID_STEP,
+                fill_color=mn.GRAY_A,
+                fill_opacity=1,
+                stroke_color=mn.GRAY_D,
+                stroke_width=1,
+            ).move_to(
+                top_left
+                + (col + 0.5) * _S_GRID_STEP * mn.RIGHT
+                + (row + 0.5) * _S_GRID_STEP * mn.DOWN
+            )
+            for row in range(cells_per_side)
+            for col in range(row, cells_per_side)
+        )
+    )
+
+
 class DataB(mn.Scene):
     @t.override
     def setup(self) -> None:
@@ -131,4 +153,14 @@ class DataB(mn.Scene):
         self.next_section()
         self.play(mn.Uncreate(joint_prob), mn.Uncreate(group_x), mn.Uncreate(group_y))
         self.play(mn.Create(d_square))
+        upper_triangular_cells = _upper_triangular_cells(d_square)
+        self.play(
+            mn.LaggedStart(
+                *(
+                    mn.FadeIn(cell)
+                    for cell in upper_triangular_cells
+                ),
+                lag_ratio=0.1,
+            )
+        )
         self.wait()

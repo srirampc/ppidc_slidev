@@ -239,7 +239,7 @@ class ParAlgoInsight(mn.Scene):
             None,
             [r"\textrm{sorted } \rho \mathsf{-tuples}"],
             body=[
-                [rf"\langle Y, {c}, {yl.replace('y=', '')}, ({idx}, {s}, {p}) \rangle"]
+                [rf"\langle Y, {c}, {yl.replace('y=', '')}, ({idx}, {s}, {p}) \rangle"]  # pyright: ignore[reportUnknownMemberType, reportAttributeAccessIssue]
                 if s
                 else [r"\langle \dots, \dots, \dots, \dots   \rangle"]
                 for yl, idx, c, s, p in sorted_tuple_list
@@ -272,29 +272,29 @@ class ParAlgoInsight(mn.Scene):
         label_x = float(sorted_tuple_table.table.get_right()[0]) + 1.5
         for name, y in cut_specs:
             line = mn.Line(
-                [float(vms_full_table.table.get_left()[0]), y, 0],
-                [float(sorted_tuple_table.table.get_right()[0]) + 2.0, y, 0],
+                [float(vms_full_table.table.get_left()[0]), y, 0],  # pyright: ignore[reportArgumentType]
+                [float(sorted_tuple_table.table.get_right()[0]) + 2.0, y, 0],  # pyright: ignore[reportArgumentType]
                 color=mn.RED,
                 stroke_width=4,
             )
             label = (
                 mn.MathTex(rf"{name}", fill_color=mn.RED)
                 .scale(0.65)
-                .move_to([label_x, y + 0.2, 0])
+                .move_to([label_x, y + 0.2, 0])  # pyright: ignore[reportArgumentType]
             )
             cut_lines.append(line)
             cut_labels.append(label)
         cut_dots = (
             mn.MathTex(r"\vdots", fill_color=mn.RED)
             .scale(0.65)
-            .move_to([label_x, (cut_specs[1][1] + cut_specs[2][1]) / 2, 0])
+            .move_to([label_x, (cut_specs[1][1] + cut_specs[2][1]) / 2, 0])  # pyright: ignore[reportArgumentType]
         )
 
         gamma_boxes: list[mn.SurroundingRectangle] = []
         gamma_labels: list[mn.MathTex] = []
         for first_row, name in [(0, "D"), (2, "F"), (4, "W"), (6, "X")]:
             box = mn.SurroundingRectangle(
-                mn.VGroup(*sorted_cells[first_row : first_row + 2]),
+                mn.VGroup(*sorted_cells[first_row : first_row + 2]),  # pyright: ignore[reportArgumentType]
                 color=mn.BLUE,
                 stroke_width=4,
                 buff=0.08,

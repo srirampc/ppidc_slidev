@@ -163,7 +163,7 @@ class _VMCalculation:
     def sort_animation(self) -> mn.AnimationGroup:
         """Slide rows that change place past each other on opposite arcs."""
         return mn.AnimationGroup(
-            *(
+            *(  # pyright: ignore[reportArgumentType]
                 self.labels[row].animate(path_arc=mn.PI / 2).move_to(  # pyright: ignore[reportCallIssue]
                     self.label_slots[row]
                 )
