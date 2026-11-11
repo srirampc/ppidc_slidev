@@ -1,6 +1,8 @@
 import typing as t
+from dataclasses import dataclass
 
 import manim as mn
+import numpy as np
 from manim_themes import manim_theme as mtheme
 
 from ppidc import (
@@ -43,20 +45,19 @@ _SLOT_A, _SLOT_B, _SLOT_C = 1.8, -0.4, -1.5
 # Halfway between the bottom of the upper matrices and the top of the μ table.
 _DIVIDER_Y = 0.4
 
-# The bottom row: the μ(y=1; ·) values of the n-2 rows, and the table that
-# sorts them (S) and accumulates them (P). Both carry the same rows, so one
-# target height keeps them aligned row for row.
+# The lower calculation: the μ values for each choice of y, and the table
+# that sorts them (S) and accumulates them (P). Both carry the same rows, so
+# one target height keeps them aligned row for row.
 _VM_HEIGHT = 3.9
-# the values of the rows the tables spell out; ⋮ stands for the rows they leave
-# out, which have no value of their own
+# Each pass uses one entry from these lists. ⋮ stands for the rows the tables
+# leave out, which have no value of their own.
 _VM_VALUES = [
     {r"F": 1.37, r"D": 1.12, r"X": 1.86, r"W": 2.24},
     {r"F": 3.37, r"D": 1.42, r"X": 0.86, r"W": 2.14},
 ]
-#_VM_VALUES = {r"F": 1.37, r"D": 1.12, r"X": 1.86, r"W": 2.24}
 _VM_LABELS = [
     [r"F", r"D", r"X", r"\vdots", r"W", r"\vdots"],
-    [r"W", r"X", r"D", r"\vdots", r"F", r"\vdots"]
+    [r"W", r"X", r"D", r"\vdots", r"F", r"\vdots"],
 ]
 # S is the same values in ascending order, which is what orders its rows — and
 # the ⋮ rows go last so that the running total in P stays exact
@@ -72,7 +73,7 @@ _ROW_SUM_WIDTH = 1.4
 
 
 def _value_cells(vmv_dict: dict[str, float], labels: list[str]) -> list[str]:
-    """The tex of each row's μ(y=1; ·), top to bottom — a row that stands for
+    """The tex of each row's μ(y; ·), top to bottom — a row that stands for
     others gets the column's continuation marker instead of a number."""
     return [
         f"{vmv_dict[label]:.2f}" if label in vmv_dict else r"\vdots"
@@ -128,6 +129,162 @@ def _source_rows(original: list[str], reordered: list[str]) -> list[int]:
         unused.remove(match)
         out.append(match)
     return out
+
+
+@dataclass
+class _VMCalculation:
+    """The lower tables, sorting moves, and final callouts for one choice of y."""
+
+    vm_table: PxTable
+    vmsp_table: PxTable
+    labels: list[mn.VMobject]
+    label_slots: list[np.ndarray]
+    row_order: list[int]
+    sp_columns: mn.VGroup
+    row_box: mn.SurroundingRectangle
+    row_sum: mn.VGroup
+    sum_box: mn.SurroundingRectangle
+
+    @property
+    def tables(self) -> mn.VGroup:
+        return mn.VGroup(self.vm_table.table, self.vmsp_table.table)
+
+    @property
+    def all_parts(self) -> mn.VGroup:
+        """Everything shown for this pass, so it can be cleared in one move."""
+        return mn.VGroup(
+            self.tables,
+            self.sp_columns,
+            self.row_box,
+            self.row_sum,
+            self.sum_box,
+        )
+
+    def sort_animation(self) -> mn.AnimationGroup:
+        """Slide rows that change place past each other on opposite arcs."""
+        return mn.AnimationGroup(
+            *(
+                self.labels[row].animate(path_arc=mn.PI / 2).move_to(  # pyright: ignore[reportCallIssue]
+                    self.label_slots[row]
+                )
+                for row, from_row in enumerate(self.row_order)
+                if from_row != row
+            )
+        )
+
+
+def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
+    """Lay out one lower calculation; dataset zero is shown for y=1."""
+    y = index + 1
+    vm_values = _VM_VALUES[index]
+    vm_labels = _VM_LABELS[index]
+    vmsp_labels = _VMSP_LABELS[index]
+
+    vm_table = PxTable(
+        cfg,
+        len(vm_labels),
+        1,
+        vm_labels,
+        [rf"\mu(y={y}; \cdot)"],
+        body=[[cell] for cell in _value_cells(vm_values, vm_labels)],
+    )
+    vm_table.add_grid(cfg)
+    _ = vm_table.table.scale_to_fit_height(_VM_HEIGHT)
+    # Keep the lower-right table and its row sum clear of the theme logo.
+    _ = vm_table.table.move_to(0.7 * mn.RIGHT + 1.8 * mn.DOWN)
+
+    s_cells = _value_cells(vm_values, vmsp_labels)
+    p_cells = _prefix_cells(vm_values, vmsp_labels)
+    vmsp_table = PxTable(
+        cfg,
+        len(vmsp_labels),
+        2,
+        vmsp_labels,
+        [rf"\mathsf{{S}}_{{y={y}}}", rf"\mathsf{{P}}_{{y={y}}}"],
+        body=[[s, p] for s, p in zip(s_cells, p_cells, strict=True)],
+    )
+    vmsp_table.add_grid(cfg)
+    _ = vmsp_table.table.scale_to_fit_height(_VM_HEIGHT)
+    _ = vmsp_table.table.next_to(vm_table.table, mn.RIGHT, buff=0.2)
+
+    # S and P are two columns, but add_grid only separates the row labels
+    # from them; draw the divider between the two here.
+    s_head, p_head = vmsp_table.column_headers()
+    sp_divider = vmsp_table.v_line(
+        (float(s_head.get_right()[0]) + float(p_head.get_left()[0])) / 2, 2, cfg
+    )
+
+    # vmsp starts as its index column alone, holding the rows in the order
+    # they appear in the μ table; S, P and the divider are held back until
+    # the sort has happened, then revealed as one group.
+    labels = t.cast(list[mn.VMobject], vmsp_table.row_labels())
+    label_slots = [label.get_center().copy() for label in labels]
+    row_order = _source_rows(vm_labels, vmsp_labels)
+    for row, from_row in enumerate(row_order):
+        if from_row != row:
+            _ = labels[row].move_to(label_slots[from_row])
+    # Collect every held-back piece before dropping any of them: the table
+    # indexes its own entries, so it has to be whole while it is asked.
+    entries = vmsp_table.table.get_entries()
+    sp_rows = [
+        (vmsp_table.cell(row, 0), vmsp_table.cell(row, 1))
+        for row in range(len(vmsp_labels))
+    ]
+    sp_columns = mn.VGroup(
+        *vmsp_table.column_headers(),  # pyright: ignore[reportArgumentType]
+        *(cell for pair in sp_rows for cell in pair),  # pyright: ignore[reportArgumentType]
+        sp_divider,
+    )
+    for mob in sp_columns:
+        if any(entry is mob for entry in entries):
+            entries.remove(mob)
+
+    # Box the row whose value stands for the whole tail of the ordering: P is
+    # everything sorted below it, and the n-5 remaining rows are tied with it,
+    # so the value summed over all n-2 rows is this expression.
+    boxed = vmsp_labels.index(_BOXED_LABEL)
+    s_cell, p_cell = sp_rows[boxed]
+    row_box = mn.SurroundingRectangle(
+        mn.VGroup(t.cast(mn.VMobject, s_cell), t.cast(mn.VMobject, p_cell)),
+        color=mn.ORANGE,
+        stroke_width=4,
+        buff=0.12,
+    )
+    # The margin right of the tables is narrow, so the sum is stacked one row
+    # per term instead of written on one line: the width it must fit is then
+    # the widest row's — the product alone, not the whole sum — which is what
+    # lets it set at a readable size.
+    row_sum = mn.VGroup(
+        mn.MathTex(p_cells[boxed], fill_color=cfg.txt_color),
+        mn.MathTex(r"+", fill_color=cfg.txt_color),
+        mn.MathTex(
+            rf"{s_cells[boxed]} \times (n - 5)",
+            fill_color=cfg.txt_color,
+        ),
+    ).arrange(mn.DOWN, buff=0.12)
+    # Anchor it to the table's edge, not to the box (the box sits inside the
+    # table), then centre it on the boxed row.
+    _ = row_sum.scale_to_fit_width(_ROW_SUM_WIDTH)
+    _ = row_sum.next_to(vmsp_table.table, mn.RIGHT, buff=0.18)
+    _ = row_sum.set_y(row_box.get_center()[1])
+    sum_box = mn.SurroundingRectangle(
+        row_sum,
+        color=mn.GREEN,
+        stroke_width=4,
+        buff=0.12,
+    )
+
+    return _VMCalculation(
+        vm_table=vm_table,
+        vmsp_table=vmsp_table,
+        labels=labels,
+        label_slots=label_slots,
+        row_order=row_order,
+        sp_columns=sp_columns,
+        row_box=row_box,
+        row_sum=row_sum,
+        sum_box=sum_box,
+    )
 
 
 class AlgoInsight(mn.Scene):
@@ -200,64 +357,8 @@ class AlgoInsight(mn.Scene):
             .scale(0.8)
         )
 
-        vm1_table = PxTable(
-            cfg,
-            len(_VM_LABELS[0]),
-            1,
-            _VM_LABELS[0],
-            [r"\mu(y=1; \cdot)"],
-            body=[[cell] for cell in _value_cells(_VM_VALUES[0], _VM_LABELS[0])],
-        )
-        vm1_table.add_grid(cfg)
-        _ = vm1_table.table.scale_to_fit_height(_VM_HEIGHT)
-        # Keep the lower-right table and its row sum clear of the theme logo.
-        _ = vm1_table.table.move_to(0.7 * mn.RIGHT + 1.8 * mn.DOWN)
-
-        s1_cells = _value_cells(_VM_VALUES[0], _VMSP_LABELS[0])
-        p1_cells = _prefix_cells(_VM_VALUES[0], _VMSP_LABELS[0])
-        vm1sp_table = PxTable(
-            cfg,
-            len(_VMSP_LABELS[0]),
-            2,
-            _VMSP_LABELS[0],
-            [r"\mathsf{S}_{y=1}", r"\mathsf{P}_{y=1}"],
-            body=[[s, p] for s, p in zip(s1_cells, p1_cells, strict=True)],
-        )
-        vm1sp_table.add_grid(cfg)
-        _ = vm1sp_table.table.scale_to_fit_height(_VM_HEIGHT)
-        _ = vm1sp_table.table.next_to(vm1_table.table, mn.RIGHT, buff=0.2)
-
-        # S and P are two columns, but add_grid only separates the row labels
-        # from them; draw the divider between the two here.
-        s_head, p_head = vm1sp_table.column_headers()
-        sp_divider = vm1sp_table.v_line(
-            (float(s_head.get_right()[0]) + float(p_head.get_left()[0])) / 2, 2, cfg
-        )
-
-        # vmsp starts as its index column alone, holding the rows in the order
-        # they appear in the μ table; S, P and the divider are held back until
-        # the sort has happened, then revealed as one group.
-        labels = t.cast(list[mn.VMobject] , vm1sp_table.row_labels())
-        label_slots = [label.get_center().copy() for label in labels]
-        row_order = _source_rows(_VM_LABELS[0], _VMSP_LABELS[0])
-        for row, from_row in enumerate(row_order):
-            if from_row != row:
-                _ = labels[row].move_to(label_slots[from_row])
-        # collect every held-back piece before dropping any of them: the table
-        # indexes its own entries, so it has to be whole while it is asked
-        entries = vm1sp_table.table.get_entries()
-        sp_rows = [
-            (vm1sp_table.cell(row, 0), vm1sp_table.cell(row, 1))
-            for row in range(len(_VMSP_LABELS[0]))
-        ]
-        sp_columns = mn.VGroup(
-            *vm1sp_table.column_headers(),  # pyright: ignore[reportArgumentType]
-            *(cell for pair in sp_rows for cell in pair),  # pyright: ignore[reportArgumentType]
-            sp_divider,
-        )
-        for mob in sp_columns:
-            if any(entry is mob for entry in entries):
-                entries.remove(mob)
+        first = _make_vm_calculation(cfg, 0)
+        second = _make_vm_calculation(cfg, 1)
 
         section_divider = mn.Line(
             6.6 * mn.LEFT + _DIVIDER_Y * mn.UP,
@@ -348,62 +449,39 @@ class AlgoInsight(mn.Scene):
         )
         self.wait()
         self.next_section()
-        # the μ(y=1; ·) values of the n-2 rows, and the table that will hold
-        # them sorted (its index column still in the μ table's row order)
-        self.play(
-            mn.Create(vm1_table.table),
-            mn.Create(vm1sp_table.table),
-        )
-        self.wait()
-        self.next_section()
-        # the index column is sorted: rows that change place slide past each
-        # other on opposite sides (same arc sign, opposite directions)
-        self.play(
-            *(
-                labels[row].animate(path_arc=mn.PI / 2).move_to(label_slots[row])  # pyright: ignore[reportCallIssue]
-                for row, from_row in enumerate(row_order)
-                if from_row != row
+        def play_sort_and_summary(calculation: _VMCalculation) -> None:
+            """Give each pass the same sort, S/P, and final-answer steps."""
+            self.next_section()
+            self.play(calculation.sort_animation())
+            self.wait()
+            self.next_section()
+            # S and P appear only after the index column has reached its order.
+            self.play(mn.Create(calculation.sp_columns))
+            self.wait()
+            self.next_section()
+            self.play(
+                mn.Create(calculation.row_box),
+                mn.Create(calculation.sum_box),
+                mn.Write(calculation.row_sum),
             )
-        )
+            self.wait()
+
+        # First pass: μ(y=1; ·), with the S/P table's index column initially
+        # holding the μ table's unsorted row order.
+        self.play(mn.Create(first.tables))
         self.wait()
+        play_sort_and_summary(first)
         self.next_section()
-        # S and P appear: the sorted values, and their running totals
-        self.play(mn.Create(sp_columns))
-        self.wait()
-        self.next_section()
-        # Box the row whose value stands for the whole tail of the ordering:
-        # P is everything sorted below it, and the n-5 remaining rows are tied
-        # with it, so the value summed over all n-2 rows is this expression.
-        boxed = _VMSP_LABELS[0].index(_BOXED_LABEL)
-        s_cell, p_cell = sp_rows[boxed]
-        box = mn.SurroundingRectangle(
-            mn.VGroup(t.cast(mn.VMobject, s_cell), t.cast(mn.VMobject, p_cell)),
-            color=mn.ORANGE,
-            stroke_width=4,
-            buff=0.12,
+
+        # Clear the first tables and both callouts, and bring in the second
+        # pass from outside the right edge; the upper derivation stays intact.
+        second_tables = second.tables
+        _ = second_tables.shift(mn.config.frame_width * mn.RIGHT)
+        old_parts = first.all_parts
+        self.play(
+            mn.FadeOut(old_parts, shift=mn.LEFT),
+            second_tables.animate.shift(mn.config.frame_width * mn.LEFT),
         )
-        # The margin right of the tables is narrow, so the sum is stacked one
-        # row per term instead of written on one line: the width it must fit is
-        # then the widest row's — the product alone, not the whole sum — which
-        # is what lets it set at a readable size.
-        row_sum = mn.VGroup(
-            mn.MathTex(p1_cells[boxed], fill_color=cfg.txt_color),
-            mn.MathTex(r"+", fill_color=cfg.txt_color),
-            mn.MathTex(
-                rf"{s1_cells[boxed]} \times (n - 5)",
-                fill_color=cfg.txt_color,
-            ),
-        ).arrange(mn.DOWN, buff=0.12)
-        # Anchor it to the table's edge, not to the box (the box sits inside
-        # the table), then centre it on the boxed row.
-        _ = row_sum.scale_to_fit_width(_ROW_SUM_WIDTH)
-        _ = row_sum.next_to(vm1sp_table.table, mn.RIGHT, buff=0.18)
-        _ = row_sum.set_y(box.get_center()[1])
-        sum_box = mn.SurroundingRectangle(
-            row_sum,
-            color=mn.GREEN,
-            stroke_width=4,
-            buff=0.12,
-        )
-        self.play(mn.Create(box), mn.Create(sum_box), mn.Write(row_sum))
+        _ = self.remove(old_parts)
         self.wait()
+        play_sort_and_summary(second)

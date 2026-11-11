@@ -103,7 +103,7 @@ clicks: 6
 ---
 transition: fade-out
 layout: none
-clicks: 7
+clicks: 12
 ---
 <InsightAlgoInsight auto-start class="absolute inset-0" />
 
