@@ -15,7 +15,6 @@ from ppidc import (
 _EXPR_TEX = r"\frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x)\cdot p(y)} \right)"
 
 
-
 class SpecificInfo(mn.Scene):
     @t.override
     def setup(self) -> None:
