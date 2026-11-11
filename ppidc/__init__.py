@@ -176,34 +176,44 @@ class PxTable:
         cfg: Config,
         n_rows: int,
         n_cols: int,
-        row_names: list[str],
+        row_names: list[str] | None,
         col_names: list[str],
         corner_name: str | None = None,
         body: list[list[str]] | None = None,
     ) -> None:
         """A table of `n_rows` x `n_cols` body cells. `body` gives the tex of
         every body cell, row-major; without it each cell holds a `·`
-        placeholder for the caller to animate into."""
+        placeholder for the caller to animate into. Pass `row_names=None` to
+        omit the index column."""
+        self._has_index = row_names is not None
+        self._body_col_start = 1 if self._has_index else 0
+        if row_names is None and corner_name is not None:
+            raise ValueError("corner_name requires an index column")
         assert len(col_names) == n_cols
-        assert len(row_names) == n_rows
+        if row_names is not None:
+            assert len(row_names) == n_rows
         if body is not None:
             assert len(body) == n_rows
             assert all(len(row) == n_cols for row in body)
         t_entries = [
-            [mn.MathTex(r"\cdot", fill_color=cfg.txt_color) for _y in range(n_cols + 1)]
+            [
+                mn.MathTex(r"\cdot", fill_color=cfg.txt_color)
+                for _y in range(n_cols + self._body_col_start)
+            ]
             for _x in range(n_rows + 1)
         ]
         if corner_name is not None:
             t_entries[0][0] = mn.MathTex(corner_name, fill_color=cfg.txt_color)
-        t_entries[0][1:] = [
+        t_entries[0][self._body_col_start:] = [
             mn.MathTex(col_name, fill_color=cfg.txt_color) for col_name in col_names
         ]
-        for rx, r_name in zip(range(n_rows), row_names):
-            t_entries[rx + 1][0] = mn.MathTex(r_name, fill_color=cfg.txt_color)
+        if row_names is not None:
+            for rx, r_name in zip(range(n_rows), row_names):
+                t_entries[rx + 1][0] = mn.MathTex(r_name, fill_color=cfg.txt_color)
         if body is not None:
             for rx, row_tex in enumerate(body):
                 for cx, tex in enumerate(row_tex):
-                    t_entries[rx + 1][cx + 1] = mn.MathTex(
+                    t_entries[rx + 1][cx + self._body_col_start] = mn.MathTex(
                         tex, fill_color=cfg.txt_color
                     )
 
@@ -253,10 +263,12 @@ class PxTable:
         """Entry at body row `row` and body column `col` (0-based from the
         top-left cell below/right of the header row and corner column)."""
         rows, ys = self._grouped_entries()
-        return rows[ys[row + 1]][col + 1]
+        return rows[ys[row + 1]][col + self._body_col_start]
 
     def row_labels(self) -> list[mn.Mobject]:
         """The entry naming each body row, top to bottom."""
+        if not self._has_index:
+            return []
         rows, ys = self._grouped_entries()
         return [rows[y][0] for y in ys[1:]]
 
@@ -264,7 +276,7 @@ class PxTable:
         """The header entry above each body column, left to right. The corner
         cell heading the row labels is not one of them."""
         rows, ys = self._grouped_entries()
-        return rows[ys[0]][1:]
+        return rows[ys[0]][self._body_col_start:]
 
     def add_grid(self, cfg: Config, column: bool = True, row: bool = True) -> None:
         """Draw every grid line of the table: strong (width 6) for the

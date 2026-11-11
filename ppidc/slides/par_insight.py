@@ -96,8 +96,7 @@ class ParAlgoInsight(mn.Scene):
             len(y_cells1),
             3,
             y_cells1,
-            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
-            corner_name=r"\mathsf{Q}",
+            [r"\mathsf{R}_{y=1}", r"\mathsf{S}_{y=1}", r"\mathsf{P}_{y=1}"],
             body=[
                 [c, s, p] for c, s, p in zip(labels1, s_cells1, p_cells1, strict=True)
             ],
@@ -111,8 +110,7 @@ class ParAlgoInsight(mn.Scene):
             len(y_cells2),
             3,
             y_cells2,
-            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
-            corner_name=r"\mathsf{Q}",
+            [r"\mathsf{R}_{y=2}", r"\mathsf{S}_{y=2}", r"\mathsf{P}_{y=2}"],
             body=[
                 [c, s, p] for c, s, p in zip(labels2, s_cells2, p_cells2, strict=True)
             ],
@@ -160,7 +158,7 @@ class ParAlgoInsight(mn.Scene):
             len(labels2),
             2,
             labels1,
-            [r"\mathsf{S}_{y=1}", r"\mathsf{P}_{y=1}"],
+            [r"\mathsf{S}_{y=2}", r"\mathsf{P}_{y=2}"],
             body=[[s, p] for s, p in zip(s_cells2, p_cells2, strict=True)],
         )
         vmsp2_table.add_grid(cfg)
@@ -174,7 +172,7 @@ class ParAlgoInsight(mn.Scene):
             len(y_cells1 + y_cells2),
             3,
             y_cells1 + y_cells2,
-            [r"\mathsf{R}", r"\mathsf{S}_y", r"\mathsf{P}_{y}"],
+            [r"\mathsf{R}", r"\mathsf{S}", r"\mathsf{P}"],
             corner_name=r"\mathsf{Q}",
             body=[
                 [c, s, p]
@@ -193,7 +191,9 @@ class ParAlgoInsight(mn.Scene):
         )
 
         tuple_list = [
-            [yl.replace('y=',''), str(idx), c, s, p] if s != r"\vdots" else ["9", idx, "Z", "", ""]
+            [yl.replace("y=", ""), str(idx), c, s, p]
+            if s != r"\vdots"
+            else ["9", idx, "Z", "", ""]
             for yl, idx, c, s, p in zip(
                 y_cells1 + y_cells2,
                 itertools.chain(range(len(y_cells1)), range(len(y_cells2))),
@@ -204,18 +204,28 @@ class ParAlgoInsight(mn.Scene):
             )
         ]
         sorted_tuple_list = sorted(tuple_list, key=lambda x: (x[2], x[0]))
+        # For each destination row, find the matching original row. Repeated
+        # tuples are matched in their original order.
+        unused_source_rows = list(range(len(tuple_list)))
+        source_row_by_target: list[int] = []
+        for target in sorted_tuple_list:
+            source_row = next(
+                row for row in unused_source_rows if tuple_list[row] == target
+            )
+            unused_source_rows.remove(source_row)
+            source_row_by_target.append(source_row)
 
         tuple_table = PxTable(
             cfg,
             len(y_cells1 + y_cells2),
             1,
-            [r"" for _ in range(len(y_cells1 + y_cells2))],
+            None,
             [r"\rho \mathsf{-tuples}"],
             body=[
-                [rf"\langle Y, {c}, {yl}, g({s}, {p}) \rangle"]
+                [rf"\langle Y, {c}, {yl}, ({idx}, {s}, {p}) \rangle"]
                 if s
                 else [r"\langle \dots, \dots, \dots, \dots   \rangle"]
-                for yl, _idx, c, s, p in tuple_list
+                for yl, idx, c, s, p in tuple_list
             ],
         )
         tuple_table.add_grid(cfg, column=False)
@@ -226,18 +236,76 @@ class ParAlgoInsight(mn.Scene):
             cfg,
             len(y_cells1 + y_cells2),
             1,
-            [r"" for _ in range(len(y_cells1 + y_cells2))],
+            None,
             [r"\textrm{sorted } \rho \mathsf{-tuples}"],
             body=[
-                [rf"\langle Y, {c}, {yl.replace('y=', '')}, g({s}, {p}) \rangle"]
+                [rf"\langle Y, {c}, {yl.replace('y=', '')}, ({idx}, {s}, {p}) \rangle"]
                 if s
                 else [r"\langle \dots, \dots, \dots, \dots   \rangle"]
-                for yl, _idx, c, s, p in sorted_tuple_list
+                for yl, idx, c, s, p in sorted_tuple_list
             ],
         )
         sorted_tuple_table.add_grid(cfg, column=False)
         _ = sorted_tuple_table.table.scale_to_fit_height(2.2 * _VM_HEIGHT)
         _ = sorted_tuple_table.table.next_to(tuple_table.table, mn.RIGHT, buff=0.3)
+        tuple_cells = [tuple_table.cell(row, 0) for row in range(len(tuple_list))]
+        sorted_cells = [
+            sorted_tuple_table.cell(row, 0) for row in range(len(sorted_tuple_list))
+        ]
+        # Keep the sorted table's grid and header, but hold its values back so
+        # the sorting animation creates them from the matching source rows.
+        sorted_entries = sorted_tuple_table.table.get_entries()
+        for cell in sorted_cells:
+            sorted_entries.remove(cell)
+
+        # Four horizontal cuts divide the complete table, and therefore the
+        # two tuple views aligned with it, into p logical partitions.
+        row_ys = [label.get_y() for label in vms_full_table.row_labels()]
+        cut_specs = [
+            ("0", (row_ys[1] + row_ys[2]) / 2),  # between the second and third rows
+            ("1", (row_ys[3] + row_ys[4]) / 2),  # below the fourth row
+            ("p-2", (row_ys[-3] + row_ys[-2]) / 2),  # above the final two rows
+            ("p-1", float(vms_full_table.table.get_bottom()[1]) - 0.1),
+        ]
+        cut_lines: list[mn.Line] = []
+        cut_labels: list[mn.MathTex] = []
+        label_x = float(sorted_tuple_table.table.get_right()[0]) + 1.5
+        for name, y in cut_specs:
+            line = mn.Line(
+                [float(vms_full_table.table.get_left()[0]), y, 0],
+                [float(sorted_tuple_table.table.get_right()[0]) + 2.0, y, 0],
+                color=mn.RED,
+                stroke_width=4,
+            )
+            label = (
+                mn.MathTex(rf"{name}", fill_color=mn.RED)
+                .scale(0.65)
+                .move_to([label_x, y + 0.2, 0])
+            )
+            cut_lines.append(line)
+            cut_labels.append(label)
+        cut_dots = (
+            mn.MathTex(r"\vdots", fill_color=mn.RED)
+            .scale(0.65)
+            .move_to([label_x, (cut_specs[1][1] + cut_specs[2][1]) / 2, 0])
+        )
+
+        gamma_boxes: list[mn.SurroundingRectangle] = []
+        gamma_labels: list[mn.MathTex] = []
+        for first_row, name in [(0, "D"), (2, "F"), (4, "W"), (6, "X")]:
+            box = mn.SurroundingRectangle(
+                mn.VGroup(*sorted_cells[first_row : first_row + 2]),
+                color=mn.BLUE,
+                stroke_width=4,
+                buff=0.08,
+            )
+            label = (
+                mn.MathTex(rf"\gamma(Y, {name})", fill_color=mn.BLUE)
+                .scale(0.65)
+                .next_to(box, mn.RIGHT, buff=0.2)
+            )
+            gamma_boxes.append(box)
+            gamma_labels.append(label)
 
         self.play(mn.Create(header_txt))
         self.play(
@@ -262,7 +330,39 @@ class ParAlgoInsight(mn.Scene):
         )
         self.next_section()
         self.play(
+            *(mn.Create(line) for line in cut_lines),
+            *(mn.Write(label) for label in cut_labels),
+            mn.Write(cut_dots),
+        )
+        self.next_section()
+        self.play(
             mn.Create(tuple_table.table),
             mn.Create(sorted_tuple_table.table),
+        )
+        self.next_section()
+        sort_motions = [
+            mn.TransformFromCopy(
+                tuple_cells[source_row],
+                sorted_cells[target_row],
+                path_arc=0
+                if source_row == target_row
+                else mn.PI / 12
+                if target_row > source_row
+                else -mn.PI / 12,
+            )
+            for target_row, source_row in enumerate(source_row_by_target)
+        ]
+        self.play(mn.LaggedStart(*sort_motions, lag_ratio=0.08, run_time=4))
+        self.wait()
+        self.next_section()
+        self.play(
+            mn.LaggedStart(
+                *(
+                    mn.AnimationGroup(mn.Create(box), mn.Write(label))
+                    for box, label in zip(gamma_boxes, gamma_labels, strict=True)
+                ),
+                lag_ratio=0.12,
+                run_time=3,
+            )
         )
         self.wait()
