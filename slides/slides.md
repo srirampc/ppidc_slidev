@@ -87,7 +87,7 @@ clicks: 10
 ---
 transition: fade-out
 layout: none
-clicks: 2
+clicks: 5
 ---
 <DataB auto-start class="absolute inset-0" />
 
