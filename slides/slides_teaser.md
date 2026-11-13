@@ -83,9 +83,9 @@ layout: two-cols-header
 ---
 transition: fade-out
 layout: none
-clicks: 10
+clicks: 9
 ---
-<AllpairsMINet auto-start class="absolute inset-0" />
+<AllpairsPairwiseNet auto-start class="absolute inset-0" />
 
 
 ---

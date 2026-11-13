@@ -78,10 +78,10 @@ def theme_background() -> mn.ImageMobject:
     return background.set_z_index(-100)
 
 
-def scene_header(title: str, cfg: Config) -> mn.Text:
+def scene_header(title: str, cfg: Config, weight: str = mn.NORMAL) -> mn.Text:
     """A consistently positioned header for the animated slides."""
     return (
-        mn.Text(title, font="Concourse T3")
+        mn.Text(title, font="Concourse T3", weight=weight)
         .set_color(cfg.txt_color)
         .move_to(3.5 * mn.UP)
     )
