@@ -22,7 +22,9 @@ _S_GRID_STEP: float = 0.6
 _S_POS = 3.5 * mn.LEFT + 2.2 * mn.DOWN
 
 
-def _sub_rectangle(src_rect: mn.Rectangle, color=mn.BLUE, offset=0.0):
+def _sub_rectangle(
+    src_rect: mn.Rectangle, color: mn.ManimColor = mn.BLUE, offset: float = 0.0
+):
     rct = mn.Rectangle(
         width=src_rect.width,
         height=src_rect.height / 5,
@@ -77,7 +79,7 @@ def _bullet_row(
     dot = mn.Text("•", font="Concourse T3", font_size=font_size).set_color(
         cfg.txt_color
     )
-    dot.next_to(body, mn.LEFT, buff=0.16)
+    dot.next_to(body, mn.LEFT, buff=0.16)  # pyright: ignore[reportUnusedCallResult]
     return mn.VGroup(dot, body)
 
 
@@ -162,7 +164,7 @@ class DataB(mn.Scene):
         bullets = mn.VGroup(*_bullet_points(cfg)).arrange(
             mn.DOWN, aligned_edge=mn.LEFT, buff=0.18
         )
-        bullets.next_to(header_txt, mn.DOWN, aligned_edge=mn.RIGHT, buff=0.35)
+        _ = bullets.next_to(header_txt, mn.DOWN, aligned_edge=mn.RIGHT, buff=0.35)
         self.play(mn.Create(header_txt))
         d_rect = (
             _matrix_rect().set_color(cfg.d_color).shift(3.5 * mn.LEFT + 2.75 * mn.UP)

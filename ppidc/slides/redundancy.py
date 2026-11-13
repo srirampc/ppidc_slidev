@@ -4,10 +4,11 @@ import manim as mn
 from manim.mobject.types.vectorized_mobject import VMobject
 from manim_themes import manim_theme as mtheme
 
-from ppidc import PxTable, default_config, scene_header, theme_background
+from ppidc import PxTable, default_config, parts_by_tex, scene_header, theme_background
 
-_TEX_RED = r"\sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
+_TEX_REXP = r"\sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
 _TEX_RHO = r"\rho((X, Z); Y) = "
+_TEX_RHO_EQ = r"\rho((X, Z); Y) = \sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
 _TEX_PID = r"\nu((X, Z); Y) = I(X, Z) - \rho((X, Z); Y)"
 _TABLE_WIDTH: float = 4.0
 _TABLE_HEIGHT: float = 3.0
@@ -24,7 +25,11 @@ class Redundancy(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Redundancy and Unique Contribution", cfg)
+        rho_color = mn.PURPLE
+        nu_color = mn.MAROON
+        header_txt = scene_header(
+            "Redundancy and Unique Contribution", cfg, weight=mn.BOLD
+        )
         py_values = [0.3, 0.4, 0.3]
         x_values = [1.12, 2.22, 0.85]
         z_values = [3.38, 1.29, 1.35]
@@ -36,6 +41,7 @@ class Redundancy(mn.Scene):
             1,
             [r"y=1", r"y=2", r"y=3"],
             [r"I_s(y; X)"],
+            corner_name="Y",
             body=[[f"{value:.2f}"] for value in x_values],
         )
         mx_table.add_grid(cfg)
@@ -48,6 +54,7 @@ class Redundancy(mn.Scene):
             1,
             [r"y=1", r"y=2", r"y=3"],
             [r"I_s(y; Z)"],
+            corner_name="Y",
             body=[[f"{value:.2f}"] for value in z_values],
         )
         mz_table.add_grid(cfg)
@@ -64,9 +71,10 @@ class Redundancy(mn.Scene):
         )
         py_table.add_grid(cfg)
         _ = py_table.table.scale_to_fit_width(1.25 * _TABLE_WIDTH)
-        _ = py_table.table.next_to(mx_table.table, mn.DOWN, buff=0.3).shift(
-            0.6 * mn.RIGHT
+        _ = py_table.table.next_to(
+            mx_table.table, 0.5 * mn.DOWN, buff=0.3, aligned_edge=mn.LEFT
         )
+        # .shift( 0.6 * mn.RIGHT )
         py_cells = t.cast(
             list[VMobject], [py_table.cell(0, column) for column in range(3)]
         )
@@ -77,6 +85,7 @@ class Redundancy(mn.Scene):
             1,
             [r"y=1", r"y=2", r"y=3"],
             [r"\min(I_s(y; X), I_s(y; Z))"],
+            corner_name="Y",
             body=[[f"{value:.2f}"] for value in min_values],
         )
         minxz_table.add_grid(cfg)
@@ -104,22 +113,63 @@ class Redundancy(mn.Scene):
             for row in range(3)
         ]
 
-        red_txt = mn.MathTex(_TEX_RED, fill_color=cfg.txt_color).scale_to_fit_width(
+        # Redundancy Expression box an surrounding rectangle
+        rexp_txt = mn.MathTex(_TEX_REXP, fill_color=cfg.txt_color).scale_to_fit_width(
             minxz_table.table.width
         )
-        _ = red_txt.next_to(minxz_table.table, mn.DOWN, buff=0.3)
+        _ = rexp_txt.next_to(minxz_table.table, mn.DOWN, buff=0.3)
+        rexp_box = mn.SurroundingRectangle(
+            rexp_txt, color=rho_color, stroke_width=4, buff=0.12
+        )
+
+        # Rho text is not made visible, but used to measure
         rho_txt = mn.MathTex(_TEX_RHO, fill_color=cfg.txt_color).scale_to_fit_width(
             _RHO_WIDTH
         )
-        _ = rho_txt.next_to(red_txt, mn.LEFT, buff=0.5)
+        _ = rho_txt.next_to(rexp_txt, mn.LEFT, buff=0.5)
+        # Rho eq text is the one made visible, but used to measure
+        rho_eq_txt = mn.MathTex(
+            _TEX_RHO_EQ,
+            fill_color=cfg.txt_color,
+            substrings_to_isolate=[_TEX_RHO, _TEX_REXP],
+        )
+        _ = rho_eq_txt.scale_to_fit_width(rexp_txt.width + rho_txt.width + 0.5)
+        _ = rho_eq_txt.move_to(mn.VGroup(rho_txt, rexp_txt).get_center())
+        rho_eq_lhs, rho_eq_rhs = (
+            parts_by_tex(rho_eq_txt, tex)[0] for tex in (_TEX_RHO, _TEX_REXP)
+        )
 
+
+        # One box around the values with values themselves visible for the summation.
+        min_group_box = mn.SurroundingRectangle(
+            mn.VGroup(*min_cells), color=rho_color, stroke_width=4, buff=0.12
+        )
+        py_group_box = mn.SurroundingRectangle(
+            mn.VGroup(*py_cells), color=rho_color, stroke_width=4, buff=0.12
+        )
+        min_avg = mn.MathTex(
+            f"{sum(py * mx for py, mx in zip(py_values, min_values)):.2f}",
+            fill_color=cfg.txt_color,
+        )
+        _ = min_avg.scale(0.8).next_to(min_group_box, mn.RIGHT, buff=0.2)
+
+        # Enclose the complete equation, preserving its two existing parts.
+        rho_eq_box = mn.SurroundingRectangle(
+            rho_eq_txt, color=rho_color, stroke_width=4, buff=0.12
+        )
+
+        # Partial Information Decomposition
         pid_txt = mn.MathTex(_TEX_PID, fill_color=cfg.txt_color)
         _ = pid_txt.move_to(3 * mn.DOWN)
+        pid_box = mn.SurroundingRectangle(
+            pid_txt, color=nu_color, stroke_width=4, buff=0.12
+        )
+
         self.play(mn.Create(header_txt))
         self.play(
-            mn.Create(py_table.table),
             mn.Create(mx_table.table),
             mn.Create(mz_table.table),
+            mn.Create(py_table.table),
         )
         self.next_section()
         self.play(mn.Create(minxz_table.table))
@@ -143,35 +193,31 @@ class Redundancy(mn.Scene):
             self.remove(z_fly)  # pyright: ignore[reportUnusedCallResult]
             result_boxes.append(x_fly)
             self.play(mn.Write(min_cells[row]))
-            self.next_section()
-
-        # Replace the per-row highlights with one box around the values, but
-        # leave the values themselves visible for the summation.
+        self.next_section()
         self.play(mn.FadeOut(mn.VGroup(*result_boxes)))
-        min_group_box = mn.SurroundingRectangle(
-            mn.VGroup(*min_cells), color=mn.GREEN, stroke_width=4, buff=0.12
-        )
-        py_group_box = mn.SurroundingRectangle(
-            mn.VGroup(*py_cells), color=mn.GREEN, stroke_width=4, buff=0.12
-        )
-        min_total = mn.MathTex(
-            f"{sum(py * mx for py, mx in zip(py_values, min_values)):.2f}",
-            fill_color=cfg.txt_color,
-        )
-        _ = min_total.scale(0.8).next_to(min_group_box, mn.RIGHT, buff=0.2)
+        self.play(mn.Create(min_group_box), mn.Create(py_group_box), mn.Write(min_avg))
+        self.next_section()
+        self.play(mn.Create(rexp_txt), mn.Create(rexp_box))
+        self.next_section()
         self.play(
-            mn.Create(min_group_box), mn.Create(py_group_box), mn.Write(min_total)
+            mn.Transform(rexp_box, rho_eq_box),
+            mn.Uncreate(rexp_txt),
+            mn.Create(rho_eq_rhs),
+            mn.Create(rho_eq_lhs),
+            mn.Write(
+                mn.Text("Redundancy", font="Concourse T3", font_size=24).next_to(
+                    rho_eq_box, mn.DOWN, buff=0.1
+                )
+            ),
         )
         self.next_section()
-        red_box = mn.SurroundingRectangle(
-            red_txt, color=mn.GREEN, stroke_width=4, buff=0.12
+        self.play(
+            mn.Write(pid_txt),
+            mn.Create(pid_box),
+            mn.Write(
+                mn.Text(
+                    "Unique Contribution", font="Concourse T3", font_size=24
+                ).next_to(pid_box, mn.LEFT, buff=0.1)
+            ),
         )
-        self.play(mn.Write(red_txt), mn.Create(red_box))
-        self.next_section()
-        pid_box = mn.SurroundingRectangle(
-            pid_txt, color=cfg.txt_color, stroke_width=4, buff=0.12
-        )
-        self.play(mn.Write(rho_txt))
-        self.next_section()
-        self.play(mn.Write(pid_txt), mn.Create(pid_box))
         self.wait()

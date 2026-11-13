@@ -76,8 +76,7 @@ def _value_cells(vmv_dict: dict[str, float], labels: list[str]) -> list[str]:
     """The tex of each row's μ(y; ·), top to bottom — a row that stands for
     others gets the column's continuation marker instead of a number."""
     return [
-        f"{vmv_dict[label]:.2f}" if label in vmv_dict else r"\vdots"
-        for label in labels
+        f"{vmv_dict[label]:.2f}" if label in vmv_dict else r"\vdots" for label in labels
     ]
 
 
@@ -113,7 +112,9 @@ def _residue(line: mn.MathTex, *handled: mn.Mobject) -> mn.VGroup:
     its reading order, so transforming these glyphs maps them one-to-one
     instead of smearing two whole equations into each other."""
     skip = {id(glyph) for mob in handled for glyph in mob.family_members_with_points()}
-    return mn.VGroup(*(g for g in line.family_members_with_points() if id(g) not in skip))  # pyright: ignore[reportArgumentType]
+    return mn.VGroup(
+        *(g for g in line.family_members_with_points() if id(g) not in skip)  # pyright: ignore[reportArgumentType]
+    )
 
 
 def _source_rows(original: list[str], reordered: list[str]) -> list[int]:
@@ -164,9 +165,9 @@ class _VMCalculation:
         """Slide rows that change place past each other on opposite arcs."""
         return mn.AnimationGroup(
             *(  # pyright: ignore[reportArgumentType]
-                self.labels[row].animate(path_arc=mn.PI / 2).move_to(  # pyright: ignore[reportCallIssue]
-                    self.label_slots[row]
-                )
+                self.labels[row]
+                .animate(path_arc=mn.PI / 2)  # pyright: ignore[reportCallIssue, reportUnknownMemberType]
+                .move_to(self.label_slots[row])
                 for row, from_row in enumerate(self.row_order)
                 if from_row != row
             )
@@ -211,7 +212,9 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
     # from them; draw the divider between the two here.
     s_head, p_head = vmsp_table.column_headers()
     sp_divider = vmsp_table.v_line(
-        (float(s_head.get_right()[0]) + float(p_head.get_left()[0])) / 2, 2, cfg
+        (float(s_head.get_right()[0]) + float(p_head.get_left()[0])) / 2,  # pyright: ignore[reportAny]
+        2,
+        cfg,
     )
 
     # vmsp starts as its index column alone, holding the rows in the order
@@ -237,7 +240,7 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
     )
     for mob in sp_columns:
         if any(entry is mob for entry in entries):
-            entries.remove(mob)
+            entries.remove(mob)  # pyright: ignore[reportUnusedCallResult]
 
     # Box the row whose value stands for the whole tail of the ordering: P is
     # everything sorted below it, and the n-5 remaining rows are tied with it,
@@ -258,7 +261,7 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
         mn.MathTex(p_cells[boxed], fill_color=cfg.txt_color),
         mn.MathTex(r"+", fill_color=cfg.txt_color),
         mn.MathTex(
-            rf"{s_cells[boxed]} \times (n - 5)",
+            rf"{s_cells[boxed]} \times (n - {2 + boxed})",
             fill_color=cfg.txt_color,
         ),
     ).arrange(mn.DOWN, buff=0.12)
@@ -266,7 +269,7 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
     # table), then centre it on the boxed row.
     _ = row_sum.scale_to_fit_width(_ROW_SUM_WIDTH)
     _ = row_sum.next_to(vmsp_table.table, mn.RIGHT, buff=0.18)
-    _ = row_sum.set_y(row_box.get_center()[1])
+    _ = row_sum.set_y(row_box.get_center()[1])  # pyright: ignore[reportAny]
     sum_box = mn.SurroundingRectangle(
         row_sum,
         color=mn.GREEN,
@@ -296,7 +299,7 @@ class AlgoInsight(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Algorithm Insight", cfg)
+        header_txt = scene_header("Algorithm Insight", cfg, weight=mn.BOLD)
 
         # All four equations share a font size, fitted to the column left of
         # the tables, and a common left edge, so that each derivation reads as
@@ -360,6 +363,34 @@ class AlgoInsight(mn.Scene):
         first = _make_vm_calculation(cfg, 0)
         second = _make_vm_calculation(cfg, 1)
 
+        box_eq_a = mn.SurroundingRectangle(
+            eq_a,
+            color=mn.BLUE,
+            stroke_width=2,
+            buff=0.1,
+        )
+        seq_complexity = (
+            mn.MathTex(r"O(n) \textsf{ time per pair}")
+            .next_to(eq_a, 0.5 * mn.DOWN, buff=0.3)
+            .scale(0.8)
+        )
+        box_eq_c = mn.SurroundingRectangle(
+            eq_c,
+            color=mn.BLUE,
+            stroke_width=2,
+            buff=0.1,
+        )
+        novel_complexity = (
+            mn.MathTex(r"O(1) \textsf{ time per pair}")
+            .next_to(eq_c, 0.5 * mn.DOWN, buff=0.3)
+            .scale(0.8)
+        )
+        novel_condition = (
+            mn.MathTex(r"\textsf{given }  O(n^2 \log n ) \textsf{ prep. time}")
+            .next_to(novel_complexity, 0.5 * mn.DOWN, buff=0.3)
+            .scale(0.8)
+        )
+
         section_divider = mn.Line(
             6.6 * mn.LEFT + _DIVIDER_Y * mn.UP,
             6.6 * mn.RIGHT + _DIVIDER_Y * mn.UP,
@@ -386,6 +417,10 @@ class AlgoInsight(mn.Scene):
         )
         self.wait()
         self.next_section()
+        self.play(
+            mn.Create(box_eq_a),
+            mn.Write(seq_complexity),
+        )
         # Separate the original objective and matrices from the derivation
         # before A supplies the first line below the divider.
         self.play(mn.Create(section_divider))
@@ -449,6 +484,7 @@ class AlgoInsight(mn.Scene):
         )
         self.wait()
         self.next_section()
+
         def play_sort_and_summary(calculation: _VMCalculation) -> None:
             """Give each pass the same sort, S/P, and final-answer steps."""
             self.next_section()
@@ -485,3 +521,9 @@ class AlgoInsight(mn.Scene):
         _ = self.remove(old_parts)
         self.wait()
         play_sort_and_summary(second)
+        self.next_section()
+        self.play(
+            mn.Create(box_eq_c),
+            mn.Write(novel_complexity),
+            mn.Write(novel_condition),
+        )

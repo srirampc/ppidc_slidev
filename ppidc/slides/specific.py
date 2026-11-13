@@ -14,17 +14,25 @@ from ppidc import (
 
 _EXPR_TEX = r"\frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x)\cdot p(y)} \right)"
 
+# Joint probabilities in hundredths; the marginals are derived from this table.
+_PXY_HUNDREDTHS = (
+    (8, 10, 7),
+    (4, 12, 4),
+    (10, 10, 5),
+    (8, 18, 4),
+)
+
 
 class SpecificInfo(mn.Scene):
     @t.override
     def setup(self) -> None:
         mtheme.apply_theme(self, theme_name=default_config().manim_theme)
-        self.add(theme_background())
+        _ = self.add(theme_background())
 
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Specific Information", cfg)
+        header_txt = scene_header("Specific Information", cfg, weight=mn.BOLD)
 
         pxy_table = PxTable(
             cfg,
@@ -33,6 +41,10 @@ class SpecificInfo(mn.Scene):
             [r"x=1", r"x=2", r"x=3", r"x=4"],
             [r"y=1", r"y=2", r"y=3"],
             corner_name=r"p(x,y)",
+            body=[
+                [f"{probability / 100:.2f}" for probability in row]
+                for row in _PXY_HUNDREDTHS
+            ],
         )
         pxy_table.add_grid(cfg)
         table = pxy_table.table
@@ -45,6 +57,8 @@ class SpecificInfo(mn.Scene):
             1,
             [r"x=1", r"x=2", r"x=3", r"x=4"],
             [r"p(x)"],
+            corner_name=r"X",
+            body=[[f"{sum(row) / 100:.2f}"] for row in _PXY_HUNDREDTHS],
         )
         px_table.add_grid(cfg)
         px_marginal = px_table.table
@@ -57,6 +71,13 @@ class SpecificInfo(mn.Scene):
             3,
             [r"p(y)"],
             [r"y=1", r"y=2", r"y=3"],
+            corner_name=r"Y",
+            body=[
+                [
+                    f"{sum(row[col] for row in _PXY_HUNDREDTHS) / 100:.2f}"
+                    for col in range(len(_PXY_HUNDREDTHS[0]))
+                ]
+            ],
         )
         py_table.add_grid(cfg)
         py_marginal = py_table.table

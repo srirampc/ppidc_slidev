@@ -135,7 +135,7 @@ clicks: 6
 ---
 transition: fade-out
 layout: none
-clicks: 8
+clicks: 6
 ---
 <Redundancy auto-start class="absolute inset-0" />
 
@@ -168,7 +168,7 @@ transition: fade-out
 ---
 transition: fade-out
 layout: none
-clicks: 12
+clicks: 13
 ---
 <InsightAlgoInsight auto-start class="absolute inset-0" />
 
