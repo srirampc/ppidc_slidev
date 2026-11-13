@@ -3,10 +3,12 @@
 theme: ext/slidev-theme-spc-gt
 # addons, can be a list of package names or local paths
 # Learn more: https://sli.dev/guide/theme-addon.html#use-addon
-addons: []
+addons:
+  - fancy-arrow
+  - tikzjax
 # random image from a curated Unsplash collection by Anthony
 # like them? see https://unsplash.com/collections/94734566/slidev
-background: https://cover.sli.dev
+#background: https://cover.sli.dev
 # some information about your slides (markdown enabled)
 title: Parallel PIDC
 info: false
@@ -22,12 +24,15 @@ transition: slide-left
 # enable Comark Syntax: https://comark.dev/syntax/markdown
 comark: true
 # duration of the presentation
-duration: 35min
-presenterName: Sriram, A, and B
+duration: 20min
+presenterName: Sriram P Chockalingam
 affiliation: Georgia Institute of Technology
 mdc: true
+# Fonts
+fonts:
+  sans: Concourse T3
+  local: Concourse T3
 ---
-
 
 ## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from Single-Cell Datasets 
 
@@ -75,6 +80,7 @@ layout: two-cols-header
 }
 </style>
 
+
 ---
 transition: fade-out
 layout: none
@@ -83,13 +89,39 @@ clicks: 10
 <AllpairsMINet auto-start class="absolute inset-0" />
 
 
+---
+transition: fade-out
+---
+# Contributions
+
+<v-clicks depth="2">
+
+- **PIDC**, a partial-information decomposition (PID) based network construction method
+  - Effective for single-cell datasets.
+  - Takes $O(n)$ time for each pair, and hence $O(n^3)$ time for $\binom{n}{2}$ pairs.
+
+- Our Contributions
+  - A novel $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
+  - Distributed-memory parallelization that takes $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ time.
+  - Achieves $158$X speedup over the existing PIDC implementation.
+  - Scaling to Human Genome: $30,000$-gene network from $\approx800$K cells in $2.5$ hours using $2,048$ cores.
+
+</v-clicks>
+
 
 ---
 transition: fade-out
-layout: none
-clicks: 5
 ---
-<DataB auto-start class="absolute inset-0" />
+# Background : Random variables and MI
+
+- Notations
+  - $\mathcal{X}, |\mathcal{X}|=n$: Set of discrete random variables, each representing a gene.
+  - Uppercase $X, Y, Z, \ldots$ for random variables
+  - $P(X,Y)$ joint distribution of two genes represented by $X$ and $Y$.
+  - $p(x, y)$: Probability  $P(X=x,Y=y)$
+  - Lower case $x \in X$ also denote the distinct values, random variable $X$ can take.
+- Mutual Information:
+  $$I(X,Y) = \sum_{x \in X} \sum_{y \in Y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)$$
 
 
 ---
@@ -103,220 +135,237 @@ clicks: 6
 ---
 transition: fade-out
 layout: none
+clicks: 8
+---
+<Redundancy auto-start class="absolute inset-0" />
+
+
+---
+transition: fade-out
+layout: none
+clicks: 5
+---
+<XyzpucPUC auto-start class="absolute inset-0" />
+
+
+---
+transition: fade-out
+---
+# Background : PUC
+
+- Unique Contribution, $\nu((X, Z); Y)) =  I(X, Y) - \rho((X, Z); Y)$
+- PUC, $\gamma(X, Y)$, is formally defined as,
+  $$
+  \begin{aligned}
+  \gamma(X, Y) &=  \sum_{Z \in \mathcal{T}} \frac{\nu((X, Z); Y) + \nu((Y, Z); X)}{I(X, Y)}\\
+   &= \sum_{Z \in \mathcal{T}} \frac{2I(X, Y) - \rho((X, Z); Y) - \rho((Y, Z); X)}{I(X, Y)} \\
+   &=  \frac{1}{I(X, Y)} \left( 2(n-2) I(X, Y) - \sum_{Z \in \mathcal{T}} \rho((X, Z); Y) + \rho((Y, Z); X) \right)
+  \end{aligned}
+  $$
+- Bottleneck: $\sum_{Z \in \mathcal{T}} \rho((X, Z); Y)  = \sum_Z \sum_y p(y) \min (I_s(y;X), I_s(y; Z))$
+
+
+---
+transition: fade-out
+layout: none
 clicks: 12
 ---
 <InsightAlgoInsight auto-start class="absolute inset-0" />
 
 
 ---
-
-# Powered by _**Slidev**_
-
-Slidev is a slide maker and <span v-mark.yellow>presentation tool</span> designed for developers.
-
-This theme, leaning on the CD of the University of Graz, has been created by [Benjamin Hackl](https://benjamin-hackl.at).
-
-<div v-click>
-
-To start a new presentation, simply start a new file `slides.md`
-with a bit of content like
-
-</div>
-<div v-click="3">
-
-```md {none|1-5|all}{lines: true, at: '+1'}
+transition: fade-out
 ---
-theme: path/to/slidev-theme-behackl-kfu
-presenterName: Benjamin Hackl
-affiliation: Department of Mathematics and Scientific Computing / University of Graz
----
+# Sequential Algorithm
 
-# Fancy Main Title
-
-### With Some Subtitle
-
-```
-</div>
-<div v-click>
-
-Then startup the preview server using
-
-```bash
-$ npx slidev
-```
-
-</div>
-
----
-
-# Navigation
-
-Hover on the bottom-left corner to see the navigation's controls panel
-
-## Keyboard Shortcuts
-
-|     |     |
-| --- | --- |
-| <kbd>space</kbd> / <kbd>tab</kbd> / <kbd>right</kbd> | next animation or slide |
-| <kbd>left</kbd>  / <kbd>shift</kbd><kbd>space</kbd> | previous animation or slide |
-| <kbd>up</kbd> | previous slide |
-| <kbd>down</kbd> | next slide |
+  ||Given: $P(X), \forall X \in \mathcal{X}$; $P(X, Y),\forall (X, Y)$ ||
+  |--|--|--|
+  |1| Compute Mutual Information, $I(X,Y)$ |$O(n^2)$|
+  |2| Compute tables $\mu(y; X), \forall (y, X)$ |$O(n^2 d)=O(n^2)$|
+  |3| $\forall y \in Y, Y \in \mathcal{X}, \mathbf{S}_y \gets$ Sorted $\mu(y; X)$ table | $O(n^2 \log n)$|
+  |3| $\forall y \in Y,Y \in \mathcal{X}, \mathbf{P}_y \gets$ Prefix summed $\mathbf{S}_y$ table | $O(n^2)$|
+  |4| $\forall (X,Y)$, Compute (a) $\sum_Z\nu((X,Z); Y)$, (b)$\sum_Z\nu((Y,Z); X)$  |  $O(n^2)$|
+  |5| $\forall (X,Y)$, Compute PUC  | $O(n^2)$|
 
 
 ---
-
-# Admonitions!
-
-::admonition{kind="warning" title="Warning" icon="mdi:warning"}
-here is something important!
-::
-
-::admonition{kind="danger" title="Very dangerous!" icon="mdi:skull"}
-here is something dangerous!
-::
-
-::admonition{kind="info" title="Interesting ..." icon="mdi:info"}
-here is something interesting!
-::
-
-::admonition{title="GT branding!" kind="gt"}
-Here is something GT related!
-::
-
-::admonition{title="Defaults?"}
-Let us also try and get some default values up and running?
-::
-
+transition: fade-out
+layout: none
+clicks: 7
 ---
-
-# An Inequality ...
-
-- Bóna--DeJonge-question $\iff a_n / C_n > a_{n+1} / C_{n+1}$ for $n\geq 3$
-- After some further manipulations, this is equivalent to...
-
-<v-click>
-<block title="Proposition">
-
-$a_n / C_n$ is decreasing for $n \geq 3$ if and only if
-$$ F(n) := \sum_{k=1}^n k \sigma(k) (k^2 - 3n + 2) (2k^2 - n) \binom{2n}{n-k} < 0 $$
-for $n \geq 5$.
-
-</block>
-</v-click>
-
----
-
-# ... followed by __Asymptotics!__
-
-<div style="font-size: 18px;">
-
-- Split *binomial sums* into "central" and "tails" regions, <br>show
-  contribution of tails is negligible
-- Approximate $\binom{2n}{n-k}$ in "central" region, complete tails
-- Mellin for integral representation; shift line of integration + collect residues
-
-</div>
-
-<decor class="top-15 right-40">
-<mdi-compass />
-</decor>
-
-<block v-click title="Theorem (H.&ndash;Wagner, 2024)">
-
-For $n \to \infty$, we have
-$$ F(n) = \binom{2n}{n} \Big( -\frac{n^2}{8} + \frac{n}{24} + o(n) \Big) $$
-
-</block>
-<div v-click>
-
-- **Not good enough!** No information about error -- can only
-  say sequence is _eventually decreasing_...
-
-</div>
-
----
-
-# *__Act II__* -- `dependent_bterms` in SageMath
-
-<v-clicks depth="2">
-
-- **$B$-terms:** $O$-terms with *__explicit__* constant + validity point,
-  e.g., $B_{n\geq 100}(42 n^3)$
-
-- Package extends SageMath; assume $n\to\infty$:
-
-  - Support for additional monomially bounded variable $n^\alpha \leq k \leq n^\beta$
-
-  - Taylor expansions with (and at) $B$-terms
-
-
-</v-clicks>
-
-<div class="grid grid-cols-[2fr_1fr] gap-4">
-<div>
-<v-clicks at="5">
-
-- Installation:
-  ```sh
-  $ sage -pip install dependent_bterms
-  ```
-
-- Try it! Interactive demo at [behackl.dev/asy/dbt](https://behackl.dev/asy/dbt), or
-  view [static version](https://github.com/behackl/dependent_bterms/blob/main/toolbox_demo.ipynb)
-  on GitHub
-
-</v-clicks>
-</div>
-<div>
-<decor v-click="5" class="bottom-30 right-30"><mdi-laptop/></decor>
-</div>
-</div>
+<ParInsightParAlgoInsight auto-start class="absolute inset-0" />
 
 
 ---
-layout: image-right
-image: https://picsum.photos/900/600
+transition: fade-out
 ---
+# Parallel Algorithm : Data Structures
 
-# Code
+- Flat arrays, uniformly distributed across $p$ processes
+  - $\mathbf{S}$, concatenation of all the $\mathbf{S}_y$
+  - $\mathbf{P}$, concatenation of all the $\mathbf{P}_y$
+  - $\mathbf{Q}$,  an array of size $|\mathbf{S}|$
+    - $\mathbf{Q}[i]$ holds the value $y$ corresponding to the $\mu(y; X)$ value in $\mathbf{S}[i]$.
+  - $\mathbf{R}$,  an array of size $|\mathbf{S}|$
+    -  $\mathbf{R}[i]$ holds the variable $X$ corresponding to the $\mu(y; X)$ value in $\mathbf{S}[i]$.
+ - Each array size of $n\sum_{Y \in \mathcal{X}} |Y| = O(n^2)$
+---
+transition: fade-out
+---
+# Parallel Algorithm
+  ||Given $\mathbf{S}, \mathbf{P}, \mathbf{Q}, \mathbf{R}$||
+  |-|-|-|
+  |1|Let $j \gets$ processor's rank||
+  |2| Compute $\langle X, Y,  \sum \nu((X, Z); Y) \rangle$ for each entry $\mathbf{S}^{(j)}, \mathbf{P}^{(j)}, \mathbf{Q}^{(j)}, \mathbf{R}^{(j)}$|$O(n^2/p)$|
+  |3|Insert $\langle X, Y,  \sum \nu((X, Z); Y) \rangle$ to $\mathbf{R}^{(j)}$|$O(n^2/p)$|
+  |4|Insert $\langle X, Y,  I(X, Y) \rangle$ to $\mathbf{R}^{(j)}$|$O(n^2/p)$|
+  |5|Parallel Sort the distributed $\mathbf{R}$|$\mathsf{T}_{\mathtt{sort}}(n^2, p))$|
+  |6|Compute PUC from sorted $\mathbf{R}^{(j)}$ |$O(n^2/p)$|
 
-Use code snippets and get the highlighting directly!
-
-```py
-def fibonacci(n):
-    if n == 0:
-        return 0
-    if n == 1:
-        return 1
-    return fibonacci(n-1) + fibonacci(n-2)
-```
 
 ---
+transition: fade-out
+---
+# Implementation : Platform and Data Processing
+- PIDC implementation in julia
+  - Read input data from `HDF5` input instead of `csv` files
+- Our MPI Implementation
+  - Rust programming language
+  - `rsmpi` : MPI 3.1 wrapper (Experiments use `OpenMPI`)
+  - `sope` : Convenience library features include generic struct types, sorting etc
+  - `hdf5-rs` : Updated for parallel I/O
+- `anndata` I/O
+  - Save $\mathsf{D}^T$ with genes as rows for faster parallel I/O
+
+---
+transition: fade-out
+---
+# Implementation : Computing $P(X)$ and $P(X,Y)$
+- Marginal distributions, $P(X)$
+  - Block distribute $n$ genes across $p$ processes
+  - Compute histogram with BayesianBlocks method for $n/p$ genes
+- Joint Distribution
+  - Copy of $P(X), \forall X$ in every process (Only 26MB for 30K genes).
+  - Each process computes $P(X, Y)$ $\approx \binom{n}{2}$ genes.
+  - Sorted order of $(X, Y)$ enable constant time ownership id.
+
+
+---
+transition: fade-out
+layout: none
+clicks: 5
+---
+<DataB auto-start class="absolute inset-0" />
+
+
+---
+transition: fade-out
 layout: two-cols-header
 ---
-
-This spans both columns, might only be evident if used
-with a sufficiently long text?
+# Implementation : Handling large datasets
 
 ::left::
+![](/img/block-dist.svg){width=300px lazy}
 
-This is a list in the left column.
+::right::
+- Datasets with $m$ exceeding millions of cells.
+- Batch-wise processing of pair blocks with only $O(mn/p)$ data per process.
+- Row/column-wise distribution
+  - Parallel I/O of non-contiguous overlapping rows of $\mathsf{D}^T$.
+- Diagonal distribution
+  -  Uniform block-distributed parallel read of the input HDF5
 
-- First item
-- Second item
-- Third item
-- And final item
+---
+transition: fade-out
+---
+# Implementation : Parallel Algorithm
+- Compute MI and $\mu(\cdot, \cdot)$
+  -  $I(X, Y )$
+  -  $\mu(x; Y) \forall x \in Y$, and  $\mu(y; X), \forall y \in Y$.
+  - Distribute $\mu(x; Y)$ values in the order of $Y$ , followed by $y$, and then by X.
+- Compute PUC, $\gamma(X, Y)$
+  - $\mathbf{Q}$ and $\mathbf{R}$ are not explicitly computed
+    - Derived from the ordering of $X$ and $x \in X$
+  - Radix sorting with a single `MPI_all2allv`
+
+---
+transition: fade-out
+---
+# Experiments: Datasets
+| Dataset | Tissue | $m$ | $n$ | $\mathsf{D}$ (GB) | $\sum \|P(X,Y)\|$ (GB) |
+|:-|:-:|-:|-:|-:|-:|
+|D1 |  PBMC |  23,766 |   5,000 |   0.44 |     47.38 |
+|D2 |  Lung |  91,068 |   5,000 |   1.82 |    121.10 |
+|   |   "   |         |  10,000 |   3.39 |    476.46 |
+|   |   "   |         |  15,000 |   5.08 |  1,131.42 |
+|D3 | PBMC  | 794,170 |  20,000 |  57.63 |  8,828.66 |
+|   |   "   |         |  30,000 |  86.45 | 19,570.00 |
+
+---
+transition: fade-out
+layout: two-cols-header
+---
+# Results for dataset $D1$
+
+::left::
+- Machine:  Shared memory machine with 72-core Intel® Xeon® E7-8870 2.7 GHz CPU
+-  Max. speedup of 52 on 64 cores
+- Communication and I/O times are a small fraction (at most 11% with 64 cores)
+- 158X times faster than PIDC, reducing the runtime from 10.8 hours to about $4$ minutes.
+to about 4 minutes.
+::right::
+##### Speedup vs. number of cores
+![](/img/strong-scaling-small-ai.svg){width=800px lazy}
+---
+transition: fade-out
+---
+# Results : Dataset $D2$ w. 5K genes
+  | ![](/img/strong-scaling-big-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
+  |--|--|
+-  484-node cluster where each node has a 24-core Intel® Xeon® 6226 2.7 GHz processor
+- Max speedup of  speedup of 96 with 512 cores, which then drops to 55 with 1, 024 cores
+---
+transition: fade-out
+layout: two-cols-header
+---
+# Results : Runtime vs. number of gene Weak Scaling
+
+::left::
+- D2 using 256 cores, varying network size from 1, 000 genes
+to 18, 000 genes.
+-  Observed growth is close to $O(n^2)$ rather than $O(n^2 \log n)$
+   because parallel sort does not dominate the run-time .
 
 ::right::
 
-And this is right column. We could put a little
-decoration element here?
-
-<decor class="bottom-10 right-50"><mdi-flower/></decor>
-
+![](/img/runtime-growth-n-ai.svg){width=500px lazy}
 ---
-layout: end
-class: "text-center"
+transition: fade-out
 ---
+# Results : Big Datasets
 
-# Thank you!
+|$n$|20K| 20K|30K| 30K|
+|-|-:|-:|-:|-:|
+|$p$| 1, 024 | 2, 048| 1, 024|  2, 048|
+|Distributions, µ (min.)| 116.89| 71.08| 243.39| 149.36|
+|µ →PUC (min.)| 0.91 | 1.02 | 1.63 | 1.90 |
+|Total Runtime (min.)|117.80 |72.10 | 245.02 |151.26 |
+
+-  20K-gene network took 1.9 hours and 1.2 hours, respectively, with 1, 024 cores and 2, 048 cores.
+-  30K-gene network took 4.1 hours and 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- No linear scaling from 1, 024 to 2, 048 cores due to the increase in I/O time.
+---
+transition: fade-out
+---
+# Conclusions
+
+- Key Contributions
+  - $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
+  - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm on $p$ processors.
+  - To our knowledge, the 30K network is the largest network covering the complete human genome.
+- Future work
+  - Improve scalability of computing the distributions by better
+    process assignment.
+  - Address the cases where  the gene expression values
+    need to be treated as continuous.
+  - I/O scalability via asynchronous read/writes.
