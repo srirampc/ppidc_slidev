@@ -84,7 +84,7 @@ layout: two-cols-header
 ---
 transition: fade-out
 layout: none
-clicks: 9
+clicks: 7
 ---
 <AllpairsPairwiseNet auto-start class="absolute inset-0" />
 
@@ -135,7 +135,7 @@ clicks: 6
 ---
 transition: fade-out
 layout: none
-clicks: 6
+clicks: 5
 ---
 <Redundancy auto-start class="absolute inset-0" />
 

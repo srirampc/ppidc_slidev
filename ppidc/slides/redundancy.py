@@ -169,10 +169,9 @@ class Redundancy(mn.Scene):
         self.play(
             mn.Create(mx_table.table),
             mn.Create(mz_table.table),
-            mn.Create(py_table.table),
+            mn.Create(minxz_table.table)
         )
-        self.next_section()
-        self.play(mn.Create(minxz_table.table))
+        self.wait()
         self.next_section()
         self.play(*(mn.Create(box) for box in [*x_boxes, *z_boxes]))
         result_boxes: list[mn.SurroundingRectangle] = []
@@ -193,11 +192,15 @@ class Redundancy(mn.Scene):
             self.remove(z_fly)  # pyright: ignore[reportUnusedCallResult]
             result_boxes.append(x_fly)
             self.play(mn.Write(min_cells[row]))
+        self.wait()
         self.next_section()
         self.play(mn.FadeOut(mn.VGroup(*result_boxes)))
+        self.play(mn.Create(py_table.table))
         self.play(mn.Create(min_group_box), mn.Create(py_group_box), mn.Write(min_avg))
+        self.wait()
         self.next_section()
         self.play(mn.Create(rexp_txt), mn.Create(rexp_box))
+        self.wait()
         self.next_section()
         self.play(
             mn.Transform(rexp_box, rho_eq_box),

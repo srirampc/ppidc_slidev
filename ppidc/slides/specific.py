@@ -13,7 +13,7 @@ from ppidc import (
 )
 
 _EXPR_TEX = r"\frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x)\cdot p(y)} \right)"
-
+_IXY_TEX = r"\sum_{x} \sum_{y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)"
 # Joint probabilities in hundredths; the marginals are derived from this table.
 _PXY_HUNDREDTHS = (
     (8, 10, 7),
@@ -49,7 +49,7 @@ class SpecificInfo(mn.Scene):
         pxy_table.add_grid(cfg)
         table = pxy_table.table
         _ = table.scale_to_fit_width(5)
-        _ = table.move_to(mn.ORIGIN)
+        _ = table.move_to(mn.ORIGIN + 2 * mn.LEFT + mn.UP)
 
         px_table = PxTable(
             cfg,
@@ -63,7 +63,7 @@ class SpecificInfo(mn.Scene):
         px_table.add_grid(cfg)
         px_marginal = px_table.table
         _ = px_marginal.scale_to_fit_height(table.height)
-        _ = px_marginal.next_to(table, mn.LEFT, buff=0.4)
+        _ = px_marginal.next_to(table, mn.LEFT, buff=0.3)
 
         py_table = PxTable(
             cfg,
@@ -82,21 +82,21 @@ class SpecificInfo(mn.Scene):
         py_table.add_grid(cfg)
         py_marginal = py_table.table
         _ = py_marginal.scale_to_fit_width(table.width)
-        _ = py_marginal.next_to(table, mn.DOWN, buff=0.35)
+        _ = py_marginal.next_to(table, mn.DOWN, buff=0.3)
 
         pxy_title = (
             mn.MathTex(r"P(X,Y)", fill_color=cfg.txt_color)
-            .next_to(table, mn.UP, buff=0.3)
+            .next_to(table, mn.UP, buff=0.2)
             .scale(0.8)
         )
         px_title = (
             mn.MathTex(r"P(X)", fill_color=cfg.txt_color)
-            .next_to(px_marginal, mn.LEFT, buff=0.3)
+            .next_to(px_marginal, mn.UP, buff=0.2)
             .scale(0.8)
         )
         py_title = (
             mn.MathTex(r"P(Y)", fill_color=cfg.txt_color)
-            .next_to(py_marginal, mn.LEFT, buff=0.3)
+            .next_to(py_marginal, mn.LEFT, buff=0.2)
             .scale(0.8)
         )
 
@@ -116,8 +116,8 @@ class SpecificInfo(mn.Scene):
 
         self.play(mn.Create(header_txt))
         self.play(mn.Create(table), mn.Write(pxy_title))
-        self.wait()
-        self.next_section()
+        # self.wait()
+        # self.next_section()
         # both marginals appear together
         self.play(
             mn.Create(px_marginal),
@@ -150,12 +150,12 @@ class SpecificInfo(mn.Scene):
             stroke_width=4,
             buff=0.12,
         )
-        self.play(mn.Create(joint_box), mn.Create(px_box), mn.Create(py_box))
-        self.wait()
-        self.next_section()
         xy_terms = parts_by_tex(expr, r"p(x,y)")
         x_term = parts_by_tex(expr, r"p(x)")[0]
         y_terms = parts_by_tex(expr, r"p(y)")
+        self.play(mn.Create(joint_box), mn.Create(px_box), mn.Create(py_box))
+        self.wait()
+        self.next_section()
         # each box's copy flies to its term in the expression, coloring it
         # on arrival; both occurrences of p(x,y) and of p(y) are tagged
         term_boxes = [
@@ -182,11 +182,11 @@ class SpecificInfo(mn.Scene):
         _ = sum_all.scale(expr.width / sum_all[1].width)
         _ = sum_all.shift(expr.get_center() - sum_all[1].get_center())
         sum_sym: mn.VMobject = sum_all[0]  # pyright: ignore[reportAssignmentType]
-        self.play(mn.Write(sum_sym))
         # widen the entry boxes to their full columns: the y=2 column of the
         # joint table and the whole p(x) value column
         joint_col = mn.VGroup(*(pxy_table.cell(row, 1) for row in range(4)))  # pyright: ignore[reportArgumentType]
         px_col = mn.VGroup(*(px_table.cell(row, 0) for row in range(4)))  # pyright: ignore[reportArgumentType]
+        self.play(mn.Write(sum_sym))
         self.play(
             mn.Transform(
                 joint_box,
@@ -226,8 +226,25 @@ class SpecificInfo(mn.Scene):
         self.next_section()
         # name the boxed quantity, centered below the box
         is_label = mn.MathTex(r"I_s(y; X)", fill_color=cfg.txt_color).scale(0.9)
-        _ = is_label.next_to(final_box, mn.DOWN, buff=0.3)
+        _ = is_label.next_to(final_box, mn.DOWN, buff=0.2)
         self.play(mn.Write(is_label))
+        self.wait()
+        self.next_section()
+        ir_tex = mn.MathTex(_IXY_TEX, fill_color=cfg.txt_color).scale(0.8)
+        _ = ir_tex.next_to(is_label, mn.DOWN, buff=0.5).align_to(whole_sum, mn.LEFT)
+        ir_box = mn.SurroundingRectangle(
+            ir_tex,
+            color=cfg.txt_color,
+            stroke_width=4,
+            buff=0.12,
+        )
+        ir_label = mn.MathTex(r"I(Y,X)", fill_color=cfg.txt_color).scale(0.9)
+        _ = ir_label.next_to(ir_box, mn.DOWN, buff=0.2)
+        self.play(
+            mn.Write(ir_tex),
+            mn.Create(ir_box),
+            mn.Create(ir_label),
+        )
         self.wait()
 
     def _fly_box_copies(

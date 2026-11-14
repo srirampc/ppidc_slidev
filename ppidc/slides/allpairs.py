@@ -251,6 +251,7 @@ class PairwiseNet(mn.Scene):
                 if mobj is not None
             )
         )
+        self.wait()
         self.next_section()
         # self.play(*[mn.Create(arx) for arx in matrix_d.arrows])
         # self.next_section()
@@ -270,9 +271,12 @@ class PairwiseNet(mn.Scene):
                 mn.TransformFromCopy(yvd.group_shift_y, yvd.rv_txt_y),
             )
             if ix == 0:
+                self.wait()
                 self.next_section()
             self.play(mn.Create(yvd.fn_txt))
-            self.next_section()
+            if ix == 0:
+                self.wait()
+                self.next_section()
             # self.play(mn.Transform(yvd.group_txt, mi_dot))
             fn_grp_txt = yvd.group_txt
             self.play(
@@ -288,15 +292,16 @@ class PairwiseNet(mn.Scene):
             src_net_groups.append(mi_dot)
             if ix == 0:
                 self.play(mn.Create(net_vx))
-                self.next_section()
+            self.wait()
+            self.next_section()
             self.play(
                 mn.Uncreate(yvd.group_y),
                 mn.Uncreate(yvd.group_shift_x),
                 mn.Uncreate(yvd.group_shift_y),
             )
-            if ix == 0:
-                self.next_section()
-        self.next_section()
+            #if ix == 0:
+            #    self.next_section()
+        #self.next_section()
         self.play(
             mn.Transform(mn.VGroup(*src_net_groups), square_n),
             mn.Uncreate(group_x),

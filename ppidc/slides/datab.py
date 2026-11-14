@@ -205,20 +205,8 @@ class DataB(mn.Scene):
         d_square, d_triangle = _comp_matrix()
 
         sub_rect_list = [
-            _sub_rectangle(d_rect_t, mn.BLUE, ofx) for ofx in [0, 0.5, 1, 1.5, 2]
+            _sub_rectangle(d_rect_t, mn.BLUE, ofx) for ofx in [0, 0.6, 1.2, 1.8, 2.4]
         ]
-        # top_d_rect_t = mn.Rectangle(
-        #    width=d_rect_t.width,
-        #    height=d_rect_t.height / 5,
-        #    grid_xstep=_D_GRID_STEP,
-        #    grid_ystep=_D_GRID_STEP,
-        # ).set_color(mn.BLUE)
-        # _ = top_d_rect_t.grid_lines.set_stroke(width=_D_GRID_STROKE * 2)
-        # _ = top_d_rect_t.align_to(d_rect_t, mn.UP + mn.LEFT).shift(0.5 * mn.DOWN)
-
-        # bot_d_rect_t = top_d_rect_t.copy()
-        # _ = bot_d_rect_t.grid_lines.set_stroke(width=_D_GRID_STROKE * 2)
-        # _ = top_d_rect_t.align_to(d_rect_t, mn.DOWN + mn.LEFT)
 
         _a = self.add(
             *(
