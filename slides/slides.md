@@ -143,7 +143,7 @@ clicks: 6
 ---
 transition: fade-out
 layout: none
-clicks: 5
+clicks: 6
 ---
 <XyzpucPUC auto-start class="absolute inset-0" />
 
