@@ -154,8 +154,8 @@ class SpecificInfo(mn.Scene):
         x_term = parts_by_tex(expr, r"p(x)")[0]
         y_terms = parts_by_tex(expr, r"p(y)")
         self.play(mn.Create(joint_box), mn.Create(px_box), mn.Create(py_box))
-        self.wait()
-        self.next_section()
+        #self.wait()
+        #self.next_section()
         # each box's copy flies to its term in the expression, coloring it
         # on arrival; both occurrences of p(x,y) and of p(y) are tagged
         term_boxes = [
@@ -226,12 +226,12 @@ class SpecificInfo(mn.Scene):
         self.next_section()
         # name the boxed quantity, centered below the box
         is_label = mn.MathTex(r"I_s(y; X)", fill_color=cfg.txt_color).scale(0.9)
-        _ = is_label.next_to(final_box, mn.DOWN, buff=0.2)
+        _ = is_label.next_to(final_box, mn.UP, buff=0.2)
         self.play(mn.Write(is_label))
         self.wait()
         self.next_section()
         ir_tex = mn.MathTex(_IXY_TEX, fill_color=cfg.txt_color).scale(0.8)
-        _ = ir_tex.next_to(is_label, mn.DOWN, buff=0.5).align_to(whole_sum, mn.LEFT)
+        _ = ir_tex.next_to(whole_sum, mn.DOWN, buff=1.4).align_to(whole_sum, mn.LEFT)
         ir_box = mn.SurroundingRectangle(
             ir_tex,
             color=cfg.txt_color,

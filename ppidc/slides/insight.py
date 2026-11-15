@@ -18,7 +18,7 @@ from ppidc import (
 # which is A with the two summations swapped and p(y) distributed into both
 # min arguments; and C, which writes each p(y)·I_s(y; ·) product as a single
 # μ(y; ·).
-_TEX_R = r"\sum_{Z \in \mathcal{T}} \rho((X, Z); Y)"
+_TEX_R = r"\sum_{Z \not\in \{X, Y\}} \rho((X, Z); Y)"
 _TEX_A = r"\sum_Z \sum_y p(y) \min(I_s(y;X), I_s(y;Z))"
 _TEX_A_FLIPPED = r"\sum_y \sum_Z p(y) \min(I_s(y;X), I_s(y;Z))"
 _TEX_B = r"\sum_y \sum_Z \min(p(y) I_s(y;X), p(y) I_s(y;Z))"
@@ -147,14 +147,19 @@ class _VMCalculation:
     sum_box: mn.SurroundingRectangle
 
     @property
-    def tables(self) -> mn.VGroup:
-        return mn.VGroup(self.vm_table.table, self.vmsp_table.table)
+    def mu_table(self) -> mn.Table:
+        return self.vm_table.table
+
+    @property
+    def sorted_table(self) -> mn.Table:
+        return self.vmsp_table.table
 
     @property
     def all_parts(self) -> mn.VGroup:
         """Everything shown for this pass, so it can be cleared in one move."""
         return mn.VGroup(
-            self.tables,
+            self.mu_table,
+            self.sorted_table,
             self.sp_columns,
             self.row_box,
             self.row_sum,
@@ -187,6 +192,7 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
         1,
         vm_labels,
         [rf"\mu(y={y}; \cdot)"],
+        corner_name="Z",
         body=[[cell] for cell in _value_cells(vm_values, vm_labels)],
     )
     vm_table.add_grid(cfg)
@@ -202,6 +208,7 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
         2,
         vmsp_labels,
         [rf"\mathsf{{S}}_{{y={y}}}", rf"\mathsf{{P}}_{{y={y}}}"],
+        corner_name="Z",
         body=[[s, p] for s, p in zip(s_cells, p_cells, strict=True)],
     )
     vmsp_table.add_grid(cfg)
@@ -425,6 +432,7 @@ class AlgoInsight(mn.Scene):
         # before A supplies the first line below the divider.
         self.play(mn.Create(section_divider))
         self.wait()
+        self.next_section()
         # A -> B, part one: a copy of A drops into B's slot, still written as
         # A, and the two summations trade places there. They are equally wide
         # and no B-side piece is involved yet, so nothing else on the line
@@ -487,16 +495,17 @@ class AlgoInsight(mn.Scene):
 
         def play_sort_and_summary(calculation: _VMCalculation) -> None:
             """Give each pass the same sort, S/P, and final-answer steps."""
-            self.next_section()
             self.play(calculation.sort_animation())
-            self.wait()
-            self.next_section()
             # S and P appear only after the index column has reached its order.
             self.play(mn.Create(calculation.sp_columns))
             self.wait()
             self.next_section()
             self.play(
                 mn.Create(calculation.row_box),
+            )
+            self.wait()
+            self.next_section()
+            self.play(
                 mn.Create(calculation.sum_box),
                 mn.Write(calculation.row_sum),
             )
@@ -504,14 +513,16 @@ class AlgoInsight(mn.Scene):
 
         # First pass: μ(y=1; ·), with the S/P table's index column initially
         # holding the μ table's unsorted row order.
-        self.play(mn.Create(first.tables))
+        self.play(mn.Create(first.mu_table))
         self.wait()
+        self.next_section()
+        self.play(mn.Create(first.sorted_table))
         play_sort_and_summary(first)
         self.next_section()
 
         # Clear the first tables and both callouts, and bring in the second
         # pass from outside the right edge; the upper derivation stays intact.
-        second_tables = second.tables
+        second_tables = mn.VGroup(second.mu_table, second.sorted_table)
         _ = second_tables.shift(mn.config.frame_width * mn.RIGHT)
         old_parts = first.all_parts
         self.play(

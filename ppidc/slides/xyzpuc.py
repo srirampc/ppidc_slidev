@@ -180,7 +180,7 @@ class PUC(mn.Scene):
             mn.FadeOut(x_tangents.rho_label),
             mn.FadeOut(y_tangents.rho_label),
         )
-        self.next_section()
+        # self.next_section()
         self.play(
             mn.Transform(x_tangents.line_bottom, x_tangents.line_mid),
             mn.Transform(y_tangents.line_bottom, y_tangents.line_mid),

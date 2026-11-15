@@ -87,7 +87,7 @@ class ParAlgoInsight(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Parallel Algorithm", cfg)
+        header_txt = scene_header("Parallel Algorithm", cfg, weight=mn.BOLD)
 
         labels1, y_cells1, s_cells1, p_cells1 = _vm_table_cells(0)
         labels2, y_cells2, s_cells2, p_cells2 = _vm_table_cells(1)

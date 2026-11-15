@@ -194,12 +194,17 @@ class Redundancy(mn.Scene):
             self.play(mn.Write(min_cells[row]))
         self.wait()
         self.next_section()
-        self.play(mn.FadeOut(mn.VGroup(*result_boxes)))
         self.play(mn.Create(py_table.table))
-        self.play(mn.Create(min_group_box), mn.Create(py_group_box), mn.Write(min_avg))
+        self.play(mn.Create(rexp_txt))
         self.wait()
         self.next_section()
-        self.play(mn.Create(rexp_txt), mn.Create(rexp_box))
+        self.play(mn.FadeOut(mn.VGroup(*result_boxes)))
+        self.play(
+            mn.Create(min_group_box),
+            mn.Create(py_group_box),
+            mn.Create(rexp_box),
+            mn.Write(min_avg)
+        )
         self.wait()
         self.next_section()
         self.play(
@@ -213,6 +218,7 @@ class Redundancy(mn.Scene):
                 )
             ),
         )
+        self.wait()
         self.next_section()
         self.play(
             mn.Write(pid_txt),
