@@ -20,6 +20,7 @@ _D_GRID_STEP: float = 0.1
 _D_GRID_STROKE: float = 0.8
 _S_GRID_STEP: float = 0.6
 _S_POS = 3.5 * mn.LEFT + 2.2 * mn.DOWN
+_BATCH_COLORS = ("#a5d8ff", "#ffd43b", "#d0bfff")
 
 
 def _sub_rectangle(
@@ -88,23 +89,27 @@ def _bullet_points(cfg: Config) -> list[mn.VGroup]:
         _bullet_row(
             cfg,
             [
-                ("Compute ", "text"),
+                ("Bottleneck: Computing ", "text"),
                 (r"P(X,Y) \forall X, Y,\ X < Y", "math"),
-                (" (assuming an order in ", "text"),
+                (" (assumed ", "text"),
                 (r"\mathcal{X}", "math"),
-                (")", "text"),
+                (" ordering)", "text"),
             ],
         ),
         _bullet_row(
             cfg,
             [
-                ("Block-wise distribution of work limits ", "text"),
-                (r"O\left(\frac{m}{p}\right)", "math"),
-                (" data", "text"),
+                ("Work distribution with ", "text"),
+                (r"\frac{n}{p} \times \frac{n}{p}", "math"),
+                (" sized blocks", "text"),
             ],
         ),
-        _bullet_row(cfg, [("Read corresponding rows", "text")]),
-        _bullet_row(cfg, [("Batch distribution scheme", "text")]),
+        _bullet_row(cfg, [
+            ("Reading rows limits to ", "text"),
+            (r"O\left(\frac{m}{p}\right)", "math"),
+            (" data", "text"),
+        ]),
+        _bullet_row(cfg, [("Off-diagonal batch distribution scheme", "text")]),
     ]
 
 
@@ -139,6 +144,21 @@ def _upper_triangular_cells(
     )
 
 
+def _batch_legend(cfg: Config, batch: int, color: str) -> mn.VGroup:
+    swatch = mn.Square(
+        side_length=0.25,
+        fill_color=color,
+        fill_opacity=1,
+        stroke_color=mn.GRAY_D,
+        stroke_width=1,
+    )
+    label = mn.Text(f"Batch #{batch}", font="Concourse T3", font_size=20).set_color(
+        cfg.txt_color
+    )
+    _ = label.next_to(swatch, mn.RIGHT, buff=0.12)
+    return mn.VGroup(swatch, label)
+
+
 class DataB(mn.Scene):
     @t.override
     def setup(self) -> None:
@@ -160,11 +180,15 @@ class DataB(mn.Scene):
         cfg = default_config()
         x_name = r"\vec{x}"
         y_name = r"\vec{y}"
-        header_txt = scene_header("Handling Large Datasets", cfg).shift(2.5 * mn.RIGHT)
+        header_txt = scene_header("Handling Large Datasets", cfg, weight=mn.BOLD).shift(
+            3.3 * mn.RIGHT
+        )
         bullets = mn.VGroup(*_bullet_points(cfg)).arrange(
             mn.DOWN, aligned_edge=mn.LEFT, buff=0.18
         )
-        _ = bullets.next_to(header_txt, mn.DOWN, aligned_edge=mn.RIGHT, buff=0.35)
+        _ = bullets.next_to(
+            header_txt, mn.DOWN, aligned_edge=mn.RIGHT, buff=0.35
+        ).shift(0.6 * mn.RIGHT)
         self.play(mn.Create(header_txt))
         d_rect = (
             _matrix_rect().set_color(cfg.d_color).shift(3.5 * mn.LEFT + 2.75 * mn.UP)
@@ -253,3 +277,89 @@ class DataB(mn.Scene):
         )
         self.play(mn.FadeIn(bullets[2]), mn.FadeIn(bullets[3]))
         self.wait()
+        self.next_section()
+
+        # Reuse the fine-grained upper triangle to show the coarser partition
+        # into n/5-sized row and column blocks, without moving the first matrix.
+        batch_cells = [[cell.copy() for cell in row] for row in ut_cells]
+        batch_cell_list = [cell for row in batch_cells for cell in row]
+        batch_group = mn.VGroup(*batch_cell_list).align_to(d_rect, mn.DOWN + mn.LEFT)
+        for cell in batch_cell_list:
+            _ = cell.set_fill(mn.GRAY_A, opacity=1).set_stroke(mn.GRAY_D, width=1)
+        original_d = mn.VGroup(
+            d_rect,
+            d_matrix.text_bg_rect,
+            d_matrix.text,
+            *d_matrix.arrows,
+        )
+        size_labels = [r"\frac{n}{5}", r"\frac{2n}{5}", r"\frac{3n}{5}", r"\frac{4n}{5}", r"n"]
+        column_markers = mn.VGroup()
+        for cell, text in zip(batch_cells[0], size_labels, strict=True):
+            label = mn.MathTex(text, font_size=20, fill_color=cfg.txt_color)
+            # Center the label above the cell, then put its left edge on the
+            # cell's right edge.
+            _ = label.next_to(cell, mn.UP, buff=0.12).shift(
+                0.5 * (cell.width + label.width) * mn.RIGHT
+            )
+            column_markers.add(label)
+        self.play(
+            mn.FadeOut(original_d),
+            mn.LaggedStart(
+                *(
+                    mn.TransformFromCopy(source, target)
+                    for source, target in zip(
+                        ut_cells_vgroup, batch_cell_list, strict=True
+                    )
+                ),
+                lag_ratio=0.04,
+            ),
+            mn.LaggedStart(
+                *(mn.Write(marker) for marker in column_markers),
+                lag_ratio=0.08,
+            ),
+        )
+        self.wait()
+        self.next_section()
+
+        batch_legends = mn.VGroup(
+            *(
+                _batch_legend(cfg, batch, color)
+                for batch, color in enumerate(_BATCH_COLORS, start=1)
+            )
+        ).arrange(mn.DOWN, aligned_edge=mn.LEFT, buff=0.18)
+        _ = batch_legends.next_to(batch_group, mn.LEFT, buff=0.25, aligned_edge=mn.UP)
+        batch_count = mn.MathTex(r"p = 5", font_size=24, fill_color=cfg.txt_color)
+        _ = batch_count.next_to(batch_legends, mn.UP, buff=0.2, aligned_edge=mn.LEFT)
+
+        # (row, column, number), matching slides/img/block-dist.svg. The first
+        # two batches complete the diagonal bands; the third fills the remainder.
+        batches = [
+            [(row, row, str(row)) for row in range(5)],
+            [(row, row + 1, str(row)) for row in range(4)] + [(0, 4, "4")],
+            [(0, 2, "0"), (0, 3, "3"), (1, 3, "1"), (1, 4, "4"), (2, 4, "2")],
+        ]
+
+        def batch_cell(row: int, col: int) -> mn.Square:
+            return batch_cells[row][col - row]
+
+        for batch, (color, cells) in enumerate(
+            zip(_BATCH_COLORS, batches, strict=True)
+        ):
+            targets = [batch_cell(row, col) for row, col, _ in cells]
+            numbers = [
+                mn.MathTex(number, font_size=24, fill_color=cfg.txt_color).move_to(
+                    batch_cell(row, col)
+                )
+                for row, col, number in cells
+            ]
+            animations: list[mn.Animation] = [
+                mn.FadeIn(batch_legends[batch]),
+                *(target.animate.set_fill(color, opacity=1) for target in targets),
+                *(mn.Write(number) for number in numbers),
+            ]
+            if batch == 0:
+                animations.insert(0, mn.Write(batch_count))
+            self.play(*animations)
+            self.wait()
+            if batch < len(batches) - 1:
+                self.next_section()

@@ -147,7 +147,7 @@ class ParAlgoInsight(mn.Scene):
             len(_VM_LABELS),
             1,
             _VM_LABELS,
-            [r"\mu(y=1; \cdot)"],
+            [r"\mu(y=2; \cdot)"],
             body=[[cell] for cell in _vm_label_cells(1)],
         )
         vm2_table.add_grid(cfg)
@@ -312,14 +312,15 @@ class ParAlgoInsight(mn.Scene):
             mn.Create(vm1_group),
             mn.Create(vm2_group),
         )
+        self.wait()
         self.next_section()
         self.play(
             mn.TransformFromCopy(vm1_group, vms1_table.table),
         )
-        self.next_section()
         self.play(
             mn.TransformFromCopy(vm2_group, vms2_table.table),
         )
+        self.wait()
         self.next_section()
         self.play(
             mn.Uncreate(vm1_group),
@@ -328,18 +329,23 @@ class ParAlgoInsight(mn.Scene):
             mn.Uncreate(vms2_table.table),
             mn.Create(vms_full_table.table),
         )
+        self.wait()
         self.next_section()
         self.play(
             *(mn.Create(line) for line in cut_lines),
             *(mn.Write(label) for label in cut_labels),
             mn.Write(cut_dots),
         )
+        self.wait()
         self.next_section()
         self.play(
             mn.Create(tuple_table.table),
-            mn.Create(sorted_tuple_table.table),
         )
+        self.wait()
         self.next_section()
+        self.play(
+           mn.Create(sorted_tuple_table.table),
+        )
         sort_motions = [
             mn.TransformFromCopy(
                 tuple_cells[source_row],

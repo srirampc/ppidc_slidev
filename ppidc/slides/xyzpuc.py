@@ -108,7 +108,7 @@ class PUC(mn.Scene):
 
         puc_full_label = (
             mn.MathTex(
-                r"\gamma(X, Y) = \sum_{Z \in \mathcal{X,Y}} \frac{\nu((X, Z); Y)}{I(X,Y)} + \frac{\nu((Y, Z); X)}{I(X,Y)}",
+                r"\gamma(X, Y) = \sum_{Z \not \in \{X,Y\}} \frac{\nu((X, Z); Y)}{I(X,Y)} + \frac{\nu((Y, Z); X)}{I(X,Y)}",
                 fill_color=cfg.txt_color,
             )
             .scale(0.8)

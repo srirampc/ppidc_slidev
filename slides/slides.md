@@ -90,13 +90,13 @@ clicks: 7
 transition: fade-out
 ---
 
-# Summary of Contributions
+# Our Contributions
 
 <v-clicks depth="2">
 
-- Focus on **PIDC**
+- Focus on **PIDC** (_Chan et. al. (2017)_)
   - Partial-information decomposition (PID) based network construction method.
-  - Shown to be effective for single-cell datasets.
+  - Shown to produce accurate networks in benchmarks on real and simulated single-cell datasets.
   - Takes $O(n)$ time for each pair, and hence $O(n^3)$ time for $\binom{n}{2}$ pairs.
 
 - Our Contributions
@@ -150,7 +150,8 @@ clicks: 5
 <Redundancy auto-start class="absolute inset-0" />
 
 <!--
-Make sure to emphasize the decomposisiton
+1. Redundancy in terms of the average of the min.
+2. Make sure to emphasize the decomposition
 -->
 
 ---
@@ -203,21 +204,22 @@ transition: fade-out
 |     | Given: $P(X), \forall X \in \mathcal{X}$; $P(X, Y),\forall (X, Y)$                         |                   |
 | --- | ------------------------------------------------------------------------------------------ | ----------------- |
 | 1   | Compute Mutual Information, $I(X,Y)$ and tables $\mu(y; X), \forall (y, X)$                | $O(n^2)$          |
-| 2   | Compute $\mathbf{S}_y$, sorted $\mu(y; X)$ tables $\forall y \in Y, Y \in \mathcal{X}$     | $O(n^2 \log n)$   |
+| 2   | Compute $\mathbf{S}_y$, sorted $\mu(y; X)$ tables $\forall (y, X)$                         | $O(n^2 \log n)$   |
 |     | Compute $\mathbf{P}_y$, prefix sum table for all $\mathbf{S}_y$ tables                     | $O(n^2)$          |
-| 3   | $\forall (X,Y)$, Compute (a) $\sum_Z\nu((X,Z); Y)$, (b)$\sum_Z\nu((Y,Z); X)$               | $O(n^2)$          |
+| 3   | $\forall (X,Y)$, Compute (a) $\sum_Z\rho((X,Z); Y)$, (b)$\sum_Z\rho((Y,Z); X)$             | $O(n^2)$          |
 | 4   | $\forall (X,Y)$, Compute PUC                                                               | $O(n^2)$          |
 
 ---
 transition: fade-out
 layout: none
-clicks: 7
+clicks: 6
 ---
 
 <ParInsightParAlgoInsight auto-start class="absolute inset-0" />
 
 <!--
 Update Header;
+p processes
 -->
 
 ---
@@ -226,13 +228,14 @@ transition: fade-out
 
 # Parallel Algorithm
 
-|     | Given $\mathbf{S}, \mathbf{P}, \mathbf{Q}, \mathbf{R}$, flat arrays of size $n \sum_{Y \in \mathcal{X}}  \|Y\|$,  distributed across $p$ processes    |                     |
+|     | Given $\mathbf{S}, \mathbf{P}, \mathbf{Q}, \mathbf{R}$, flat arrays of size $n \sum_{Y \in \mathcal{X}}  \|Y\|$,  distributed across $p$ processes    |                                       |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| 1   | Let $j \gets$ processor's rank                                                                                                                        |                                       |
-| 2   | Insert $\langle Y, X, y, s_{\mu}, p_{\mu}  \rangle$ for each entry in $\mathbf{S}^{(j)}, \mathbf{P}^{(j)}, \mathbf{Q}^{(j)}, \mathbf{R}^{(j)}$        | $O(n^2/p)$                            |
-| 3   | Insert $\langle Y, X, I(X, Y) \rangle$ to $\mathsf{puc}\textrm{-}\mathsf{tuples}^{(j)}$                                                               | $O(n^2/p)$                            |
-| 4   | Sort in parallel the distributed $\mathsf{puc}\textrm{-}\mathsf{tuples}$                                                                              | $\mathsf{T}_{\mathtt{sort}}(n^2, p))$ |
-| 5   | Compute PUC from sorted $\mathsf{puc}\textrm{-}\mathsf{tuples}$                                                                                       | $O(n^2/p)$                            |
+| a   | Let $j \gets$ processor's rank                                                                                                                        |                                       |
+| b   | Let $\mathsf{puc}\textrm{-}\mathsf{tuples}$ be distributed array of tuple                                                                             |                                       |
+| 1   | Insert $\langle Y, X, y, s_{\mu}, p_{\mu}  \rangle$ for each entry in $\mathbf{S}^{(j)}, \mathbf{P}^{(j)}, \mathbf{Q}^{(j)}, \mathbf{R}^{(j)}$        | $O(n^2/p)$                            |
+| 2   | Insert $\langle Y, X, I(X, Y) \rangle$ to $\mathsf{puc}\textrm{-}\mathsf{tuples}^{(j)}$                                                               | $O(n^2/p)$                            |
+| 3   | Sort in parallel the distributed $\mathsf{puc}\textrm{-}\mathsf{tuples}$                                                                              | $\mathsf{T}_{\mathtt{sort}}(n^2, p))$ |
+| 4   | Compute PUC from sorted $\mathsf{puc}\textrm{-}\mathsf{tuples}$                                                                                       | $O(n^2/p)$                            |
 
 ---
 transition: fade-out
@@ -240,75 +243,25 @@ transition: fade-out
 
 # Implementation : Platform and Data Processing
 
-- PIDC implementation in `julia`
-  - Updated to read input data from `HDF5` input instead of `csv` files
+<v-clicks depth="1">
+
+- Chan et. al. (2017) PIDC implementation in `julia`
+  - Modified I/O:  Read input data from `HDF5` files (`anndata` spec.) instead of `csv`.
 - Our MPI Implementation in `Rust`
-  - `rsmpi` : MPI 3.1 wrapper (Experiments use `OpenMPI`)
-  - `sope` : Convenience library features include generic struct types, sorting etc
-  - `hdf5-rs` : Updated for parallel I/O
-- I/O of HDF5 files with `anndata` specifications
-  - Save $\mathsf{D}^T$ with genes as rows for faster parallel I/O
+  - `rsmpi` : MPI 3.1 wrapper (Experiments use `OpenMPI`).
+  - `sope` : Convenience MPI library features include generic struct types, sorting etc.
+  - `hdf5-rs` : Updated for MPI parallel I/O.
+-  Computing $P(X), P(X, Y)$ : `BayesianBlocks` histogram method w. equal distribution across $p$ processes.
 
-
----
-transition: fade-out
----
-
-# Implementation : Computing $P(X)$ and $P(X,Y)$
-
-- Marginal distributions, $P(X)$
-  - Block distribute $n$ genes across $p$ processes
-  - Compute histogram with BayesianBlocks method for $n/p$ genes
-- Joint Distribution
-  - Copy of $P(X), \forall X$ in every process (Only 26MB for 30K genes).
-  - Each process computes $P(X, Y)$ $\approx \binom{n}{2}$ genes.
-  - Sorted order of $(X, Y)$ enable constant time ownership id.
-
-<!--
-Consider removing this
--->
+</v-clicks>
 
 ---
 transition: fade-out
 layout: none
-clicks: 5
+clicks: 9
 ---
 
 <DataB auto-start class="absolute inset-0" />
-
----
-transition: fade-out
-layout: two-cols-header
----
-
-# Implementation : Handling large datasets
-
-::left::
-![](/img/block-dist.svg){width=300px lazy}
-
-::right::
-
-- Datasets with $m$ exceeding millions of cells.
-- Batch-wise processing of pair blocks with only $O(mn/p)$ data per process.
-- Row/column-wise distribution
-  - Parallel I/O of non-contiguous overlapping rows of $\mathsf{D}^T$.
-- Diagonal distribution
-  - Uniform block-distributed parallel read of the input HDF5
-
----
-transition: fade-out
----
-
-# Implementation : Parallel Algorithm
-
-- Compute MI and $\mu(\cdot, \cdot)$
-  - $I(X, Y )$
-  - $\mu(x; Y) \forall x \in Y$, and $\mu(y; X), \forall y \in Y$.
-  - Distribute $\mu(x; Y)$ values in the order of $Y$ , followed by $y$, and then by X.
-- Compute PUC, $\gamma(X, Y)$
-  - $\mathbf{Q}$ and $\mathbf{R}$ are not explicitly computed
-    - Derived from the ordering of $X$ and $x \in X$
-  - Radix sorting with a single `MPI_all2allv`
 
 ---
 transition: fade-out
@@ -320,8 +273,6 @@ transition: fade-out
 | :------ | :----: | ------: | -----: | ----------------: | ---------------------: |
 | D1      |  PBMC  |  23,766 |  5,000 |              0.44 |                  47.38 |
 | D2      |  Lung  |  91,068 |  5,000 |              1.82 |                 121.10 |
-|         |   "    |         | 10,000 |              3.39 |                 476.46 |
-|         |   "    |         | 15,000 |              5.08 |               1,131.42 |
 | D3      |  PBMC  | 794,170 | 20,000 |             57.63 |               8,828.66 |
 |         |   "    |         | 30,000 |             86.45 |              19,570.00 |
 
@@ -349,38 +300,37 @@ layout: two-cols-header
 transition: fade-out
 ---
 
-# Results : Dataset $D2$ w. 5K genes
+# Results : Dataset $D2$
 
 | ![](/img/strong-scaling-big-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
 | ----------------------------------------------------- | -------------------------------------------------- |
 
-- 484-node cluster where each node has a 24-core Intel® Xeon® 6226 2.7 GHz processor
+- Distributed cluster where each node has a 24-core Intel® Xeon® 6226 2.7 GHz processor
 - Max speedup of speedup of 96 with 512 cores, which then drops to 55 with 1, 024 cores
 
 ---
 transition: fade-out
 ---
-# Results : Big Datasets
+# Results : $D3$ Dataset
 
-| $n$                     |    20K |    20K |    30K |    30K |
-| ----------------------- | -----: | -----: | -----: | -----: |
-| $p$                     | 1, 024 | 2, 048 | 1, 024 | 2, 048 |
-| Distributions, µ (min.) | 116.89 |  71.08 | 243.39 | 149.36 |
-| µ →PUC (min.)           |   0.91 |   1.02 |   1.63 |   1.90 |
-| Total Runtime (min.)    | 117.80 |  72.10 | 245.02 | 151.26 |
-
-- 20K-gene network took 1.9 hours and 1.2 hours, respectively, with 1, 024 cores and 2, 048 cores.
-- 30K-gene network took 4.1 hours and 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- Integrated human gene expression datasets include 20,000 --30,000 genes at the genome-scale.
+- For 20K and 30K genes, the sizes of $P(X,Y)$ are 8.5TB and 19.1TB, respectively.
+- 20K-gene network
+   - $\approx$ 1.9 hours and 1.2 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- 30K-gene network
+   -  $\approx$ 4.1 hours and 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- Time to compute PUC values from µ(·; ·) values is less than 1% of the total runtime.
 - No linear scaling from 1, 024 to 2, 048 cores due to the increase in I/O time.
+  - From 15.99 to 19.48 minutes for 20, 000-genes network, and
+  - From 20.52 to 35.10 minutes for the 30, 000-genes network.
 
 ---
 transition: fade-out
 ---
-# Conclusions
+# Conclusions and Future Work
 
 - Key Contributions
-  - $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
-  - $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm on $p$ processors.
+  - Novel $O(n^2 \log n)$ sequential algorithm and  $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm.
   - To our knowledge, the 30K network is the largest network covering the complete human genome.
 - Future work
   - Improve scalability of computing the distributions by better process assignment.
@@ -392,8 +342,46 @@ transition: fade-out
 transition: fade-out
 layout: intro
 ---
-# Misc. Results
+# Additional Slides
 
+
+---
+transition: fade-out
+---
+
+# Implementation : Computing $P(X)$ and $P(X,Y)$
+
+- Marginal distributions, $P(X)$
+  - Block distribute $n$ genes across $p$ processes
+  - Compute histogram with BayesianBlocks method for $n/p$ genes
+- Joint Distribution
+  - Copy of $P(X), \forall X$ in every process (Only 26MB for 30K genes).
+  - Each process computes $P(X, Y)$ $\approx \binom{n}{2}$ genes.
+  - Sorted order of $(X, Y)$ enable constant time ownership id.
+
+<!--
+Consider removing this
+-->
+
+
+---
+transition: fade-out
+layout: two-cols-header
+---
+
+# Implementation : Handling large datasets
+
+::left::
+![](/img/block-dist.svg){width=300px lazy}
+
+::right::
+
+- Datasets with $m$ exceeding millions of cells.
+- Batch-wise processing of pair blocks with only $O(mn/p)$ data per process.
+- Row/column-wise distribution
+  - Parallel I/O of non-contiguous overlapping rows of $\mathsf{D}^T$.
+- Diagonal distribution
+  - Uniform block-distributed parallel read of the input HDF5
 
 ---
 transition: fade-out
@@ -412,3 +400,20 @@ layout: two-cols-header
 ::right::
 
 ![](/img/runtime-growth-n-ai.svg){width=500px lazy}
+
+
+---
+transition: fade-out
+---
+# Results : Big Datasets
+
+| $n$                     |    20K |    20K |    30K |    30K |
+| ----------------------- | -----: | -----: | -----: | -----: |
+| $p$                     | 1, 024 | 2, 048 | 1, 024 | 2, 048 |
+| Distributions, µ (min.) | 116.89 |  71.08 | 243.39 | 149.36 |
+| µ →PUC (min.)           |   0.91 |   1.02 |   1.63 |   1.90 |
+| Total Runtime (min.)    | 117.80 |  72.10 | 245.02 | 151.26 |
+
+- 20K-gene network took 1.9 hours and 1.2 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- 30K-gene network took 4.1 hours and 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
+- No linear scaling from 1, 024 to 2, 048 cores due to the increase in I/O time.
