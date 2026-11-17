@@ -103,20 +103,20 @@ def _bullet_points(cfg: Config) -> list[mn.VGroup]:
         _bullet_row(
             cfg,
             [
-                ("Work distribution with ", "text"),
+                ("Work divided into blocks of size ", "text"),
                 (r"\frac{n}{p} \times \frac{n}{p}", "math"),
-                (" sized blocks", "text"),
+                (".", "text"),
             ],
         ),
         _bullet_row(
             cfg,
             [
-                ("Reading rows limits to ", "text"),
-                (r"O\left(\frac{m}{p}\right)", "math"),
-                (" data", "text"),
+                ("Limits to ", "text"),
+                (r"\frac{2mn}{p}", "math"),
+                (" data read per block.", "text"),
             ],
         ),
-        _bullet_row(cfg, [("Off-diagonal batch distribution scheme", "text")]),
+        _bullet_row(cfg, [("Off-diagonal scheme for batch processing.", "text")]),
     ]
 
 
@@ -284,7 +284,7 @@ class DataB(mn.Scene):
             mn.Create(sub_rect_list[1]),
             mn.Create(sub_rect_list[4]),
         )
-        self.play(mn.FadeIn(bullets[2]), mn.FadeIn(bullets[3]))
+        self.play(mn.FadeIn(bullets[2]))
         self.wait()
         self.next_section()
 
@@ -335,6 +335,7 @@ class DataB(mn.Scene):
                 lag_ratio=0.08,
             ),
         )
+        self.play(mn.FadeIn(bullets[3]))
         self.wait()
         self.next_section()
 
