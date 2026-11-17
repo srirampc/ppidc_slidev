@@ -101,7 +101,12 @@ def _prefix_cells(vmv_dict: dict[str, float], labels: list[str]) -> list[str]:
 
 def _equation(cfg: Config, tex: str, isolate: list[str]) -> mn.MathTex:
     """One line of the derivation, with `isolate` exposed as named parts."""
-    return mn.MathTex(tex, fill_color=cfg.txt_color, substrings_to_isolate=isolate)
+    return mn.MathTex(
+        tex,
+        color=cfg.txt_color,
+        fill_color=cfg.txt_color,
+        substrings_to_isolate=isolate,
+    )
 
 
 def _residue(line: mn.MathTex, *handled: mn.Mobject) -> mn.VGroup:
@@ -265,10 +270,11 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
     # the widest row's — the product alone, not the whole sum — which is what
     # lets it set at a readable size.
     row_sum = mn.VGroup(
-        mn.MathTex(p_cells[boxed], fill_color=cfg.txt_color),
-        mn.MathTex(r"+", fill_color=cfg.txt_color),
+        mn.MathTex(p_cells[boxed], color=cfg.txt_color, fill_color=cfg.txt_color),
+        mn.MathTex(r"+", color=cfg.txt_color, fill_color=cfg.txt_color),
         mn.MathTex(
             rf"{s_cells[boxed]} \times (n - {2 + boxed})",
+            color=cfg.txt_color,
             fill_color=cfg.txt_color,
         ),
     ).arrange(mn.DOWN, buff=0.12)
@@ -306,7 +312,7 @@ class AlgoInsight(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Algorithm Insight", cfg, weight=mn.BOLD)
+        header_txt = scene_header("Algorithm: Key Insight", cfg, weight=mn.BOLD)
 
         # All four equations share a font size, fitted to the column left of
         # the tables, and a common left edge, so that each derivation reads as
@@ -346,13 +352,13 @@ class AlgoInsight(mn.Scene):
         _ = mz_table.table.next_to(mx_table.table, mn.RIGHT, buff=0.3)
 
         mx_dots_mid = (
-            mn.MathTex(r"\cdots", fill_color=cfg.txt_color)
+            mn.MathTex(r"\cdots", color=cfg.txt_color, fill_color=cfg.txt_color)
             .next_to(mz_table.table, mn.RIGHT, buff=0.3)
             .scale(0.8)
         )
 
         mx_dots_end = (
-            mn.MathTex(r"\cdots", fill_color=cfg.txt_color)
+            mn.MathTex(r"\cdots", color=cfg.txt_color, fill_color=cfg.txt_color)
             .next_to(mx_dots_mid, mn.RIGHT, buff=0.3)
             .scale(0.8)
         )
@@ -362,7 +368,7 @@ class AlgoInsight(mn.Scene):
             direction=mn.UP,
         )
         br_size = (
-            mn.MathTex(r"n-2", fill_color=cfg.txt_color)
+            mn.MathTex(r"n-2", color=cfg.txt_color, fill_color=cfg.txt_color)
             .next_to(top_brace, mn.UP, buff=0.1)
             .scale(0.8)
         )
@@ -377,7 +383,11 @@ class AlgoInsight(mn.Scene):
             buff=0.1,
         )
         seq_complexity = (
-            mn.MathTex(r"O(n) \textsf{ time per pair}")
+            mn.MathTex(
+                r"O(n) \textsf{ time per pair}",
+                color=cfg.txt_color,
+                fill_color=cfg.txt_color,
+            )
             .next_to(eq_a, 0.5 * mn.DOWN, buff=0.3)
             .scale(0.8)
         )
@@ -388,12 +398,20 @@ class AlgoInsight(mn.Scene):
             buff=0.1,
         )
         novel_complexity = (
-            mn.MathTex(r"O(1) \textsf{ time per pair}")
+            mn.MathTex(
+                r"O(1) \textsf{ time per pair}",
+                color=cfg.txt_color,
+                fill_color=cfg.txt_color,
+            )
             .next_to(eq_c, 0.5 * mn.DOWN, buff=0.3)
             .scale(0.8)
         )
         novel_condition = (
-            mn.MathTex(r"\textsf{given }  O(n^2 \log n ) \textsf{ prep. time}")
+            mn.MathTex(
+                r"\textsf{given }  O(n^2 \log n ) \textsf{ prep. time}",
+                color=cfg.txt_color,
+                fill_color=cfg.txt_color,
+            )
             .next_to(novel_complexity, 0.5 * mn.DOWN, buff=0.3)
             .scale(0.8)
         )
@@ -404,6 +422,7 @@ class AlgoInsight(mn.Scene):
             color=mn.RED,
             stroke_width=4,
         )
+        _ = header_txt.align_to(eq_r, mn.LEFT)
 
         self.play(mn.Create(header_txt))
         self.play(mn.Write(eq_r))

@@ -113,20 +113,37 @@ transition: fade-out
 
 # Background : Random variables and MI
 
+<v-click>
+
+- $\mathcal{X}, |\mathcal{X}|=n$: Set of discrete random variables, each representing a gene.
+- Uppercase $X, Y, Z, \ldots$ for random variables.
+- Lowercase $x \in X$ denote the distinct values r. v. $X$ can take.
+- $P(X,Y)$: Joint distribution of gene expression of two genes $X$ and $Y$.
+</v-click>
+
 <v-clicks depth="1">
 
-- Notations: Random Variables and Distributions
-  - $\mathcal{X}, |\mathcal{X}|=n$: Set of discrete random variables, each representing a gene.
-  - Uppercase $X, Y, Z, \ldots$ for random variables.
-  - Lowercase $x \in X$ denote the distinct values r. v. $X$ can take.
-  - $P(X,Y)$: Joint distribution of gene expression of two genes $X$ and $Y$.
 - Mutual Information
   $$I(X,Y) = \sum_{x \in X} \sum_{y \in Y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)$$
-- **Assumption: Number of values any random variable can take is constant**
 </v-clicks>
 
+<v-click>
+
+::admonition{kind="warning" title="Key Assumption" icon="mdi:info"}
+**Number of values a random variable can take is constant**
+::
+
+</v-click>
+
+
 <!--
-Describe MI
+1. Discrete random variables representing genes
+2. Joint distribution
+2. Describe MI : 
+   - dependence
+   - reduces uncertainty
+   - usually in terms of conditional entropy 
+   - joint distributions
 -->
 
 ---
@@ -138,7 +155,13 @@ clicks: 5
 <SpecificSpecificInfo auto-start class="absolute inset-0" />
 
 <!--
-Fix mutual information
+1. Specific Information: state-dependent information 
+2. "how did the uncertainty about X change upon learning Y=y?"
+
+Source: https://www.eneuro.org/content/5/3/ENEURO.0052-18.2018.long
+
+A Tutorial for Information Theory in Neuroscience
+by Nicholas M. Timme and Christopher Lapish
 -->
 
 ---
@@ -150,8 +173,13 @@ clicks: 5
 <Redundancy auto-start class="absolute inset-0" />
 
 <!--
-1. Redundancy in terms of the average of the min.
-2. Make sure to emphasize the decomposition
+1. "what portion of Y is provided redundantly by both X and Z (what information overlap about Y exists between X and Z), "
+2. "uniquely by X or Z alone (what information does X provide about Y that Z does not and vice versa)"
+3. Redundancy in terms of the average of the min.
+4. Make sure to emphasize the decomposition
+
+
+If all of the information in I((X,Z), Y) is provided redundantly, then we know X and Z are doing the same thing, at least in an information theoretic sense. If all of the information in I((X,Z), Y) is provided uniquely by X, then we know Z is not providing information about Y
 -->
 
 ---
@@ -162,13 +190,21 @@ clicks: 5
 
 <XyzpucPUC auto-start class="absolute inset-0" />
 
+<!--
+1.a "what portion of Y is provided redundantly by both X and Z (what information overlap about Y exists between X and Z), "
+1.b "what portion of X is provided redundantly by both Y and Z (what information overlap about X exists between Y and Z), "
+
+2a. "uniquely by X or Z alone (what information does X provide about Y that Z does not and vice versa)"
+2a. "uniquely by Y or Z alone (what information does Y provide about Z that Z does not and vice versa)"
+-->
+
 ---
 transition: fade-out
 ---
 
-# PUC : Algebraic Simplification and Bottleneck
+# Bottleneck in PUC Computation
 
-<v-clicks depth="1">
+<v-click>
 
 PUC, $\gamma(X, Y)$, can be simplified as below:
   $$
@@ -178,10 +214,20 @@ PUC, $\gamma(X, Y)$, can be simplified as below:
    &= \frac{1}{I(X, Y)} \left( 2(n-2) I(X, Y) - \sum_{Z \not\in \{X, Y\}} \rho((X, Z); Y) - \sum_{Z\not\in \{X, Y\}} \rho((Y, Z); X) \right)
   \end{aligned}
   $$
+  
+</v-click>
 
- Bottleneck: <span v-mark.yellow>$\sum_{Z} \rho((X, Z); Y)$</span> and $\sum_{Z} \rho((Y, Z); X)$
+<v-click>
 
-</v-clicks>
+::admonition{kind="danger" title="Computation Bottleneck" icon="mdi:info"}
+$$
+\sum_{Z \not \in \{X, Y\}} \rho((X, Z); Y)   \textrm{ \& }
+\sum_{Z \not \in \{X, Y\}} \rho((Y, Z); X)
+$$
+::
+
+</v-click>
+
 
 ---
 transition: fade-out
@@ -192,14 +238,17 @@ clicks: 13
 <InsightAlgoInsight auto-start class="absolute inset-0" />
 
 <!--
-Remove the \mathcal{T} from the slide
+1. Substitute
+2. inner sum over values Y can take, outer sum over of possible values for Z
+3. Visualize as n-2 table comparisons
+4. Each table
 -->
 
 ---
 transition: fade-out
 ---
 
-# Sequential Algorithm Summary
+# Sequential Algorithm
 
 |     | Given: $P(X), \forall X \in \mathcal{X}$; $P(X, Y),\forall (X, Y)$                         |                   |
 | --- | ------------------------------------------------------------------------------------------ | ----------------- |
@@ -208,6 +257,16 @@ transition: fade-out
 |     | Compute $\mathbf{P}_y$, prefix sum table for all $\mathbf{S}_y$ tables                     | $O(n^2)$          |
 | 3   | $\forall (X,Y)$, Compute (a) $\sum_Z\rho((X,Z); Y)$, (b)$\sum_Z\rho((Y,Z); X)$             | $O(n^2)$          |
 | 4   | $\forall (X,Y)$, Compute PUC                                                               | $O(n^2)$          |
+
+
+<v-click>
+
+::admonition{kind="warning" title="PUC Network Construction" icon="mdi:info"}
+PUC Network of $n$ genes can be constructed in $O(n^2 \log n)$ time.
+::
+
+</v-click>
+
 
 ---
 transition: fade-out
@@ -230,12 +289,21 @@ transition: fade-out
 
 |     | Given $\mathbf{S}, \mathbf{P}, \mathbf{Q}, \mathbf{R}$, flat arrays of size $n \sum_{Y \in \mathcal{X}}  \|Y\|$,  distributed across $p$ processes    |                                       |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| a   | Let $j \gets$ processor's rank                                                                                                                        |                                       |
-| b   | Let $\mathsf{puc}\textrm{-}\mathsf{tuples}$ be distributed array of tuple                                                                             |                                       |
-| 1   | Insert $\langle Y, X, y, s_{\mu}, p_{\mu}  \rangle$ for each entry in $\mathbf{S}^{(j)}, \mathbf{P}^{(j)}, \mathbf{Q}^{(j)}, \mathbf{R}^{(j)}$        | $O(n^2/p)$                            |
+|     | Let $j \gets$ processor's rank                                                                                                                        |                                       |
+| 1   | Insert $\langle Y, X, y, s_{\mu}, p_{\mu}  \rangle$ to $\mathsf{puc}\textrm{-}\mathsf{tuples}^{(j)}$ for each entry in $\mathbf{S}^{(j)}, \mathbf{P}^{(j)}, \mathbf{Q}^{(j)}, \mathbf{R}^{(j)}$        | $O(n^2/p)$                            |
 | 2   | Insert $\langle Y, X, I(X, Y) \rangle$ to $\mathsf{puc}\textrm{-}\mathsf{tuples}^{(j)}$                                                               | $O(n^2/p)$                            |
 | 3   | Sort in parallel the distributed $\mathsf{puc}\textrm{-}\mathsf{tuples}$                                                                              | $\mathsf{T}_{\mathtt{sort}}(n^2, p))$ |
-| 4   | Compute PUC from sorted $\mathsf{puc}\textrm{-}\mathsf{tuples}$                                                                                       | $O(n^2/p)$                            |
+| 4   | Compute PUC from sorted $\mathsf{puc}\textrm{-}\mathsf{tuples}^{(j)}$                                                                                       | $O(n^2/p)$                            |
+
+
+<v-click>
+
+::admonition{kind="warning" title="PUC Network Construction" icon="mdi:info"}
+PUC Network of $n$ genes can be constructed with $p$ processes in $O(n^2/p) + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ time.
+::
+
+</v-click>
+
 
 ---
 transition: fade-out
@@ -262,6 +330,14 @@ clicks: 9
 ---
 
 <DataB auto-start class="absolute inset-0" />
+
+<!--
+1. Each pair two rows
+2. Represent the computation as upper triangular matrix
+3. Reduce memory foot print via block wise work decomposition and processing in batches
+4. Blocks and corresponding rows
+5.
+-->
 
 ---
 transition: fade-out

@@ -220,7 +220,7 @@ class ParAlgoInsight(mn.Scene):
             len(y_cells1 + y_cells2),
             1,
             None,
-            [r"\rho \mathsf{-tuples}"],
+            [r"\mathsf{puc}\textrm{-}\mathsf{tuples}"],
             body=[
                 [rf"\langle Y, {c}, {yl}, ({idx}, {s}, {p}) \rangle"]
                 if s
@@ -237,7 +237,7 @@ class ParAlgoInsight(mn.Scene):
             len(y_cells1 + y_cells2),
             1,
             None,
-            [r"\textrm{sorted } \rho \mathsf{-tuples}"],
+            [r"\textrm{sorted } \mathsf{puc}\textrm{-}\mathsf{tuples}"],
             body=[
                 [rf"\langle Y, {c}, {yl.replace('y=', '')}, ({idx}, {s}, {p}) \rangle"]  # pyright: ignore[reportUnknownMemberType, reportAttributeAccessIssue]
                 if s
@@ -278,14 +278,14 @@ class ParAlgoInsight(mn.Scene):
                 stroke_width=4,
             )
             label = (
-                mn.MathTex(rf"{name}", fill_color=mn.RED)
+                mn.MathTex(rf"{name}", color=mn.RED, fill_color=mn.RED)
                 .scale(0.65)
                 .move_to([label_x, y + 0.2, 0])  # pyright: ignore[reportArgumentType]
             )
             cut_lines.append(line)
             cut_labels.append(label)
         cut_dots = (
-            mn.MathTex(r"\vdots", fill_color=mn.RED)
+            mn.MathTex(r"\vdots", color=mn.RED, fill_color=mn.RED)
             .scale(0.65)
             .move_to([label_x, (cut_specs[1][1] + cut_specs[2][1]) / 2, 0])  # pyright: ignore[reportArgumentType]
         )
@@ -300,12 +300,13 @@ class ParAlgoInsight(mn.Scene):
                 buff=0.08,
             )
             label = (
-                mn.MathTex(rf"\gamma(Y, {name})", fill_color=mn.BLUE)
+                mn.MathTex(rf"\gamma(Y, {name})", color=mn.BLUE, fill_color=mn.BLUE)
                 .scale(0.65)
                 .next_to(box, mn.RIGHT, buff=0.2)
             )
             gamma_boxes.append(box)
             gamma_labels.append(label)
+        _ = header_txt.align_to(vms_full_table.table, mn.LEFT)
 
         self.play(mn.Create(header_txt))
         self.play(

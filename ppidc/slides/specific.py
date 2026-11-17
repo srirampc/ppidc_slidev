@@ -32,7 +32,9 @@ class SpecificInfo(mn.Scene):
     @t.override
     def construct(self) -> None:
         cfg = default_config()
-        header_txt = scene_header("Specific Information", cfg, weight=mn.BOLD)
+        header_txt = scene_header(
+            "Background: Specific Information", cfg, weight=mn.BOLD
+        )
 
         pxy_table = PxTable(
             cfg,
@@ -85,23 +87,24 @@ class SpecificInfo(mn.Scene):
         _ = py_marginal.next_to(table, mn.DOWN, buff=0.3)
 
         pxy_title = (
-            mn.MathTex(r"P(X,Y)", fill_color=cfg.txt_color)
+            mn.MathTex(r"P(X,Y)", color=cfg.txt_color, fill_color=cfg.txt_color)
             .next_to(table, mn.UP, buff=0.2)
             .scale(0.8)
         )
         px_title = (
-            mn.MathTex(r"P(X)", fill_color=cfg.txt_color)
+            mn.MathTex(r"P(X)", color=cfg.txt_color, fill_color=cfg.txt_color)
             .next_to(px_marginal, mn.UP, buff=0.2)
             .scale(0.8)
         )
         py_title = (
-            mn.MathTex(r"P(Y)", fill_color=cfg.txt_color)
+            mn.MathTex(r"P(Y)", color=cfg.txt_color, fill_color=cfg.txt_color)
             .next_to(py_marginal, mn.LEFT, buff=0.2)
             .scale(0.8)
         )
 
         expr = mn.MathTex(
             _EXPR_TEX,
+            color=cfg.txt_color,
             fill_color=cfg.txt_color,
             substrings_to_isolate=[r"p(x,y)", r"p(x)", r"p(y)"],
         )
@@ -113,6 +116,8 @@ class SpecificInfo(mn.Scene):
         _ = mn.VGroup(
             table, px_marginal, py_marginal, pxy_title, px_title, py_title, expr
         ).move_to(mn.ORIGIN)
+
+        _ = header_txt.align_to(px_marginal, mn.LEFT)
 
         self.play(mn.Create(header_txt))
         self.play(mn.Create(table), mn.Write(pxy_title))
@@ -154,8 +159,8 @@ class SpecificInfo(mn.Scene):
         x_term = parts_by_tex(expr, r"p(x)")[0]
         y_terms = parts_by_tex(expr, r"p(y)")
         self.play(mn.Create(joint_box), mn.Create(px_box), mn.Create(py_box))
-        #self.wait()
-        #self.next_section()
+        # self.wait()
+        # self.next_section()
         # each box's copy flies to its term in the expression, coloring it
         # on arrival; both occurrences of p(x,y) and of p(y) are tagged
         term_boxes = [
@@ -175,7 +180,9 @@ class SpecificInfo(mn.Scene):
                 for part in xy_terms + [x_term] + y_terms
             ),
         )
-        sum_all = mn.MathTex(r"\sum_{x \in X}", _EXPR_TEX, fill_color=cfg.txt_color)
+        sum_all = mn.MathTex(
+            r"\sum_{x \in X}", _EXPR_TEX, color=cfg.txt_color, fill_color=cfg.txt_color
+        )
         # scale + place so the expression body overlays the existing one
         # exactly; only the summation symbol is new (shifting the whole
         # mobject, since moving submobject [1] alone would leave [0] behind)
@@ -225,12 +232,16 @@ class SpecificInfo(mn.Scene):
         self.wait()
         self.next_section()
         # name the boxed quantity, centered below the box
-        is_label = mn.MathTex(r"I_s(y; X)", fill_color=cfg.txt_color).scale(0.9)
+        is_label = mn.MathTex(
+            r"I_s(y; X)", color=cfg.txt_color, fill_color=cfg.txt_color
+        ).scale(0.9)
         _ = is_label.next_to(final_box, mn.UP, buff=0.2)
         self.play(mn.Write(is_label))
         self.wait()
         self.next_section()
-        ir_tex = mn.MathTex(_IXY_TEX, fill_color=cfg.txt_color).scale(0.8)
+        ir_tex = mn.MathTex(
+            _IXY_TEX, color=cfg.txt_color, fill_color=cfg.txt_color
+        ).scale(0.8)
         _ = ir_tex.next_to(whole_sum, mn.DOWN, buff=1.4).align_to(whole_sum, mn.LEFT)
         ir_box = mn.SurroundingRectangle(
             ir_tex,
@@ -238,7 +249,9 @@ class SpecificInfo(mn.Scene):
             stroke_width=4,
             buff=0.12,
         )
-        ir_label = mn.MathTex(r"I(Y,X)", fill_color=cfg.txt_color).scale(0.9)
+        ir_label = mn.MathTex(
+            r"I(Y,X)", color=cfg.txt_color, fill_color=cfg.txt_color
+        ).scale(0.9)
         _ = ir_label.next_to(ir_box, mn.DOWN, buff=0.2)
         self.play(
             mn.Write(ir_tex),

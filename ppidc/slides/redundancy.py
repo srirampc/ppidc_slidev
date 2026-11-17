@@ -28,7 +28,7 @@ class Redundancy(mn.Scene):
         rho_color = mn.PURPLE
         nu_color = mn.MAROON
         header_txt = scene_header(
-            "Redundancy and Unique Contribution", cfg, weight=mn.BOLD
+            "Background: Redundancy and Unique Contribution", cfg, weight=mn.BOLD
         )
         py_values = [0.3, 0.4, 0.3]
         x_values = [1.12, 2.22, 0.85]
@@ -114,7 +114,7 @@ class Redundancy(mn.Scene):
         ]
 
         # Redundancy Expression box an surrounding rectangle
-        rexp_txt = mn.MathTex(_TEX_REXP, fill_color=cfg.txt_color).scale_to_fit_width(
+        rexp_txt = mn.MathTex(_TEX_REXP, color=cfg.txt_color, fill_color=cfg.txt_color).scale_to_fit_width(
             minxz_table.table.width
         )
         _ = rexp_txt.next_to(minxz_table.table, mn.DOWN, buff=0.3)
@@ -123,13 +123,13 @@ class Redundancy(mn.Scene):
         )
 
         # Rho text is not made visible, but used to measure
-        rho_txt = mn.MathTex(_TEX_RHO, fill_color=cfg.txt_color).scale_to_fit_width(
+        rho_txt = mn.MathTex(_TEX_RHO, color=cfg.txt_color, fill_color=cfg.txt_color).scale_to_fit_width(
             _RHO_WIDTH
         )
         _ = rho_txt.next_to(rexp_txt, mn.LEFT, buff=0.5)
         # Rho eq text is the one made visible, but used to measure
         rho_eq_txt = mn.MathTex(
-            _TEX_RHO_EQ,
+            _TEX_RHO_EQ, color=cfg.txt_color,
             fill_color=cfg.txt_color,
             substrings_to_isolate=[_TEX_RHO, _TEX_REXP],
         )
@@ -138,7 +138,6 @@ class Redundancy(mn.Scene):
         rho_eq_lhs, rho_eq_rhs = (
             parts_by_tex(rho_eq_txt, tex)[0] for tex in (_TEX_RHO, _TEX_REXP)
         )
-
 
         # One box around the values with values themselves visible for the summation.
         min_group_box = mn.SurroundingRectangle(
@@ -149,6 +148,7 @@ class Redundancy(mn.Scene):
         )
         min_avg = mn.MathTex(
             f"{sum(py * mx for py, mx in zip(py_values, min_values)):.2f}",
+            color=cfg.txt_color,
             fill_color=cfg.txt_color,
         )
         _ = min_avg.scale(0.8).next_to(min_group_box, mn.RIGHT, buff=0.2)
@@ -159,17 +159,18 @@ class Redundancy(mn.Scene):
         )
 
         # Partial Information Decomposition
-        pid_txt = mn.MathTex(_TEX_PID, fill_color=cfg.txt_color)
+        pid_txt = mn.MathTex(_TEX_PID, color=cfg.txt_color, fill_color=cfg.txt_color)
         _ = pid_txt.move_to(3 * mn.DOWN)
         pid_box = mn.SurroundingRectangle(
             pid_txt, color=nu_color, stroke_width=4, buff=0.12
         )
+        _ = header_txt.align_to(mx_table.table, mn.LEFT)
 
         self.play(mn.Create(header_txt))
         self.play(
             mn.Create(mx_table.table),
             mn.Create(mz_table.table),
-            mn.Create(minxz_table.table)
+            mn.Create(minxz_table.table),
         )
         self.wait()
         self.next_section()
@@ -203,7 +204,7 @@ class Redundancy(mn.Scene):
             mn.Create(min_group_box),
             mn.Create(py_group_box),
             mn.Create(rexp_box),
-            mn.Write(min_avg)
+            mn.Write(min_avg),
         )
         self.wait()
         self.next_section()
@@ -213,9 +214,9 @@ class Redundancy(mn.Scene):
             mn.Create(rho_eq_rhs),
             mn.Create(rho_eq_lhs),
             mn.Write(
-                mn.Text("Redundancy", font="Concourse T3", font_size=24).next_to(
-                    rho_eq_box, mn.DOWN, buff=0.1
-                )
+                mn.Text(
+                    "Redundancy", font="Concourse T3", font_size=24, color=cfg.txt_color
+                ).next_to(rho_eq_box, mn.DOWN, buff=0.1)
             ),
         )
         self.wait()
@@ -225,8 +226,23 @@ class Redundancy(mn.Scene):
             mn.Create(pid_box),
             mn.Write(
                 mn.Text(
-                    "Unique Contribution", font="Concourse T3", font_size=24
+                    "Unique Contribution",
+                    font="Concourse T3",
+                    font_size=24,
+                    color=cfg.txt_color,
                 ).next_to(pid_box, mn.LEFT, buff=0.1)
+            ),
+        )
+        self.wait()
+        self.next_section()
+        self.play(
+            mn.Write(
+                mn.Text(
+                    "Principle of Partial Information Decomposition",
+                    font="Concourse T3",
+                    font_size=24,
+                    color=cfg.txt_color,
+                ).next_to(pid_box, mn.DOWN, buff=0.1)
             ),
         )
         self.wait()

@@ -39,7 +39,7 @@ class Tangents:
         self.dot_bottom = mn.Dot(pt_bottom, color=nu_color, radius=0.04)
         mid_bottom = (src_pt + pt_bottom) / 2
         self.nu_label = mn.MathTex(
-            rf"\nu(({label}, Z) ; \cdot)", fill_color=nu_color
+            rf"\nu(({label}, Z) ; \cdot)", color=nu_color, fill_color=nu_color
         ).next_to(
             mid_bottom,
             2.5 * mn.DOWN,
@@ -50,7 +50,7 @@ class Tangents:
         self.dot_top = mn.Dot(pt_top, color=rho_color, radius=0.04)
         mid_top = (src_pt + pt_top) / 2
         self.rho_label = mn.MathTex(
-            rf"\rho(({label}; Z); \cdot)", fill_color=rho_color
+            rf"\rho(({label}; Z); \cdot)", color=rho_color, fill_color=rho_color
         ).next_to(mid_top, 3.2 * mn.UP, buff=0.35)
         # Line aimed at the circle center, ending at the circle's edge
         to_center: mnt.Vector3D = target_pt - src_pt
@@ -72,7 +72,7 @@ class PUC(mn.Scene):
         nu_color = mn.MAROON
         cfg = default_config()
         header_txt = scene_header(
-            "Partial Unique Contribution (PUC)", cfg, weight=mn.BOLD
+            "Background: Partial Unique Contribution (PUC)", cfg, weight=mn.BOLD
         )
         x_pt = 6.25 * mn.LEFT + 1.5 * mn.DOWN
         y_pt = 2.75 * mn.RIGHT + 1.5 * mn.DOWN
@@ -80,13 +80,13 @@ class PUC(mn.Scene):
         mid_xy = line_xy.get_midpoint()
         x_dot = mn.Dot(x_pt, color=cfg.txt_color)
         y_dot = mn.Dot(y_pt, color=cfg.txt_color)
-        x_label = mn.MathTex("X", fill_color=cfg.txt_color).next_to(
+        x_label = mn.MathTex("X", color=cfg.txt_color, fill_color=cfg.txt_color).next_to(
             line_xy.get_start(), mn.LEFT
         )
-        y_label = mn.MathTex("Y", fill_color=cfg.txt_color).next_to(
+        y_label = mn.MathTex("Y", color=cfg.txt_color, fill_color=cfg.txt_color).next_to(
             line_xy.get_end(), mn.RIGHT
         )
-        xy_label = mn.MathTex("I(X, Y)", fill_color=cfg.txt_color).next_to(
+        xy_label = mn.MathTex("I(X, Y)", color=cfg.txt_color, fill_color=cfg.txt_color).next_to(
             mid_xy, 0.5 * mn.DOWN
         )
         # Halves of the XY line used as transform sources for the tangents
@@ -95,10 +95,11 @@ class PUC(mn.Scene):
 
         z_pt = line_xy.get_midpoint() + 4 * mn.UP
         z_circle = mn.Circle(radius=0.5, color=cfg.txt_color).move_to(z_pt)
-        z_label = mn.MathTex("Z", fill_color=cfg.txt_color).move_to(z_pt)
+        z_label = mn.MathTex("Z", color=cfg.txt_color, fill_color=cfg.txt_color).move_to(z_pt)
         puc_label = (
             mn.MathTex(
                 r"\gamma(X, Y) = \frac{\nu((X, Z); Y)}{I(X,Y)} + \frac{\nu((Y, Z); X)}{I(X,Y)}",
+                color=cfg.txt_color,
                 fill_color=cfg.txt_color,
             )
             .scale(0.8)
@@ -109,6 +110,7 @@ class PUC(mn.Scene):
         puc_full_label = (
             mn.MathTex(
                 r"\gamma(X, Y) = \sum_{Z \not \in \{X,Y\}} \frac{\nu((X, Z); Y)}{I(X,Y)} + \frac{\nu((Y, Z); X)}{I(X,Y)}",
+                color=cfg.txt_color,
                 fill_color=cfg.txt_color,
             )
             .scale(0.8)
@@ -137,6 +139,7 @@ class PUC(mn.Scene):
             rho_color=rho_color,
             nu_color=nu_color,
         )
+        _ = header_txt.align_to(x_dot, mn.LEFT)
 
         self.play(mn.Create(header_txt))
         self.play(

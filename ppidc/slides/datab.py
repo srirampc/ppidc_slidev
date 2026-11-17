@@ -68,17 +68,21 @@ def _bullet_row(
     cfg: Config, parts: list[_BulletPart], font_size: float = 24
 ) -> mn.VGroup:
     runs = [
-        mn.MathTex(text, font_size=font_size, fill_color=cfg.txt_color)
-        if kind == "math"
-        else mn.Text(text, font="Concourse T3", font_size=font_size).set_color(
-            cfg.txt_color
+        mn.MathTex(
+            text, font_size=font_size, color=cfg.txt_color, fill_color=cfg.txt_color
         )
+        if kind == "math"
+        else mn.Text(text, font="Concourse T3", font_size=font_size)
+        .set_color(cfg.txt_color)
+        .set_fill(cfg.txt_color)
         for text, kind in parts
     ]
     body = mn.VGroup(*runs).arrange(mn.RIGHT, buff=0.12)
 
-    dot = mn.Text("•", font="Concourse T3", font_size=font_size).set_color(
-        cfg.txt_color
+    dot = (
+        mn.Text("•", font="Concourse T3", font_size=font_size)
+        .set_color(cfg.txt_color)
+        .set_fill(cfg.txt_color)
     )
     dot.next_to(body, mn.LEFT, buff=0.16)  # pyright: ignore[reportUnusedCallResult]
     return mn.VGroup(dot, body)
@@ -104,11 +108,14 @@ def _bullet_points(cfg: Config) -> list[mn.VGroup]:
                 (" sized blocks", "text"),
             ],
         ),
-        _bullet_row(cfg, [
-            ("Reading rows limits to ", "text"),
-            (r"O\left(\frac{m}{p}\right)", "math"),
-            (" data", "text"),
-        ]),
+        _bullet_row(
+            cfg,
+            [
+                ("Reading rows limits to ", "text"),
+                (r"O\left(\frac{m}{p}\right)", "math"),
+                (" data", "text"),
+            ],
+        ),
         _bullet_row(cfg, [("Off-diagonal batch distribution scheme", "text")]),
     ]
 
@@ -169,9 +176,9 @@ class DataB(mn.Scene):
         self, src_rect: mn.Rectangle, h_shift: mnt.Vector3D, txt: str
     ) -> tuple[mn.VGroup, mn.Line]:
         line_v = mn.Line(src_rect.get_left(), src_rect.get_right()).shift(h_shift)
-        txt_v = mn.MathTex(txt, fill_color=default_config().txt_color).move_to(
-            line_v.get_start() + 0.5 * mn.LEFT, mn.LEFT
-        )
+        txt_v = mn.MathTex(
+            txt, color=default_config().txt_color, fill_color=default_config().txt_color
+        ).move_to(line_v.get_start() + 0.5 * mn.LEFT, mn.LEFT)
         group_v = mn.VGroup(line_v, txt_v)
         return group_v, line_v
 
@@ -225,7 +232,9 @@ class DataB(mn.Scene):
         group_x, _line_x = self.vec_with_name(d_rect_t, -0.8 * mn.DOWN, x_name)
         group_y, _line_y = self.vec_with_name(d_rect_t, 0.7 * mn.DOWN, y_name)
 
-        joint_prob = mn.MathTex(r"P(X, Y)", fill_color=cfg.txt_color).shift(_S_POS)
+        joint_prob = mn.MathTex(
+            r"P(X, Y)", color=default_config().txt_color, fill_color=cfg.txt_color
+        ).shift(_S_POS)
         d_square, d_triangle = _comp_matrix()
 
         sub_rect_list = [
@@ -288,14 +297,22 @@ class DataB(mn.Scene):
             _ = cell.set_fill(mn.GRAY_A, opacity=1).set_stroke(mn.GRAY_D, width=1)
         original_d = mn.VGroup(
             d_rect,
-            d_matrix.text_bg_rect,
+            d_matrix.text_bg_rect,  # pyright: ignore[reportArgumentType]
             d_matrix.text,
             *d_matrix.arrows,
         )
-        size_labels = [r"\frac{n}{5}", r"\frac{2n}{5}", r"\frac{3n}{5}", r"\frac{4n}{5}", r"n"]
+        size_labels = [
+            r"\frac{n}{5}",
+            r"\frac{2n}{5}",
+            r"\frac{3n}{5}",
+            r"\frac{4n}{5}",
+            r"n",
+        ]
         column_markers = mn.VGroup()
         for cell, text in zip(batch_cells[0], size_labels, strict=True):
-            label = mn.MathTex(text, font_size=20, fill_color=cfg.txt_color)
+            label = mn.MathTex(
+                text, font_size=20, color=cfg.txt_color, fill_color=cfg.txt_color
+            )
             # Center the label above the cell, then put its left edge on the
             # cell's right edge.
             _ = label.next_to(cell, mn.UP, buff=0.12).shift(
@@ -328,7 +345,9 @@ class DataB(mn.Scene):
             )
         ).arrange(mn.DOWN, aligned_edge=mn.LEFT, buff=0.18)
         _ = batch_legends.next_to(batch_group, mn.LEFT, buff=0.25, aligned_edge=mn.UP)
-        batch_count = mn.MathTex(r"p = 5", font_size=24, fill_color=cfg.txt_color)
+        batch_count = mn.MathTex(
+            r"p = 5", font_size=24, color=cfg.txt_color, fill_color=cfg.txt_color
+        )
         _ = batch_count.next_to(batch_legends, mn.UP, buff=0.2, aligned_edge=mn.LEFT)
 
         # (row, column, number), matching slides/img/block-dist.svg. The first
@@ -347,14 +366,14 @@ class DataB(mn.Scene):
         ):
             targets = [batch_cell(row, col) for row, col, _ in cells]
             numbers = [
-                mn.MathTex(number, font_size=24, fill_color=cfg.txt_color).move_to(
-                    batch_cell(row, col)
-                )
+                mn.MathTex(
+                    number, font_size=24, color=cfg.txt_color, fill_color=cfg.txt_color
+                ).move_to(batch_cell(row, col))
                 for row, col, number in cells
             ]
             animations: list[mn.Animation] = [
                 mn.FadeIn(batch_legends[batch]),
-                *(target.animate.set_fill(color, opacity=1) for target in targets),
+                *(target.animate.set_fill(color, opacity=1) for target in targets),  # pyright: ignore[reportAssignmentType]
                 *(mn.Write(number) for number in numbers),
             ]
             if batch == 0:

@@ -25,6 +25,9 @@ class Config:
         )
 
         self.txt_color: str = theme_colors["Ansi 7 Color"].to_hex()
+        if self.theme == 'light':
+            self.txt_color: str = "#000000"
+            #mn.BLACK = "#000000"
         # m.BLACK = theme_manim_colors['Ansi 0 Color']
         self.bkg_color: mn.ManimColor = theme_colors["Background Color"]
         self.d_color: mn.ManimColor = theme_colors[
@@ -180,6 +183,7 @@ class PxTable:
         col_names: list[str],
         corner_name: str | None = None,
         body: list[list[str]] | None = None,
+        table_color: str | None = None
     ) -> None:
         """A table of `n_rows` x `n_cols` body cells. `body` gives the tex of
         every body cell, row-major; without it each cell holds a `·`
@@ -195,26 +199,33 @@ class PxTable:
         if body is not None:
             assert len(body) == n_rows
             assert all(len(row) == n_cols for row in body)
+        if table_color == None:
+            table_color = cfg.txt_color
         t_entries = [
             [
-                mn.MathTex(r"\cdot", fill_color=cfg.txt_color)
+                mn.MathTex(r"\cdot", color=cfg.txt_color)
                 for _y in range(n_cols + self._body_col_start)
             ]
             for _x in range(n_rows + 1)
         ]
         if corner_name is not None:
-            t_entries[0][0] = mn.MathTex(corner_name, fill_color=cfg.txt_color)
-        t_entries[0][self._body_col_start:] = [
-            mn.MathTex(col_name, fill_color=cfg.txt_color) for col_name in col_names
+            t_entries[0][0] = mn.MathTex(
+                corner_name, color=cfg.txt_color, fill_color=cfg.txt_color
+            )
+        t_entries[0][self._body_col_start :] = [
+            mn.MathTex(col_name, color=cfg.txt_color, fill_color=cfg.txt_color)
+            for col_name in col_names
         ]
         if row_names is not None:
             for rx, r_name in zip(range(n_rows), row_names):
-                t_entries[rx + 1][0] = mn.MathTex(r_name, fill_color=cfg.txt_color)
+                t_entries[rx + 1][0] = mn.MathTex(
+                    r_name, color=cfg.txt_color, fill_color=cfg.txt_color
+                )
         if body is not None:
             for rx, row_tex in enumerate(body):
                 for cx, tex in enumerate(row_tex):
                     t_entries[rx + 1][cx + self._body_col_start] = mn.MathTex(
-                        tex, fill_color=cfg.txt_color
+                        tex, color=cfg.txt_color, fill_color=cfg.txt_color
                     )
 
         mobj_gen: t.Callable[[mn.VMobject], mn.VMobject] = lambda m: m
@@ -226,7 +237,7 @@ class PxTable:
             include_inner_lines=False,
             include_outer_lines=True,
             # element_to_mobject_config={"color": cfg.txt_color},
-        )
+        ).set_stroke(color=table_color)
         self.table = table
 
     def h_line(self, y: float, width: int, cfg: Config) -> mn.Line:
@@ -276,7 +287,7 @@ class PxTable:
         """The header entry above each body column, left to right. The corner
         cell heading the row labels is not one of them."""
         rows, ys = self._grouped_entries()
-        return rows[ys[0]][self._body_col_start:]
+        return rows[ys[0]][self._body_col_start :]
 
     def add_grid(self, cfg: Config, column: bool = True, row: bool = True) -> None:
         """Draw every grid line of the table: strong (width 6) for the

@@ -89,9 +89,9 @@ class PairwiseNet(mn.Scene):
             .set_color(mn.GRAY_BROWN)
             .shift(v_shift)
         )
-        txt_v = mn.MathTex(txt, fill_color=default_config().txt_color).move_to(
-            line_v.get_start() + 0.2 * mn.DOWN, mn.UP
-        )
+        txt_v = mn.MathTex(
+            txt, color=default_config().txt_color, fill_color=default_config().txt_color
+        ).move_to(line_v.get_start() + 0.2 * mn.DOWN, mn.UP)
         group_v = mn.VGroup(line_v, txt_v)
         return group_v
 
@@ -148,25 +148,25 @@ class PairwiseNet(mn.Scene):
     ) -> tuple[mn.VGroup, mn.MathTex, mn.MathTex]:
         cfg = default_config()
         fn_text = mn.VGroup(
-            mn.MathTex("f(", fill_color=cfg.txt_color).move_to(
+            mn.MathTex("f(", color=cfg.txt_color, fill_color=cfg.txt_color).move_to(
                 shift_line_x.get_end() + 0.2 * mn.LEFT + 0.35 * mn.UP, mn.RIGHT
             ),
-            mn.MathTex(",", fill_color=cfg.txt_color).move_to(
+            mn.MathTex(",", color=cfg.txt_color, fill_color=cfg.txt_color).move_to(
                 0.5 * shift_line_x.get_end()
                 + 0.5 * shift_line_y.get_end()
                 + 0.25 * mn.UP,
                 mn.UP,
             ),
-            mn.MathTex(")", fill_color=cfg.txt_color).move_to(
+            mn.MathTex(")", color=cfg.txt_color, fill_color=cfg.txt_color).move_to(
                 shift_line_y.get_end() + 0.2 * mn.RIGHT + 0.35 * mn.UP, mn.LEFT
             ),
         )
-        rv_text_x = mn.MathTex("X", fill_color=cfg.txt_color).move_to(
-            shift_line_x.get_end() + 0.2 * mn.UP, mn.DOWN
-        )
-        rv_text_y = mn.MathTex(y_rv, fill_color=cfg.txt_color).move_to(
-            shift_line_y.get_end() + 0.2 * mn.UP, mn.DOWN
-        )
+        rv_text_x = mn.MathTex(
+            "X", color=cfg.txt_color, fill_color=cfg.txt_color
+        ).move_to(shift_line_x.get_end() + 0.2 * mn.UP, mn.DOWN)
+        rv_text_y = mn.MathTex(
+            y_rv, color=cfg.txt_color, fill_color=cfg.txt_color
+        ).move_to(shift_line_y.get_end() + 0.2 * mn.UP, mn.DOWN)
         return fn_text, rv_text_x, rv_text_y
 
     def net_lines(
@@ -299,9 +299,9 @@ class PairwiseNet(mn.Scene):
                 mn.Uncreate(yvd.group_shift_x),
                 mn.Uncreate(yvd.group_shift_y),
             )
-            #if ix == 0:
+            # if ix == 0:
             #    self.next_section()
-        #self.next_section()
+        # self.next_section()
         self.play(
             mn.Transform(mn.VGroup(*src_net_groups), square_n),
             mn.Uncreate(group_x),
@@ -310,10 +310,24 @@ class PairwiseNet(mn.Scene):
         self.wait()
         self.next_section("Pairwise evaluation complexity")
         call_count_txt = mn.VGroup(
-            mn.MathTex(r"f(\cdot, \cdot)"),
-            mn.Text("called", font="Concourse T3"),
-            mn.MathTex(r"\binom{n}{2} = O(n^2)"),
-            mn.Text("times", font="Concourse T3"),
+            mn.MathTex(
+                r"f(\cdot, \cdot)", color=cfg.txt_color, fill_color=cfg.txt_color
+            ),
+            mn.Text(
+                "called",
+                font="Concourse T3",
+                color=cfg.txt_color,
+                fill_color=cfg.txt_color,
+            ),
+            mn.MathTex(
+                r"\binom{n}{2} = O(n^2)", color=cfg.txt_color, fill_color=cfg.txt_color
+            ),
+            mn.Text(
+                "times",
+                font="Concourse T3",
+                color=cfg.txt_color,
+                fill_color=cfg.txt_color,
+            ),
         )
         _ = call_count_txt.arrange(mn.RIGHT, buff=0.2).set_color(cfg.txt_color)
         _ = call_count_txt.move_to(2.8 * mn.DOWN)
