@@ -55,8 +55,8 @@ layout: two-cols-header
 
 <v-clicks>
 
-- **Goal :** Learn gene interactions from gene expression data.
-- **Gene Expression Data:** Snapshots of gene activity across different samples or conditions.
+- **Goal :** Identify gene interactions from gene expression data.
+- **Gene Expression Data:** Snapshots of gene activity across different samples and/or conditions.
 - Single-cell gene expression datasets:
   - Large datasets with millions of cells.
   - Sparse, has missing values and noisy.
@@ -96,14 +96,14 @@ transition: fade-out
 
 - Focus on **PIDC** (_Chan et. al. (2017)_)
   - Partial-information decomposition (PID) based network construction method.
-  - Shown to produce accurate networks in benchmarks on real and simulated single-cell datasets.
+  - Generates accurate networks on single-cell datasets (Benchmarked by _Pratapa et.al. (2020)_).
   - Takes $O(n)$ time for each pair, and hence $O(n^3)$ time for $\binom{n}{2}$ pairs.
 
 - Our Contributions
   - A novel $O(n^2 \log n)$ sequential algorithm, a factor of $n/\log n$ improvement.
-  - Distributed-memory parallelization that takes $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ time.
-  - Achieves $158$X speedup over the existing PIDC implementation.
-  - Scaling to Human Genome: $30,000$-gene network from $\approx800$K cells in $2.5$ hours using $2,048$ cores.
+  - $O(n^2/p + \mathsf{T}_{\mathsf{sort}}(n^2, p))$ time distributed-memory parallelization on $p$ processes.
+  - Achieve $158$X speedup over the existing parallel PIDC implementation.
+  - Scale to Human Genome: $30,000$-gene network from $\approx 800$K cells in $2.5$ hours on $2,048$ distributed cores.
 
 </v-clicks>
 
@@ -111,25 +111,23 @@ transition: fade-out
 transition: fade-out
 ---
 
-# Background : Random variables and MI
+# Background: Random variables and MI
 
-<v-click>
 
-- $\mathcal{X}, |\mathcal{X}|=n$: Set of discrete random variables, each representing a gene.
+- $\mathcal{X}, |\mathcal{X}|=n$: Set of **discrete** random variables, each representing a gene.
 - Uppercase $X, Y, Z, \ldots$ for random variables.
-- Lowercase $x \in X$ denote the distinct values r. v. $X$ can take.
+- Lowercase $x \in X$ denote the distinct values a random variable $X$ can take.
 - $P(X,Y)$: Joint distribution of gene expression of two genes $X$ and $Y$.
-</v-click>
 
 <v-clicks depth="1">
 
-- Mutual Information
+- Mutual Information (MI)
   $$I(X,Y) = \sum_{x \in X} \sum_{y \in Y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)$$
 </v-clicks>
 
 <v-click>
 
-::admonition{kind="warning" title="Key Assumption" icon="mdi:info"}
+::admonition{kind="warning" title="Assumption" icon="mdi:info"}
 **Number of values a random variable can take is constant**
 ::
 
@@ -149,7 +147,7 @@ transition: fade-out
 ---
 transition: fade-out
 layout: none
-clicks: 5
+clicks: 4
 ---
 
 <SpecificSpecificInfo auto-start class="absolute inset-0" />
@@ -167,7 +165,7 @@ by Nicholas M. Timme and Christopher Lapish
 ---
 transition: fade-out
 layout: none
-clicks: 5
+clicks: 6
 ---
 
 <Redundancy auto-start class="absolute inset-0" />
@@ -221,8 +219,7 @@ PUC, $\gamma(X, Y)$, can be simplified as below:
 
 ::admonition{kind="danger" title="Computation Bottleneck" icon="mdi:info"}
 $$
-\sum_{Z \not \in \{X, Y\}} \rho((X, Z); Y)   \textrm{ \& }
-\sum_{Z \not \in \{X, Y\}} \rho((Y, Z); X)
+\sum_{Z \not \in \{X, Y\}} \rho((X, Z); Y)   \textrm{ \& } \sum_{Z \not \in \{X, Y\}} \rho((Y, Z); X)
 $$
 ::
 
@@ -309,11 +306,11 @@ PUC Network of $n$ genes can be constructed with $p$ processes in $O(n^2/p) + \m
 transition: fade-out
 ---
 
-# Implementation : Platform and Data Processing
+# Implementation: Platform and Data Processing
 
 <v-clicks depth="1">
 
-- Chan et. al. (2017) PIDC implementation in `julia`
+- _Chan et. al. (2017)_ PIDC implementation in `julia`
   - Modified I/O:  Read input data from `HDF5` files (`anndata` spec.) instead of `csv`.
 - Our MPI Implementation in `Rust`
   - `rsmpi` : MPI 3.1 wrapper (Experiments use `OpenMPI`).
@@ -341,77 +338,88 @@ clicks: 9
 
 ---
 transition: fade-out
----
-
-# Experiments: Datasets
-
-| Dataset | Tissue |     $m$ |    $n$ | $\mathsf{D}$ (GB) | $\sum \|P(X,Y)\|$ (GB) |
-| :------ | :----: | ------: | -----: | ----------------: | ---------------------: |
-| D1      |  PBMC  |  23,766 |  5,000 |              0.44 |                  47.38 |
-| D2      |  Lung  |  91,068 |  5,000 |              1.82 |                 121.10 |
-| D3      |  PBMC  | 794,170 | 20,000 |             57.63 |               8,828.66 |
-|         |   "    |         | 30,000 |             86.45 |              19,570.00 |
-
----
-transition: fade-out
 layout: two-cols-header
 ---
 
-# Results for dataset $D1$
+## Results : Scaling vs. sequential algorithm and current PIDC
 
 ::left::
 
-- Machine: Shared memory machine with 72-core Intel® Xeon® E7-8870 2.7 GHz CPU
-- Max. speedup of 52 on 64 cores
-- Communication and I/O times are a small fraction (at most 11% with 64 cores)
-- 158X times faster than PIDC, reducing the runtime from 10.8 hours to about $4$ minutes.
+<v-click>
+
+- **Setup:** 72-core Intel® Xeon® E7-8870 2.7 GHz CPU with 1 TB shared memory.
+- **Dataset:** Human PBMC, $m=23,766 ; n= 5,000$.
+</v-click>
+
+<v-click>
+
+- **Key Takeaways:**
+  - Max. speedup of 52 on 64 cores w.r.t. our sequential algorithm.
+  - 158X times faster than PIDC, runtime reduced from $10.8$ hours to $\approx4$ min.
+  - Communication and I/O times are a small fraction ($<12$% on 64 cores).
+</v-click>
 
 ::right::
 
-##### Speedup vs. number of cores
+##### Speedup vs. number of cores (Novel sequential algorithm for $p=1$)
 
-![](/img/strong-scaling-small-ai.svg){width=800px lazy}
-
----
-transition: fade-out
----
-
-# Results : Dataset $D2$
-
-| ![](/img/strong-scaling-big-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
-| ----------------------------------------------------- | -------------------------------------------------- |
-
-- Distributed cluster where each node has a 24-core Intel® Xeon® 6226 2.7 GHz processor
-- Max speedup of speedup of 96 with 512 cores, which then drops to 55 with 1, 024 cores
+![](/img/strong-scaling-small-ai.svg){width=700px lazy}
 
 ---
 transition: fade-out
 ---
-# Results : $D3$ Dataset
 
-- Integrated human gene expression datasets include 20,000 --30,000 genes at the genome-scale.
-- For 20K and 30K genes, the sizes of $P(X,Y)$ are 8.5TB and 19.1TB, respectively.
-- 20K-gene network
-   - $\approx$ 1.9 hours and 1.2 hours, respectively, with 1, 024 cores and 2, 048 cores.
-- 30K-gene network
-   -  $\approx$ 4.1 hours and 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
-- Time to compute PUC values from µ(·; ·) values is less than 1% of the total runtime.
-- No linear scaling from 1, 024 to 2, 048 cores due to the increase in I/O time.
-  - From 15.99 to 19.48 minutes for 20, 000-genes network, and
-  - From 20.52 to 35.10 minutes for the 30, 000-genes network.
+# Results : Scaling to Human-genome
+
+<v-clicks depth=1>
+
+- Integrated human gene expression datasets include up to 30K genes at the genome-scale.
+- **Setup:** Distributed cluster with 24-core Intel® Xeon® 6226 2.7 GHz processor/node (Used 16 cores/node).
+- **Dataset:**  794,170 cells and 30,000 genes (Total size of $P(X,Y)$ is 19.1TB).
+- **Key Takeaways:**
+   -  $\approx$ 4.1 hours and $\approx$ 2.5 hours, respectively, with 1, 024 cores and 2, 048 cores.
+   - Construction of $P(X), P(X,Y)$ and $\mu(y; X)$ dominates the runtime.
+   - $\mu(y;X) \rightarrow \gamma(\cdot, \cdot)$ time is less than 1% of the total runtime.
+</v-clicks>
+
+<v-click>
+
+::admonition{kind="warning" title="Observation" icon="mdi:info"}
+**With our improved PIDC algorithm,  computing histograms dominates runtime.**
+::
+</v-click>
+
+<!--
+Months
+-->
 
 ---
 transition: fade-out
 ---
 # Conclusions and Future Work
 
-- Key Contributions
-  - Novel $O(n^2 \log n)$ sequential algorithm and  $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm.
-  - To our knowledge, the 30K network is the largest network covering the complete human genome.
+- Novel $O(n^2 \log n)$ sequential algorithm and  $O(n^2/p + \mathsf{T}_{\mathtt{sort}}(n^2, p))$ distributed parallel algorithm.
+- To our knowledge, the 30K network is the largest network covering the complete human genome.
 - Future work
-  - Improve scalability of computing the distributions by better process assignment.
   - Address the cases where the gene expression values need to be treated as continuous.
   - I/O scalability via asynchronous read/writes.
+  - Improve scalability histogram computations.
+
+
+<v-click>
+
+::admonition{kind="gt" title="Acknowledgements" icon="mdi:info"}
+Supported in part by the U.S. National Science Foundation under DBI-2233887
+::
+
+</v-click>
+
+
+---
+transition: fade-out
+layout: intro
+---
+# Q & A
 
 
 ---
@@ -459,6 +467,37 @@ layout: two-cols-header
 - Diagonal distribution
   - Uniform block-distributed parallel read of the input HDF5
 
+
+---
+transition: fade-out
+---
+
+# Experiments: Datasets
+
+| Dataset | Tissue |     $m$ |    $n$ | $\mathsf{D}$ (GB) | $\sum \|P(X,Y)\|$ (GB) |
+| :------ | :----: | ------: | -----: | ----------------: | ---------------------: |
+| D1      |  PBMC  |  23,766 |  5,000 |              0.44 |                  47.38 |
+| D2      |  Lung  |  91,068 |  5,000 |              1.82 |                 121.10 |
+|         |   "    |         | 10,000 |              3.39 |                 476.46 |
+|         |   "    |         | 15,000 |              5.08 |               1,131.42 |
+| D3      |  PBMC  | 794,170 | 20,000 |             57.63 |               8,828.66 |
+|         |   "    |         | 30,000 |             86.45 |              19,570.00 |
+
+
+
+---
+transition: fade-out
+---
+
+# Results : Dataset $D2$
+
+| ![](/img/strong-scaling-big-ai.svg){width=400px lazy} | ![](/img/runtime-stacked-ai.svg){width=520px lazy} |
+| ----------------------------------------------------- | -------------------------------------------------- |
+
+- Distributed cluster: 24-core Intel® Xeon® 6226 2.7 GHz processor/node.
+- Max speedup of speedup of 96 with 512 cores, which then drops to 55 with 1, 024 cores
+
+
 ---
 transition: fade-out
 layout: two-cols-header
@@ -477,6 +516,27 @@ layout: two-cols-header
 
 ![](/img/runtime-growth-n-ai.svg){width=500px lazy}
 
+
+---
+transition: fade-out
+layout: two-cols-header
+---
+
+# Results : Scaling on a distributed cluster
+
+::left::
+
+- **Setup:** Distributed cluster: 24-core Intel® Xeon® 6226 2.7 GHz processor/node.
+- **Dataset:** Human Lung Cancer dataset, $m=$ 91,068; $n=$ 5,000 
+- **Speedup:** Max speedup of 96 on 512 cores, then drops to 55 with 1,024 cores.
+  - Lack of scaling in communication and I/O time. 
+  - Work per process gets comparatively meager (Only 28.26 when $p = 1024$).
+
+::right::
+
+##### Speedup vs. number of cores
+
+![](/img/strong-scaling-big-ai.svg){width=400px lazy}
 
 ---
 transition: fade-out

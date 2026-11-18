@@ -150,6 +150,8 @@ class _VMCalculation:
     row_box: mn.SurroundingRectangle
     row_sum: mn.VGroup
     sum_box: mn.SurroundingRectangle
+    row_down_arrow: mn.Arrow
+    row_up_arrow: mn.Arrow
 
     @property
     def mu_table(self) -> mn.Table:
@@ -167,6 +169,8 @@ class _VMCalculation:
             self.sorted_table,
             self.sp_columns,
             self.row_box,
+            self.row_down_arrow,
+            self.row_up_arrow,
             self.row_sum,
             self.sum_box,
         )
@@ -265,6 +269,14 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
         stroke_width=4,
         buff=0.12,
     )
+    rbox_left = row_box.get_corner(mn.LEFT + mn.UP)
+    row_down_arrow = mn.Arrow(
+        rbox_left, rbox_left + 2 * mn.DOWN, stroke_width=2.5, tip_length=0.2
+    ).set_color(mn.GREEN_A)
+    rbox_right = row_box.get_corner(mn.RIGHT + mn.DOWN)
+    row_up_arrow = mn.Arrow(
+        rbox_right, rbox_right + mn.UP, stroke_width=2.5, tip_length=0.2
+    ).set_color(mn.RED_A)
     # The margin right of the tables is narrow, so the sum is stacked one row
     # per term instead of written on one line: the width it must fit is then
     # the widest row's — the product alone, not the whole sum — which is what
@@ -285,7 +297,7 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
     _ = row_sum.set_y(row_box.get_center()[1])  # pyright: ignore[reportAny]
     sum_box = mn.SurroundingRectangle(
         row_sum,
-        color=mn.GREEN,
+        color=mn.PURPLE,
         stroke_width=4,
         buff=0.12,
     )
@@ -300,6 +312,8 @@ def _make_vm_calculation(cfg: Config, index: int) -> _VMCalculation:
         row_box=row_box,
         row_sum=row_sum,
         sum_box=sum_box,
+        row_down_arrow=row_down_arrow,
+        row_up_arrow=row_up_arrow,
     )
 
 
@@ -521,6 +535,8 @@ class AlgoInsight(mn.Scene):
             self.next_section()
             self.play(
                 mn.Create(calculation.row_box),
+                mn.Create(calculation.row_down_arrow),
+                mn.Create(calculation.row_up_arrow),
             )
             self.wait()
             self.next_section()

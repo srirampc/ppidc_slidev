@@ -12,7 +12,7 @@ from ppidc import (
     theme_background,
 )
 
-_EXPR_TEX = r"\frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x)\cdot p(y)} \right)"
+_EXPR_TEX = r"\frac{p(x,y)}{p(y)} \log \left( \frac{p(x,y)}{p(x) p(y)} \right)"
 _IXY_TEX = r"\sum_{x} \sum_{y} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right)"
 # Joint probabilities in hundredths; the marginals are derived from this table.
 _PXY_HUNDREDTHS = (
@@ -193,7 +193,27 @@ class SpecificInfo(mn.Scene):
         # joint table and the whole p(x) value column
         joint_col = mn.VGroup(*(pxy_table.cell(row, 1) for row in range(4)))  # pyright: ignore[reportArgumentType]
         px_col = mn.VGroup(*(px_table.cell(row, 0) for row in range(4)))  # pyright: ignore[reportArgumentType]
+        # copies of the two column boxes converge into one box around the
+        # summation term
+        whole_sum = mn.VGroup(sum_sym, expr)
+        final_box = mn.SurroundingRectangle(
+            whole_sum,
+            color=cfg.txt_color,
+            stroke_width=4,
+            buff=0.12,
+        )
+        # name the boxed quantity, centered below the box
+        is_label = mn.MathTex(
+            r"I_s(y; X)", color=cfg.txt_color, fill_color=cfg.txt_color
+        ).scale(0.9)
+        _ = is_label.next_to(final_box, mn.UP, buff=0.2)
+
+        # TransformFromCopy mutates and adds its target argument, so pass
+        # copies and keep final_box pristine for positioning the label
+        #self.wait()
+        #self.next_section()
         self.play(mn.Write(sum_sym))
+        self.play(mn.Write(is_label))
         self.play(
             mn.Transform(
                 joint_box,
@@ -214,29 +234,10 @@ class SpecificInfo(mn.Scene):
                 ),
             ),
         )
-        # copies of the two column boxes converge into one box around the
-        # summation term
-        whole_sum = mn.VGroup(sum_sym, expr)
-        final_box = mn.SurroundingRectangle(
-            whole_sum,
-            color=cfg.txt_color,
-            stroke_width=4,
-            buff=0.12,
-        )
-        # TransformFromCopy mutates and adds its target argument, so pass
-        # copies and keep final_box pristine for positioning the label
         self.play(
             mn.TransformFromCopy(joint_box, final_box.copy()),
             mn.TransformFromCopy(px_box, final_box.copy()),
         )
-        self.wait()
-        self.next_section()
-        # name the boxed quantity, centered below the box
-        is_label = mn.MathTex(
-            r"I_s(y; X)", color=cfg.txt_color, fill_color=cfg.txt_color
-        ).scale(0.9)
-        _ = is_label.next_to(final_box, mn.UP, buff=0.2)
-        self.play(mn.Write(is_label))
         self.wait()
         self.next_section()
         ir_tex = mn.MathTex(
