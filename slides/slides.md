@@ -306,42 +306,27 @@ PUC Network of $n$ genes can be constructed with $p$ processes in $O(n^2/p) + \m
 transition: fade-out
 ---
 
-# Implementation: Platform and Data Processing
+## Implementation: Platform and Data Processing
 
 <v-clicks depth="1">
 
 - _Chan et. al. (2017)_ PIDC implementation in `julia`
   - Modified I/O:  Read input data from `HDF5` files (`anndata` spec.) instead of `csv`.
-- Our MPI Implementation in `Rust`
+- Our Implementation: MPI in `Rust`
   - `rsmpi` : MPI 3.1 wrapper (Experiments use `OpenMPI`).
   - `sope` : Convenience MPI library features include generic struct types, sorting etc.
   - `hdf5-rs` : Updated for MPI parallel I/O.
--  Computing $P(X), P(X, Y)$ : `BayesianBlocks` histogram method w. equal distribution across $p$ processes.
+- $P(X)$ computation: `BayesianBlocks` histogram method for $n/p$ genes per process and broadcast to all processes.
+- $P(X, Y)$, $\mu(y; X)$ and $\mu(x; Y)$ computation : $\binom{n}{2}/p$ pairs per processes.
 
 </v-clicks>
-
----
-transition: fade-out
-layout: none
-clicks: 9
----
-
-<DataB auto-start class="absolute inset-0" />
-
-<!--
-1. Each pair two rows
-2. Represent the computation as upper triangular matrix
-3. Reduce memory foot print via block wise work decomposition and processing in batches
-4. Blocks and corresponding rows
-5.
--->
 
 ---
 transition: fade-out
 layout: two-cols-header
 ---
 
-## Results : Scaling vs. sequential algorithm and current PIDC
+## Scaling vs. sequential algorithm and current PIDC
 
 ::left::
 
@@ -364,6 +349,22 @@ layout: two-cols-header
 ##### Speedup vs. number of cores (Novel sequential algorithm for $p=1$)
 
 ![](/img/strong-scaling-small-ai.svg){width=700px lazy}
+
+---
+transition: fade-out
+layout: none
+clicks: 9
+---
+
+<DataB auto-start class="absolute inset-0" />
+
+<!--
+1. Each pair two rows
+2. Represent the computation as upper triangular matrix
+3. Reduce memory foot print via block wise work decomposition and processing in batches
+4. Blocks and corresponding rows
+5. Parallel reading/writing of contiguous data non-overlapping data
+-->
 
 ---
 transition: fade-out
