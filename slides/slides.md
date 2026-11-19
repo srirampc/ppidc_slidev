@@ -34,7 +34,9 @@ fonts:
   local: Concourse T3
 ---
 
-## A Parallel Algorithm for the Construction of Partial Information Decomposition-based Genome-scale Networks from
+## A Parallel Algorithm for the Construction of
+## Partial Information Decomposition-based 
+## Genome-scale Networks from
 ## Single-Cell Datasets
 
 #### _**SC '26 @ Chicago, USA**_
